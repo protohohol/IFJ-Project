@@ -1,18 +1,16 @@
 {
     "configurations": [
         {
-            "name": "Mac",
+            "name": "macos-gcc-x64",
             "includePath": [
-                "${workspaceFolder}/**",
-                "/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/System/Library/Frameworks/Kernel.framework/Versions/A/Headers/sys"
+                "${workspaceFolder}/**"
             ],
-            "defines": [],
-            "macFrameworkPath": [
-                "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"
-            ],
-            "cStandard": "c17",
-            "cppStandard": "c++17",
-            "compilerPath": "/usr/bin/gcc"
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "${default}",
+            "cppStandard": "${default}",
+            "intelliSenseMode": "macos-gcc-x64",
+            "compilerArgs": [],
+            "configurationProvider": "ms-vscode.makefile-tools"
         }
     ],
     "version": 4
