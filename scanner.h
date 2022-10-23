@@ -1,30 +1,3 @@
-
-Skip to content
-Pull requests
-Issues
-Marketplace
-Explore
-@HelHeim111
-protohohol /
-IFJ-Project
-Private
-
-Code
-Issues
-Pull requests
-Actions
-Projects 1
-Security
-
-    Insights
-
-IFJ-Project/scanner.h
-@protohohol
-protohohol test_0.3
-Latest commit c299509 yesterday
-History
-1 contributor
-executable file 39 lines (33 sloc) 680 Bytes
 /*
 * IFJ/IAL project 2022.
 * 
@@ -40,44 +13,25 @@ executable file 39 lines (33 sloc) 680 Bytes
 
 #include <stdio.h>
 
-#define ELSE 256
-#define FLOAT 257
-#define FUNCTION 258
-#define IF 259
-#define INT 260
-#define NULL_R 261
-#define RETURN 262
-#define STRING 263
-#define VOID 264
-#define WHILE 265
-#define VARIABLE 266
+//all types for tokens
+enum TokenType{
+    STAR, STAR_STAR, SLASH, PLUS, MINUS, DOT, GREATER, GREATER_EQUAL, LESS, LESS_EQUAL,
+    BRACE_LEFT, BRACE_RIGHT, BRACKET_LEFT, BRACKET_RIGHT, SEMICOLON
+    EQUAL, EQUAL_EQUAL_EQUAL, NOT_EQUAL_EQUAL,
+
+    ID, INT, FLOAT, DOUBLE, STRING
+
+    ELSE, IF, FLOAT_K, FUNCTION, INT_K, NULL, RETURN, STRING_K, VOID, WHILE
+};
 //all the keywords we have
 char keywords[10][10] = {"else", "if", "float", "function", "int", "null", "return", "string", "void", "while"};
 
 typedef struct Token {
     size_t pos; //position in code 
-    int type;
+    enum TokenType type;
     char *text; 
 } Token_t;
 
 int Check_Keyword(char *s);
-void Scan_Word(FILE* f, Token_t token);
 
 #endif
-Footer
-© 2022 GitHub, Inc.
-Footer navigation
-
-    Terms
-    Privacy
-    Security
-    Status
-    Docs
-    Contact GitHub
-    Pricing
-    API
-    Training
-    Blog
-    About
-
-IFJ-Project/scanner.h at develop · protohohol/IFJ-Project
