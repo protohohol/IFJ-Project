@@ -17,7 +17,7 @@
 // all types for tokens
 enum TokenType{
     T_STAR=256, T_STAR_STAR, T_SLASH, T_PLUS, T_MINUS, T_DOT, T_GREATER, T_GREATER_EQUAL, T_LESS, T_LESS_EQUAL,
-    T_BRACE_LEFT, T_BRACE_RIGHT, T_BRACKET_LEFT, T_BRACKET_RIGHT, T_SEMICOLON,
+    T_BRACE_LEFT, T_BRACE_RIGHT, T_BRACKET_LEFT, T_BRACKET_RIGHT, T_SEMICOLON, T_COLON,
     T_EQUAL, T_EQUAL_EQUAL_EQUAL, T_NOT_EQUAL_EQUAL,
 
     T_ID, T_INT, T_FLOAT, T_DOUBLE, T_STRING,
@@ -30,6 +30,7 @@ char keywords[10][10] = {"else", "if", "float", "function", "int", "null", "retu
 typedef struct Token {
     size_t pos; // position in code 
     enum TokenType type;
+    int state = 0; // states of finite-state machine
     char *text; 
 } Token_t;
 
