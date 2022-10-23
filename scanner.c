@@ -10,6 +10,15 @@ int Check_Keyword(char *s){
     }
     return 0;
 }
+
+int Check_TypeID(char *s){
+    for(int i = 0; i < 3; i++){
+        if(strcmp(s, typeID[i])){
+            return 1;
+        }
+    }
+    return 0;
+}
  
 int main (int argc, char* argv[]) {
     char c; // responsible for reading each character
@@ -59,6 +68,22 @@ int main (int argc, char* argv[]) {
                     token[tokenCounter].type = T_GREATER;
                     token[tokenCounter].state = 5;
                 }
+                else if(c == '+'){
+                    token[tokenCounter].type = T_PLUS;
+                    
+                }
+                else if(c == '-'){
+                    token[tokenCounter].type = T_MINUS; 
+                }
+                else if(c == '*'){
+                    token[tokenCounter].type = T_STAR; 
+                }
+                else if(c == '/'){
+                    token[tokenCounter].state = 6;
+                }
+                else if(c == '?'){
+                    token[tokenCounter].state = 7;
+                }
             case 1:
                 if(c == '_' || isalpha(c)){
                     token[tokenCounter].state = 2;
@@ -101,6 +126,26 @@ int main (int argc, char* argv[]) {
                 else{
                     //error
                 }
+            case 6:
+                if(c == '/'){
+                        //its a comment
+                }
+                else{
+                    token[tokenCounter].type = T_SLASH; 
+                }
+            case 7:
+                if(c == '>'){
+                    token[tokenCounter].type = T_END_SYMBOL;
+                }
+                else if(isalpha(c)){
+                    strncat(token[tokenCounter].text, c, 1);
+                }
+                else{
+                    if(Check_TypeID(token[tokenCounter].text) == 1){
+                        
+                    }
+                }
+
 
         }
     }
