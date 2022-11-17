@@ -27,7 +27,7 @@ typedef enum  {
 	T_LESS,                 // <
 	T_LESS_EQUAL,           // <=
     T_PAR_LEFT,             // (
-	T_PAR_RIGHT,              // )
+	T_PAR_RIGHT,            // )
 	T_BRACKET_LEFT,         // [
 	T_BRACKET_RIGHT,        // ]
 	T_SEMICOLON,            // ;
@@ -52,7 +52,7 @@ typedef enum  {
 } token_type;
 
 typedef enum {
-    S_START,
+    S_START = 100,
     S_EOL,
     S_EOF,
     S_MUL,
@@ -93,19 +93,23 @@ typedef enum {
 // seperate list fot type identifiers 
 // char typeID[3][10] = {"int", "float", "string"};
 
-typedef struct Token {
-    token_type type; // token type
-    char* data; // token content
-    unsigned l_pos; // line on which the token is
-    unsigned c_pos; // position on which the token is
-} Token_t;
+typedef union {
+	string *string_c;	// text content
+	double double_c; 	// decimal content
+	int int_c; 			// integer content
+} data_u;
+
+typedef struct token {
+    token_type type; 	// token type
+    data_u *data; 		// token content
+} token_t;
 
 /**
- * @brief sets input to be analyzed
+ * @brief Sets input to be analyzed
  * 
  * @param f pointer to file
  */
-void set_source_file(FILE* f);
+void set_source(FILE* f);
 
 /**
  * @brief Get the Next Token object
@@ -114,6 +118,6 @@ void set_source_file(FILE* f);
  * @return 0 if operation was successful
  * @return -1 if an error appeared
  */
-int get_next_token(string* s);
+int get_next_token(token_t* t);
 
 #endif

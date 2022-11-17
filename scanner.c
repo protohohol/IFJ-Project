@@ -1,7 +1,46 @@
 #include <stdio.h>
 #include <ctype.h>
-#include <string.h>
 #include "scanner.h"
+#include "str.h"
+#include "error.h"
+
+FILE *source;
+
+void set_source(FILE *f)
+{
+    source = f;
+}
+
+const int get_next_token(token_t *token) {
+    if (source == NULL) {
+        return ERROR_INTERNAL;
+    }
+
+    string *s;
+    if (!str_init(s)) {
+        return ERROR_INTERNAL;
+    }
+    
+    int state = S_START;
+    char c;
+
+    while (true) {
+        c = getc(source);
+
+        switch (state) {
+            case (S_START):
+                if (c == '+') {
+                    token->type = T_ADD;
+                    str_free(s);
+                    return NO_ERR;
+                } else if (c == '-') {
+                    token->type = T_SUB;
+                    str_free(s);
+                    return NO_ERR;
+                }
+        }
+    }
+}
 
 // int Check_Keyword(char *s) {
 //     for(int i = 0; i < 10; i++) {

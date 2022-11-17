@@ -10,9 +10,9 @@
 
 typedef struct
 {
-  char* str;		// variable for string with '\0' in the end
-  unsigned length;		// length of string
-  unsigned allocSize;	// size of allocated memory in bytes
+  char* str;		        // variable for string with '\0' in the end
+  unsigned length;		  // length of string
+  unsigned allocSize;	  // size of allocated memory in bytes
 } string;
 
 /**
