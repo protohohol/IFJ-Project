@@ -49,6 +49,9 @@ typedef enum  {
 	T_STRING,               // keyword "string"
 	T_VOID,                 // keyword "void"
 	T_WHILE,                // keyword "while"
+	T_INT_ID,				// type identifier "int"
+	T_FLOAT_ID,				// type identifier "float"
+	T_STRING_ID,			// type identifier "string"
 } token_type;
 
 typedef enum {
@@ -86,6 +89,9 @@ typedef enum {
 	S_STRING,
 	S_VOID,
 	S_WHILE,
+	S_INT_ID,
+	S_FLOAT_ID,
+	S_STRING_ID,
 } fm_state;
 
 // all the keywords we have
