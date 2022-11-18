@@ -79,7 +79,9 @@ const int get_next_token(token_t *token) {
                     state = S_NOT;
                 } else if (c == '$') {
                     state = S_VAR_ID_1;
-                }
+                } else if (isdigit(c)) {
+                    state = S_INT;
+                } 
             
             case (S_EQUAL):
                 if (c == '=') {
@@ -152,8 +154,53 @@ const int get_next_token(token_t *token) {
                     state = S_VAR_ID_END;
                 } else {
                     token->type = T_VAR_ID;
+                    ungetc(c, source);
                     str_free(s);
                     return NO_ERR;
+                }
+
+            case (S_INT):
+                if (isdigit(c)) {
+                    state = S_INT;
+                } else if (c == '.') {
+                    state= S_FLOAT;
+                } else if (c == 'e' || c == 'E') {
+                    state = S_EXP;
+                } else if (c == ' ') {
+                    token->type = T_INT;
+                    str_free(s);
+                    return NO_ERR;
+                } else {
+                    return LEX_ERR;
+                }
+
+            case (S_FLOAT):
+                if (isdigit(c)) {
+                    state = S_FLOAT;
+                } else if (c == ' ') {
+                    token->type = T_FLOAT;
+                    str_free(s);
+                    return NO_ERR;
+                } else {
+                    return LEX_ERR;
+                }
+
+            case (S_EXP):
+                if (isdigit(c) || c == '+' || c == '-') {
+                    state = S_EXP_END;
+                } else {
+                    return LEX_ERR;
+                }
+
+            case (S_EXP_END):
+                if(isdigit(c)) {
+                    state = S_EXP_END;
+                } else if (c == ' ') {
+                    token->type = T_FLOAT;
+                    str_free(s);
+                    return NO_ERR;
+                } else {
+                    return LEX_ERR;
                 }
         }
     }

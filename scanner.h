@@ -85,6 +85,8 @@ typedef enum {
 	S_FLOAT,
 	S_FUNCTION,
 	S_INT,
+	S_EXP,
+	S_EXP_END,
 	S_NULL,
 	S_RETURN,
 	S_STRING,
