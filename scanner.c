@@ -37,6 +37,123 @@ const int get_next_token(token_t *token) {
                     token->type = T_SUB;
                     str_free(s);
                     return NO_ERR;
+                } else if (c == '*') {
+                    token->type = T_MUL;
+                    str_free(s);
+                    return NO_ERR;
+                } else if (c == '.') {
+                    token->type = T_DOT;
+                    str_free(s);
+                    return NO_ERR;
+                } else if (c == ';') {
+                    token->type = T_SEMICOLON;
+                    str_free(s);
+                    return NO_ERR;
+                } else if (c == ':') {
+                    token->type = T_COLON;
+                    str_free(s);
+                    return NO_ERR;
+                } else if (c == '(') {
+                    token->type = T_PAR_LEFT;
+                    str_free(s);
+                    return NO_ERR;
+                } else if (c == '(') {
+                    token->type = T_PAR_RIGHT;
+                    str_free(s);
+                    return NO_ERR;
+                } else if (c == '{') {
+                    token->type = T_BRACE_LEFT;
+                    str_free(s);
+                    return NO_ERR;
+                } else if (c == '}') {
+                    token->type = T_BRACE_RIGHT;
+                    str_free(s);
+                    return NO_ERR;
+                } else if (c == '=') {
+                    state = S_EQUAL;
+                } else if (c == '<') {
+                    state = S_LESS;
+                } else if (c == '>') {
+                    state = S_GREATER;
+                } else if (c == '!') {
+                    state = S_NOT;
+                } else if (c == '$') {
+                    state = S_VAR_ID_1;
+                }
+            
+            case (S_EQUAL):
+                if (c == '=') {
+                    state = S_EQUAL_EQUAL;
+                } else {
+                    ungetc(c, source);
+                    token->type = T_ASSIGN;
+                    str_free(s);
+                    return NO_ERR;
+                }
+
+            case (S_EQUAL_EQUAL):
+                if (c == '=') {
+                    token->type = T_EQUAL;
+                    str_free(s);
+                    return NO_ERR;
+                } else {
+                    return LEX_ERR;
+                }
+
+            case (S_LESS):
+                if (c == '=') {
+                    token->type = T_LESS_EQUAL;
+                    str_free(s);
+                    return NO_ERR;
+                } else {
+                    ungetc(c, source);
+                    token->type = T_LESS;
+                    str_free(s);
+                    return NO_ERR;
+                }
+
+            case (S_GREATER):
+                if (c == '=') {
+                    token->type = T_GREATER_EQUAL;
+                    str_free(s);
+                    return NO_ERR;
+                } else {
+                    ungetc(c, source);
+                    token->type = T_GREATER;
+                    str_free(s);
+                    return NO_ERR;
+                }
+
+            case (S_NOT):
+                if (c == '=') {
+                    state = S_NOT_EQUAL;
+                } else {
+                    return LEX_ERR;
+                }
+
+            case (S_NOT_EQUAL):
+                if (c == '=') {
+                    token->type = T_NOT_EQUAL;
+                    str_free(s);
+                    return NO_ERR;
+                } else {
+                    return LEX_ERR;
+                }
+
+            case (S_VAR_ID_1):
+                if (isalpha(c)) {
+                    state = S_VAR_ID_END;
+                } else{
+                    return LEX_ERR;
+                }
+
+            case (S_VAR_ID_END):
+                if (isalpha(c) || isdigit(c) || c == '_') {
+                    state = S_VAR_ID_END;
+                } else {
+                    token->type = T_VAR_ID;
+                    str_free(s);
+                    return NO_ERR;
                 }
         }
     }

@@ -28,8 +28,8 @@ typedef enum  {
 	T_LESS_EQUAL,           // <=
     T_PAR_LEFT,             // (
 	T_PAR_RIGHT,            // )
-	T_BRACKET_LEFT,         // [
-	T_BRACKET_RIGHT,        // ]
+	T_BRACE_LEFT,         	// {
+	T_BRACE_RIGHT,        	// }
 	T_SEMICOLON,            // ;
 	T_COLON,                // :
     T_ASSIGN,               // =
@@ -76,7 +76,8 @@ typedef enum {
     S_NOT_EQUAL,
 	S_NOT_EQUAL_EQUAL,
     S_FUN_ID,
-    S_VAR_ID,
+    S_VAR_ID_1,
+	S_VAR_ID_END,
     S_START_SYMBOL,
 	S_END_SYMBOL,
     S_ELSE,
