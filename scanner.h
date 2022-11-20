@@ -35,23 +35,20 @@ typedef enum  {
     T_ASSIGN,               // =
 	T_EQUAL,                // ===
 	T_NOT_EQUAL,            // !==
-    T_FUN_ID,               // function identifier
-    T_VAR_ID,               // variable identifier
     T_START_SYMBOL,         // <?php
 	T_END_SYMBOL,           // ?>
-    T_ELSE,                 // keyword "else"
-	T_IF,                   // keyword "if"
-	T_FLOAT,                // keyword "float"
-	T_FUNCTION,             // keyword "function"
-	T_INT,                  // keyword "int"
-	T_NULL,                 // keyword "null"
-	T_RETURN,               // keyword "return"
-	T_STRING,               // keyword "string"
-	T_VOID,                 // keyword "void"
-	T_WHILE,                // keyword "while"
-	T_INT_ID,				// type identifier "int"
-	T_FLOAT_ID,				// type identifier "float"
-	T_STRING_ID,			// type identifier "string"
+    T_KW_ELSE,              // keyword "else"
+	T_KW_IF,                // keyword "if"
+	T_KW_FLOAT,             // keyword "float"
+	T_KW_FUNCTION,          // keyword "function"
+	T_KW_INT,               // keyword "int"
+	T_KW_NULL,              // keyword "null"
+	T_KW_RETURN,            // keyword "return"
+	T_KW_STRING,            // keyword "string"
+	T_KW_VOID,              // keyword "void"
+	T_KW_WHILE,             // keyword "while"
+	T_VAR_ID,				// variable identifier
+	T_FUN_ID,				// function identifier
 } token_type;
 
 typedef enum {
@@ -75,9 +72,10 @@ typedef enum {
     S_NOT,
     S_NOT_EQUAL,
 	S_NOT_EQUAL_EQUAL,
-    S_FUN_ID,
-    S_VAR_ID_1,
-	S_VAR_ID_END,
+	S_VAR_ID,
+	S_KW_FUN_START,
+    S_KW_FUN,
+	S_KW_TYPE,
     S_START_SYMBOL,
 	S_END_SYMBOL,
     S_ELSE,
@@ -96,11 +94,6 @@ typedef enum {
 	S_FLOAT_ID,
 	S_STRING_ID,
 } fm_state;
-
-// all the keywords we have
-// char keywords[10][10] = {"else", "if", "float", "function", "int", "null", "return", "string", "void", "while"};
-// seperate list fot type identifiers 
-// char typeID[3][10] = {"int", "float", "string"};
 
 typedef union {
 	string *string_c;	// text content
