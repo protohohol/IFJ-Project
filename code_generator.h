@@ -5,5 +5,8 @@
 #include <stdbool.h>
 
 #include "scanner.h"
+#include "symbol_table.h"
+
+
 
 #endif
