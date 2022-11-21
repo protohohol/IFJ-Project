@@ -37,7 +37,7 @@ bool str_add_char(string* s, char c) {
     return true;
 }
 
-bool str_copy_str(string* target, string* source) {
+bool str_copy_string(string* target, string* source) {
     if (source->length >= target->allocSize) { // this means we need more memory
         if ((target->str = (char *) realloc(target->str, source->length + 1)) == NULL) {
             return false;
