@@ -11,6 +11,49 @@ void set_source(FILE *f)
     source = f;
 }
 
+bool is_keyword(string *s, token_t *token) {
+    if (!str_cmp_const_str(s, "else")) {
+        token->type = T_KW_ELSE;
+        return true;
+    } else if (!str_cmp_const_str(s, "function")) {
+        token->type = T_KW_FUNCTION;
+        return true;
+    } else if (!str_cmp_const_str(s, "if")) {
+        token->type = T_KW_IF;
+        return true;
+    } else if (!str_cmp_const_str(s, "null")) {
+        token->type = T_KW_NULL;
+        return true;
+    } else if (!str_cmp_const_str(s, "return")) {
+        token->type = T_KW_RETURN;
+        return true;
+    } else if (!str_cmp_const_str(s, "void")) {
+        token->type = T_KW_VOID;
+        return true;
+    } else if (!str_cmp_const_str(s, "while")) {
+        token->type = T_KW_WHILE;
+        return true;
+    } else {
+        token->type = T_FUN_ID;
+        return false;
+    }
+}
+
+bool is_type(string *s, token_t *token) {
+    if (!str_cmp_const_str(s, "float")) {
+        token->type = T_KW_FLOAT;
+        return true;
+    } else if (!str_cmp_const_str(s, "int")) {
+        token->type = T_KW_INT;
+        return true;
+    } else if (!str_cmp_const_str(s, "string")) {
+        token->type = T_KW_STRING;
+        return true;
+    } else {
+        return false;
+    }
+}
+
 const int get_next_token(token_t *token) {
     if (source == NULL) {
         return ERROR_INTERNAL;
@@ -33,6 +76,8 @@ const int get_next_token(token_t *token) {
                     token->type = T_ADD;
                     str_free(s);
                     return NO_ERR;
+                } else if (isspace(c)) {
+                    state = S_START;
                 } else if (c == '-') {
                     token->type = T_SUB;
                     str_free(s);
@@ -72,16 +117,99 @@ const int get_next_token(token_t *token) {
                 } else if (c == '=') {
                     state = S_EQUAL;
                 } else if (c == '<') {
+                    if (!str_add_char(s, c)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
                     state = S_LESS;
                 } else if (c == '>') {
                     state = S_GREATER;
                 } else if (c == '!') {
                     state = S_NOT;
                 } else if (c == '$') {
-                    state = S_VAR_ID_1;
+                    if (!str_add_char(s, c)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
+                    state = S_VAR_ID;
+                } else if (isalpha(c) || c == '_') {
+                    
                 } else if (isdigit(c)) {
                     state = S_INT;
-                } 
+                } else if (c == '?') {
+                    state = S_END_SYMBOL;
+                }
+                break;
+
+            case (S_VAR_ID):
+                if (isalnum(c) || c == '_') {
+                    if (!str_add_char(s, c)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
+                } else {
+                    ungetc(c, source);
+                    token->type = T_VAR_ID;
+                    if (!str_copy_string(token->data->string_c, s)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
+                    str_free(s);
+                    return NO_ERR;
+                }
+                break;
+
+            case (S_START_SYMBOL):
+                if (!isspace(c)) {
+                    if (!str_add_char(s, c)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
+                    state = S_START_SYMBOL;
+                } else if (!str_cmp_const_str(s, "<?php")) {
+                    token->type = T_START_SYMBOL;
+                    str_free(s);
+                    return NO_ERR;
+                } else {
+                    str_free(s);
+                    return ERROR_INTERNAL;
+                }
+                break;
+
+            case (S_END_SYMBOL):
+                if (c == '>') {
+                    token->type = T_END_SYMBOL;
+                    str_free(s);
+                    return NO_ERR;
+                } else if (isalpha(c)) {
+                    if (!str_add_char(s, c)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
+                    state = S_KW_TYPE;
+                } else {
+                    str_free(s);
+                    return ERROR_INTERNAL;
+                }
+                break;
+
+            case (S_KW_TYPE):
+                if (isalpha(c)) {
+                    if (!str_add_char(s, c)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
+                } else {
+                    ungetc(c, source);
+                    if (!is_type(s, token)) {
+                        str_free(s);
+                        return LEX_ERR;
+                    } else {
+                        str_free(s);
+                        return NO_ERR;
+                    }
+                }
+                break;
             
             case (S_EQUAL):
                 if (c == '=') {
@@ -92,6 +220,7 @@ const int get_next_token(token_t *token) {
                     str_free(s);
                     return NO_ERR;
                 }
+                break;
 
             case (S_EQUAL_EQUAL):
                 if (c == '=') {
@@ -101,18 +230,27 @@ const int get_next_token(token_t *token) {
                 } else {
                     return LEX_ERR;
                 }
+                break;
 
             case (S_LESS):
                 if (c == '=') {
                     token->type = T_LESS_EQUAL;
                     str_free(s);
                     return NO_ERR;
-                } else {
+                } else if (c == '?') {
+                    state = S_START_SYMBOL;
+                    if (!str_add_char(s, c)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
+                }
+                else {
                     ungetc(c, source);
                     token->type = T_LESS;
                     str_free(s);
                     return NO_ERR;
                 }
+                break;
 
             case (S_GREATER):
                 if (c == '=') {
@@ -125,6 +263,7 @@ const int get_next_token(token_t *token) {
                     str_free(s);
                     return NO_ERR;
                 }
+                break;
 
             case (S_NOT):
                 if (c == '=') {
@@ -132,6 +271,7 @@ const int get_next_token(token_t *token) {
                 } else {
                     return LEX_ERR;
                 }
+                break;
 
             case (S_NOT_EQUAL):
                 if (c == '=') {
@@ -141,49 +281,68 @@ const int get_next_token(token_t *token) {
                 } else {
                     return LEX_ERR;
                 }
+                break;
 
-            case (S_VAR_ID_1):
-                if (isalpha(c)) {
-                    state = S_VAR_ID_END;
-                } else{
+            case (S_KW_FUN_START):
+                if(isalpha(c) || c == '_') {
+                    if (!str_add_char(s, c)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
+                    state = S_KW_FUN;
+                } else {
+                    ungetc(c, source);
+                    str_free(s);
                     return LEX_ERR;
                 }
+                break;
 
-            case (S_VAR_ID_END):
-                if (isalpha(c) || isdigit(c) || c == '_') {
-                    state = S_VAR_ID_END;
+            case (S_KW_FUN):
+                if (isalnum(c) || c == '_') {
+                    if (!str_add_char(s, c)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
                 } else {
-                    token->type = T_VAR_ID;
                     ungetc(c, source);
+                    if (!is_keyword(s, token) || !is_type(s, token)) {
+                        if (!str_copy_string(token->data->string_c, s)) {
+                            str_free(s);
+                            return ERROR_INTERNAL;
+                        }
+                    }
                     str_free(s);
                     return NO_ERR;
                 }
+                break;
 
             case (S_INT):
                 if (isdigit(c)) {
                     state = S_INT;
                 } else if (c == '.') {
-                    state= S_FLOAT;
+                    state = S_FLOAT;
                 } else if (c == 'e' || c == 'E') {
                     state = S_EXP;
                 } else if (c == ' ') {
-                    token->type = T_INT;
+                    token->type = T_KW_INT;
                     str_free(s);
                     return NO_ERR;
                 } else {
                     return LEX_ERR;
                 }
+                break;
 
             case (S_FLOAT):
                 if (isdigit(c)) {
                     state = S_FLOAT;
                 } else if (c == ' ') {
-                    token->type = T_FLOAT;
+                    token->type = T_KW_FLOAT;
                     str_free(s);
                     return NO_ERR;
                 } else {
                     return LEX_ERR;
                 }
+                break;
 
             case (S_EXP):
                 if (isdigit(c) || c == '+' || c == '-') {
@@ -191,167 +350,19 @@ const int get_next_token(token_t *token) {
                 } else {
                     return LEX_ERR;
                 }
+                break;
 
             case (S_EXP_END):
                 if(isdigit(c)) {
                     state = S_EXP_END;
                 } else if (c == ' ') {
-                    token->type = T_FLOAT;
+                    token->type = T_KW_FLOAT;
                     str_free(s);
                     return NO_ERR;
                 } else {
                     return LEX_ERR;
                 }
+                break;
         }
     }
 }
-
-// int Check_Keyword(char *s) {
-//     for(int i = 0; i < 10; i++) {
-//         if (strcmp(s, keywords[i])) {
-//             return 1;
-//         }
-//     }
-//     return 0;
-// }
-
-// int Check_TypeID(char *s) {
-//     for(int i = 0; i < 3; i++) {
-//         if (strcmp(s, typeID[i])) {
-//             return 1;
-//         }
-//     }
-//     return 0;
-// }
- 
-// int main (int argc, char* argv[]) {
-//     char c; // responsible for reading each character
-//     Token_t token[1];
-//     int tokenCounter = 0; // ordinal number of the token
-//     while((c = getchar()) != -1) {
-//         switch (token[tokenCounter].state) {
-//             case 0:
-//                 if (c == '$') {
-//                     token[tokenCounter].state = 1;
-//                     strncat(token[tokenCounter].text, c, 1); // appending the text of token 
-//                 }
-//                 else if (isdigit(c)) {
-//                     token[tokenCounter].type = T_INT;
-//                     token[tokenCounter].state = 3;
-//                 }
-//                 else if (c == ':') {
-//                     token[tokenCounter].type = T_COLON;
-//                 }
-//                 else if (c == ';') {
-//                     token[tokenCounter].type = T_SEMICOLON;
-//                 }
-//                 else if (c == '{') {
-//                     token[tokenCounter].type = T_BRACE_LEFT;
-//                 }
-//                 else if (c == '}') {
-//                     token[tokenCounter].type = T_BRACE_RIGHT;
-//                 }
-//                 else if (c == '(') {
-//                     token[tokenCounter].type = T_BRACKET_LEFT;
-//                 }
-//                 else if (c == ')') {
-//                     token[tokenCounter].type = T_BRACKET_RIGHT;
-//                 }
-//                 else if (c == '=') {
-//                     token[tokenCounter].type = T_EQUAL;
-//                     token[tokenCounter].state = 4;
-//                 }
-//                 else if (c == '!') {
-//                     token[tokenCounter].state = 4;
-//                 }
-//                 else if (c == '<') {
-//                     token[tokenCounter].type = T_LESS;
-//                     token[tokenCounter].state = 5;
-//                 }
-//                 else if (c == '>') {
-//                     token[tokenCounter].type = T_GREATER;
-//                     token[tokenCounter].state = 5;
-//                 }
-//                 else if (c == '+') {
-//                     token[tokenCounter].type = T_PLUS;
-                    
-//                 }
-//                 else if (c == '-') {
-//                     token[tokenCounter].type = T_MINUS; 
-//                 }
-//                 else if (c == '*') {
-//                     token[tokenCounter].type = T_STAR; 
-//                 }
-//                 else if (c == '/') {
-//                     token[tokenCounter].state = 6;
-//                 }
-//                 else if (c == '?') {
-//                     token[tokenCounter].state = 7;
-//                 }
-//             case 1:
-//                 if (c == '_' || isalpha(c)) {
-//                     token[tokenCounter].state = 2;
-//                 }
-//             case 2:
-//                 if (c == '_' || isalpha(c) || isdigit(c)) {
-//                     token[tokenCounter].type = T_ID;
-//                 }
-//             case 3:
-//                 if (isdigit(c));
-
-//                 else if (c == '.' || c == 'e' || c == 'E') {
-//                     token[tokenCounter].type = T_FLOAT;
-//                 }
-//                 else {
-//                     // error
-//                 }
-//             case 4:
-//                 if (c == '=') {
-//                     token[tokenCounter].state = 5;
-//                 }
-//                 else {
-//                     // error
-//                 }
-//             case 5:
-//                 if (c == '=') {
-//                     if (token[tokenCounter].type == T_EQUAL) {
-//                         token[tokenCounter].type = T_EQUAL_EQUAL_EQUAL;
-//                     }
-//                     else if (token[tokenCounter].type == T_LESS) {
-//                         token[tokenCounter].type = T_LESS_EQUAL;
-//                     }
-//                     else if (token[tokenCounter].type == T_GREATER) {
-//                         token[tokenCounter].type = T_GREATER_EQUAL;
-//                     }
-//                     else {
-//                         token[tokenCounter].type = T_NOT_EQUAL_EQUAL;
-//                     }
-//                 }
-//                 else {
-//                     // error
-//                 }
-//             case 6:
-//                 if (c == '/') {
-//                         // its a comment
-//                 }
-//                 else {
-//                     token[tokenCounter].type = T_SLASH; 
-//                 }
-//             case 7:
-//                 if (c == '>') {
-//                     token[tokenCounter].type = T_END_SYMBOL;
-//                 }
-//                 else if (isalpha(c)) {
-//                     strncat(token[tokenCounter].text, c, 1);
-//                 }
-//                 else {
-//                     if (Check_TypeID(token[tokenCounter].text) == 1) {
-                        
-//                     }
-//                 }
-
-
-//         }
-//     }
-//     return 0;
-// }
