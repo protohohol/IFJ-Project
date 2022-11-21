@@ -3,13 +3,19 @@ int error_type = 0;
 
 
 
+
+
+int expression (token_t * token) {
+    return NO_ERR;
+}
+
 int f_state ( token_t * token ) {
-     switch (token->type) {
+    switch (token->type) {
         case (T_KW_RETURN):
             if (error_type = get_next_token(token)) {
                 return error_type;
             }
-            return epxression(token);
+            return expression(token);
             break;
         // case (T_VAR_ID):
         //     if (error_type = get_next_token(token)) {
@@ -206,13 +212,25 @@ int declare(token_t * token){
     }
 }
 
+int define (token_t * token) {
+    if(token->type == T_PAR_LEFT) {
+            if (error_type = get_next_token(token)) {
+                return error_type;
+            }
+            error_type = f_plist(token);
+            if (error_type) {
+                return error_type;
+            }
+    }
+}
+
 int state(token_t * token){
     switch (token->type) {
         case (T_KW_RETURN):
             if (error_type = get_next_token(token)) {
                 return error_type;
             }
-            return epxression(token);
+            return expression(token);
             break;
         // case (T_VAR_ID):
         //     if (error_type = get_next_token(token)) {
