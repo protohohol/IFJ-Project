@@ -1,8 +1,4 @@
-#include <stdio.h>
-#include <ctype.h>
-#include <stdlib.h>
 #include "scanner.h"
-#include "str.h"
 #include "error.h"
 
 FILE *source;
