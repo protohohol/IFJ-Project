@@ -2,13 +2,14 @@
 int error_type = 0;
 
 
+
 int declare(token_t * token){
     if(token->type == T_PAR_LEFT) {
             if (error_type = get_next_token(token)) {
                 return error_type;
             }
     }
-} 
+}
 
 int state(token_t * token){
     switch (token->type) {
@@ -16,10 +17,7 @@ int state(token_t * token){
             if (error_type = get_next_token(token)) {
                 return error_type;
             }
-            error_type = epxression(token);
-            if (error_type) {
-                return error_type;
-            }
+            return epxression(token);
             break;
         // case (T_VAR_ID):
         //     if (error_type = get_next_token(token)) {
@@ -38,10 +36,7 @@ int state(token_t * token){
             if (error_type = get_next_token(token)) {
                 return error_type;
             }
-            error_type = declare(token);
-            if (error_type) {
-                return error_type;
-            }
+            return declare(token);
             break;
         case (T_KW_FUNCTION):
             if (error_type = get_next_token(token)) {
@@ -67,13 +62,12 @@ int state(token_t * token){
                             if (error_type = get_next_token(token)) {
                                 return error_type;
                             }
-                            error_type = f_list(token);
-                            if (error_type) {
-                                return error_type;
-                            }
+                            return f_list(token);
                         } else {
                             return SYNTAX_ERR;
                         }
+                    } else {
+                        return SYNTAX_ERR;
                     }
                 } else {
                     return SYNTAX_ERR;;
@@ -81,6 +75,7 @@ int state(token_t * token){
             }else {
                 return SYNTAX_ERR;
             }
+            break;
         case (T_KW_WHILE):
             if (error_type = get_next_token(token)) {
                 return error_type;
@@ -101,10 +96,7 @@ int state(token_t * token){
                         if (error_type = get_next_token(token)) {
                             return error_type;
                         }
-                        error_type = st_list(token);
-                        if (error_type != NO_ERR) {
-                            return error_type;
-                        }
+                        return st_list(token);
                     } else {
                         return SYNTAX_ERR;
                     }
@@ -114,10 +106,47 @@ int state(token_t * token){
             } else {
                 return SYNTAX_ERR;
             }
-            
+            break;
         case (T_KW_ELSE):
-            
+            if ( error_type = get_next_token(token) ) {
+                return error_type;
+            }
+            if (token->type == T_BRACE_LEFT) {
+                if ( error_type = get_next_token(token) ) {
+                    return error_type;
+                }
+                error_type = st_list(token);
+                return error_type;
+            } else {
+                return SYNTAX_ERR;
+            }
+            break;
         case (T_KW_IF):
+            if ( error_type = get_next_token(token) ) {
+                return error_type;
+            }
+            if (token->type == T_PAR_LEFT) {
+                if ( error_type = get_next_token(token) ) {
+                    return error_type;
+                }
+                error_type = expression(token);
+                if (error_type != NO_ERR) {
+                    return error_type;
+                }
+                if ( token->type == T_PAR_RIGHT ) {
+                    if ( error_type = get_next_token(token) ) {
+                        return error_type;
+                    }
+                    if ( token->type == T_BRACE_LEFT) {
+                        if ( error_type = get_next_token(token) ) {
+                            return error_type;
+                        }
+                        return st_list(token);
+                    }
+                }
+            } else {
+                return SYNTAX_ERR;
+            }
             break;
         default:
             return SYNTAX_ERR;
@@ -137,6 +166,7 @@ int st_list(token_t * token){
                 if (error_type = get_next_token(token)) {
                     return error_type;
                 }
+                return st_list(token);
             } else {
                 return LEX_ERR;
             }
@@ -156,10 +186,7 @@ int st_list(token_t * token){
             } else {
                 return SYNTAX_ERR;
             }
-            error_type = st_list(token);
-            if (error_type != NO_ERR) {
-                return error_type;
-            }
+            return st_list(token);
             break;
         case (T_END_SYMBOL):
             return NO_ERR;
@@ -178,6 +205,7 @@ int prog(token_t * token){
             return LEX_ERR;
         }
         error_type = st_list(token);
+        return error_type;
     }
     else {
         return SYNTAX_ERR;
