@@ -1,156 +1,195 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "error.h"
-#include "scanner.h"
+#include "parser.h"
 int error_type = 0;
 
-void error(int flag){
-    switch (flag)
-    {
-    case (LEX_ERR):
-        exit(1);
-        break;
-    default:
-        exit(1);
-        break;
-    }
-}
 
-void state(token_t * token){
+int declare(token_t * token){
+    if(token->type == T_PAR_LEFT) {
+            if (error_type = get_next_token(token)) {
+                return error_type;
+            }
+    }
+} 
+
+int state(token_t * token){
     switch (token->type) {
         case (T_KW_RETURN):
-            if (error_type = gettoken(token)) {
-                error(error_type);
+            if (error_type = get_next_token(token)) {
+                return error_type;
             }
-            epxression(token);
+            error_type = epxression(token);
+            if (error_type) {
+                return error_type;
+            }
             break;
-        case (T_VAR_ID):
-            if (error_type = gettoken(token)) {
-                error(error_type);
-            }
-            if(token->data==T_ASSIGN){
-                if (error_type = gettoken(token)) {
-                error(error_type);
-                }
-                expression(token);
-            }
-            else
-                expression(token);
-            break;
+        // case (T_VAR_ID):
+        //     if (error_type = get_next_token(token)) {
+        //         error(error_type);
+        //     }
+        //     if(token->type == T_ASSIGN){
+        //         if (error_type = get_next_token(token)) {
+        //         error(error_type);
+        //         }
+        //         expression(token);
+        //     }
+        //     else
+        //         expression(token);
+        //     break;
         case (T_FUN_ID):
-            if (error_type = gettoken(token)) {
-                error(error_type);
+            if (error_type = get_next_token(token)) {
+                return error_type;
             }
-            delcare(token);
+            error_type = declare(token);
+            if (error_type) {
+                return error_type;
+            }
             break;
         case (T_KW_FUNCTION):
-            if (error_type = gettoken(token)) {
-                error(error_type);
+            if (error_type = get_next_token(token)) {
+                return error_type;
             }
-            if (token->data == T_FUN_ID){
-                if (error_type = gettoken(token)) {
-                    error(error_type);
+            if (token->type == T_FUN_ID){
+                if (error_type = get_next_token(token)) {
+                    return error_type;
                 }
-                define(token);
-                if(token->data == T_COLON) {
-                    if (error_type = gettoken(token)) {
-                    error(error_type);
+                error_type = define(token);
+                if (error_type) {
+                    return error_type;
+                }
+                if(token->type == T_COLON) {
+                    if (error_type = get_next_token(token)) {
+                        return error_type;
                     }
-                    if(token->data == T_KW_FLOAT || token->data == T_KW_INT || token->data == T_KW_STRING) {
-                        if (error_type = gettoken(token)) {
-                            error(error_type);
+                    if(token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING) {
+                        if (error_type = get_next_token(token)) {
+                            return error_type;
                         }
-                        if(token->data == T_BRACE_RIGHT){
-                            if (error_type = gettoken(token)) {
-                                error(error_type);
+                        if(token->type == T_BRACE_RIGHT){
+                            if (error_type = get_next_token(token)) {
+                                return error_type;
                             }
-                            f_list(token);
+                            error_type = f_list(token);
+                            if (error_type) {
+                                return error_type;
+                            }
                         } else {
-                            error("отсылаем тип хибы интом или чем-нибудь, мне похуй");
+                            return SYNTAX_ERR;
                         }
                     }
                 } else {
-                    error("отсылаем тип хибы интом или чем-нибудь, мне похуй");
+                    return SYNTAX_ERR;;
                 }
             }else {
-                error("отсылаем тип хибы интом или чем-нибудь, мне похуй");
+                return SYNTAX_ERR;
             }
         case (T_KW_WHILE):
-
-        case (T_KW_ELSE):
-        case (T_KW_IF):
-            state(token);
-            if (token == T_BRACE_RIGHT) {
-                if (error_type = gettoken(token)) {
-                    error(error_type);
+            if (error_type = get_next_token(token)) {
+                return error_type;
+            }
+            if (token->type == T_PAR_LEFT) {
+                if (error_type = get_next_token(token)) {
+                    return error_type;
+                }
+                error_type = expression(token);
+                if (error_type != NO_ERR) {
+                    return error_type;
+                }
+                if (token->type == T_PAR_RIGHT) {
+                    if (error_type = get_next_token(token)) {
+                        return error_type;
+                    }
+                    if (token->type == T_BRACE_LEFT) {
+                        if (error_type = get_next_token(token)) {
+                            return error_type;
+                        }
+                        error_type = st_list(token);
+                        if (error_type != NO_ERR) {
+                            return error_type;
+                        }
+                    } else {
+                        return SYNTAX_ERR;
+                    }
+                } else {
+                    return SYNTAX_ERR;
                 }
             } else {
-                error("отсылаем тип хибы интом или чем-нибудь, мне похуй");
+                return SYNTAX_ERR;
             }
-            st_list(token);
+            
+        case (T_KW_ELSE):
+            
+        case (T_KW_IF):
             break;
         default:
-            error("отсылаем тип хибы интом или чем-нибудь, мне похуй");
+            return SYNTAX_ERR;
     }
 }
 
-void st_list(token_t * token){
+int st_list(token_t * token){
     switch (token->type) {
         case (T_KW_RETURN):
         case (T_VAR_ID):
         case (T_FUN_ID):
-            state(token);
-            if (token == T_SEMICOLON) {
-                if (error_type = gettoken(token)) {
-                    error(error_type);
+            error_type = state(token);
+            if (error_type != NO_ERR) {
+                return error_type;
+            } 
+            if (token->type == T_SEMICOLON) {
+                if (error_type = get_next_token(token)) {
+                    return error_type;
                 }
             } else {
-                error("отсылаем тип хибы интом или чем-нибудь, мне похуй");
+                return LEX_ERR;
             }
-            st_list(token);
             break;
         case (T_KW_FUNCTION):
         case (T_KW_WHILE):
         case (T_KW_ELSE):
         case (T_KW_IF):
-            state(token);
-            if (token == T_BRACE_RIGHT) {
-                if (error_type = gettoken(token)) {
-                    error(error_type);
+            error_type = state(token);
+            if (error_type != NO_ERR) {
+                return error_type;
+            }
+            if (token->type == T_BRACE_RIGHT) {
+                if (error_type = get_next_token(token)) {
+                    return error_type;
                 }
             } else {
-                error("отсылаем тип хибы интом или чем-нибудь, мне похуй");
+                return SYNTAX_ERR;
             }
-            st_list(token);
+            error_type = st_list(token);
+            if (error_type != NO_ERR) {
+                return error_type;
+            }
             break;
         case (T_END_SYMBOL):
-            return;
+            return NO_ERR;
             break;
         case (T_EOF):
-            return;
+            return NO_ERR;
             break;
         default:
-            error("отсылаем тип хибы интом или чем-нибудь, мне похуй");
+            return SYNTAX_ERR;
     }
 }
 
-void prog(token_t * token){
-    if(token->type == 22){  // if token is <?php
-        if (error_type = gettoken(token)) {
-            error(error_type);
+int prog(token_t * token){
+    if(token->type == T_START_SYMBOL){  // if token is <?php
+        if (error_type = get_next_token(token)) {
+            return LEX_ERR;
         }
-        st_list(token);
+        error_type = st_list(token);
     }
-    else
-        error("отсылаем тип хибы интом или чем-нибудь, мне похуй");
+    else {
+        return SYNTAX_ERR;
+    }
 }
 
 int main(){
     token_t * token;
-    if (error_type = gettoken(token)) {
-        error(error_type);
+    if ((error_type = get_next_token(token)) == 0) {
+        error_type = prog(token);
     }
-    prog(token);
+    return error_type;
 }
 
 
