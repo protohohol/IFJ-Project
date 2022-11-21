@@ -1,40 +1,156 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "error.h"
+#include "scanner.h"
+int error_type = 0;
 
-char * token = gettoken();
-void prog(){
-    if(token == "begin"){
-        gettoken();
-        st_list();
+void error(int flag){
+    switch (flag)
+    {
+    case (LEX_ERR):
+        exit(1);
+        break;
+    default:
+        exit(1);
+        break;
+    }
+}
+
+void state(token_t * token){
+    switch (token->type) {
+        case (T_RETURN):
+            if (error_type = gettoken(token)) {
+                error(error_type);
+            }
+            epxression(token);
+            break;
+        case (T_VAR_ID):
+            if (error_type = gettoken(token)) {
+                error(error_type);
+            }
+            if(token->data==T_ASSIGN){
+                if (error_type = gettoken(token)) {
+                error(error_type);
+                }
+                expression(token);
+            }
+            else
+                expression(token);
+            break;
+        case (T_FUN_ID):
+            if (error_type = gettoken(token)) {
+                error(error_type);
+            }
+            delcare(token);
+            break;
+        case (T_FUNCTION):
+            if (error_type = gettoken(token)) {
+                error(error_type);
+            }
+            if (token->data == T_FUN_ID){
+                if (error_type = gettoken(token)) {
+                    error(error_type);
+                }
+                define(token);
+                if(token->data == T_COLON) {
+                    if (error_type = gettoken(token)) {
+                    error(error_type);
+                    }
+                    if(token->data == T_FLOAT_ID || token->data == T_INT_ID || token->data == T_STRING_ID) {
+                        if (error_type = gettoken(token)) {
+                            error(error_type);
+                        }
+                        if(token->data == T_BRACE_RIGHT){
+                            if (error_type = gettoken(token)) {
+                                error(error_type);
+                            }
+                            f_list(token);
+                        } else {
+                            error("отсылаем тип хибы интом или чем-нибудь, мне похуй");
+                        }
+                    }
+                } else {
+                    error("отсылаем тип хибы интом или чем-нибудь, мне похуй");
+                }
+            }else {
+                error("отсылаем тип хибы интом или чем-нибудь, мне похуй");
+            }
+        case (T_WHILE):
+            
+        case (T_ELSE):
+        case (T_IF):
+            state(token);
+            if (token == T_BRACE_RIGHT) {
+                if (error_type = gettoken(token)) {
+                    error(error_type);
+                }
+            } else {
+                error("отсылаем тип хибы интом или чем-нибудь, мне похуй");
+            }
+            st_list(token);
+            break;
+        default:
+            error("отсылаем тип хибы интом или чем-нибудь, мне похуй");
+    }
+}
+
+void st_list(token_t * token){
+    switch (token->type) {
+        case (T_RETURN):
+        case (T_VAR_ID):
+        case (T_FUN_ID):
+            state(token);
+            if (token == T_SEMICOLON) {
+                if (error_type = gettoken(token)) {
+                    error(error_type);
+                }
+            } else {
+                error("отсылаем тип хибы интом или чем-нибудь, мне похуй");
+            }
+            st_list(token);
+            break;
+        case (T_FUNCTION):
+        case (T_WHILE):
+        case (T_ELSE):
+        case (T_IF):
+            state(token);
+            if (token == T_BRACE_RIGHT) {
+                if (error_type = gettoken(token)) {
+                    error(error_type);
+                }
+            } else {
+                error("отсылаем тип хибы интом или чем-нибудь, мне похуй");
+            }
+            st_list(token);
+            break;
+        case (T_END_SYMBOL):
+            return;
+            break;
+        case (T_EOF):
+            return;
+            break;
+        default:
+            error("отсылаем тип хибы интом или чем-нибудь, мне похуй");
+    }
+}
+
+void prog(token_t * token){
+    if(token->type == 22){  // if token is <?php
+        if (error_type = gettoken(token)) {
+            error(error_type);
+        }
+        st_list(token);
     }
     else
-        eror("отсылаем тип хибы интом или чем-нибудь");
+        error("отсылаем тип хибы интом или чем-нибудь, мне похуй");
 }
-void st_list(){
-    switch (atoi(token))
-    {
-    case (RETURN):
-        gettoken();
-        break;
-    
-    case (VAR):
-        gettoken();
-        break;
-    case (ID):
-        gettoken();
-        state
-        break;
-    case ():
-        gettoken();
-        break;
-    case (ELSE):
-        gettoken();
-        break;
-    case (ELSE):
-        gettoken();
-        break;
-    case (ELSE):
-        gettoken();
-        break;
-    }
-    else{}
 
+int main(){
+    token_t * token;
+    if (error_type = gettoken(token)) {
+        error(error_type);
+    }
+    prog(token);
 }
+
+
