@@ -18,7 +18,7 @@ void error(int flag){
 
 void state(token_t * token){
     switch (token->type) {
-        case (T_RETURN):
+        case (T_KW_RETURN):
             if (error_type = gettoken(token)) {
                 error(error_type);
             }
@@ -43,7 +43,7 @@ void state(token_t * token){
             }
             delcare(token);
             break;
-        case (T_FUNCTION):
+        case (T_KW_FUNCTION):
             if (error_type = gettoken(token)) {
                 error(error_type);
             }
@@ -56,7 +56,7 @@ void state(token_t * token){
                     if (error_type = gettoken(token)) {
                     error(error_type);
                     }
-                    if(token->data == T_FLOAT_ID || token->data == T_INT_ID || token->data == T_STRING_ID) {
+                    if(token->data == T_KW_FLOAT || token->data == T_KW_INT || token->data == T_KW_STRING) {
                         if (error_type = gettoken(token)) {
                             error(error_type);
                         }
@@ -75,10 +75,10 @@ void state(token_t * token){
             }else {
                 error("отсылаем тип хибы интом или чем-нибудь, мне похуй");
             }
-        case (T_WHILE):
-            
-        case (T_ELSE):
-        case (T_IF):
+        case (T_KW_WHILE):
+
+        case (T_KW_ELSE):
+        case (T_KW_IF):
             state(token);
             if (token == T_BRACE_RIGHT) {
                 if (error_type = gettoken(token)) {
@@ -96,7 +96,7 @@ void state(token_t * token){
 
 void st_list(token_t * token){
     switch (token->type) {
-        case (T_RETURN):
+        case (T_KW_RETURN):
         case (T_VAR_ID):
         case (T_FUN_ID):
             state(token);
@@ -109,10 +109,10 @@ void st_list(token_t * token){
             }
             st_list(token);
             break;
-        case (T_FUNCTION):
-        case (T_WHILE):
-        case (T_ELSE):
-        case (T_IF):
+        case (T_KW_FUNCTION):
+        case (T_KW_WHILE):
+        case (T_KW_ELSE):
+        case (T_KW_IF):
             state(token);
             if (token == T_BRACE_RIGHT) {
                 if (error_type = gettoken(token)) {
