@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include "scanner.h"
 #include "str.h"
 #include "error.h"
@@ -133,13 +134,89 @@ const int get_next_token(token_t *token) {
                     }
                     state = S_VAR_ID;
                 } else if (isalpha(c) || c == '_') {
-                    
+                    if (!str_add_char(s, c)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
+                    state = S_KW_FUN;
                 } else if (isdigit(c)) {
-                    state = S_INT;
+                    if (!str_add_char(s, c)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
+                    state = S_INT_DEC;
                 } else if (c == '?') {
                     state = S_END_SYMBOL;
+                } else if (c == EOF) {
+                    token->type = T_EOF;
+                    str_free(s);
+                    return NO_ERR;
+                } else if (c == '\"') {
+                    state = S_STRING;
+                } else {
+                    str_free(s);
+                    return LEX_ERR;
                 }
                 break;
+
+            case (S_STRING):
+                
+                break;
+
+            case (S_INT_DEC):
+                if (isdigit(c)) {
+                    if (!str_add_char(s, c)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
+                } else if (tolower(c) == 'e') {
+                    if (!str_add_char(s, c)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
+                    state = S_DEC_START;
+                } else if (c == '.') {
+                    if (!str_add_char(s, c)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
+                    state = S_DEC;
+                } else {
+                    ungetc(c, source);
+                    token->type = T_INT_VAL;
+                    token->data->int_c = atoi(s->str);
+                    str_free(s);
+                    return NO_ERR;
+                }
+            break;
+
+            case (S_DEC_START):
+                if (isdigit(c) || c == '-' || c == '+') {
+                    if (!str_add_char(s, c)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
+                    state = S_DEC;
+                } else {
+                    str_free(s);
+                    return LEX_ERR;
+                }
+            break;
+
+            case (S_DEC):
+                if (isdigit(c)) {
+                    if (!str_add_char(s, c)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
+                } else {
+                    ungetc(c, source);
+                    token->type = T_DEC_VAL;
+                    token->data->double_c = strtod(s->str, NULL);
+                    str_free(s);
+                    return NO_ERR;
+                }
+            break;
 
             case (S_VAR_ID):
                 if (isalnum(c) || c == '_') {
