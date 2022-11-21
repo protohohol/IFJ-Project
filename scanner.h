@@ -49,11 +49,12 @@ typedef enum  {
 	T_KW_WHILE,             // keyword "while"
 	T_VAR_ID,				// variable identifier
 	T_FUN_ID,				// function identifier
+	T_INT_VAL,				// integer value
+	T_DEC_VAL,				// decimal value
 } token_type;
 
 typedef enum {
     S_START = 100,
-    S_EOL,
     S_EOF,
     S_MUL,
 	S_GREATER,
@@ -82,17 +83,13 @@ typedef enum {
 	S_IF,
 	S_FLOAT,
 	S_FUNCTION,
+	S_INT_DEC,
+	S_DEC_START,
+	S_DEC,
 	S_INT,
 	S_EXP,
 	S_EXP_END,
-	S_NULL,
-	S_RETURN,
 	S_STRING,
-	S_VOID,
-	S_WHILE,
-	S_INT_ID,
-	S_FLOAT_ID,
-	S_STRING_ID,
 } fm_state;
 
 typedef union {
@@ -116,10 +113,9 @@ void set_source(FILE* f);
 /**
  * @brief Get the Next Token object
  * 
- * @param s pointer to string
+ * @param t pointer to token
  * @return 0 if operation was successful
- * @return -1 if an error appeared
  */
-int get_next_token(token_t* t);
+const int get_next_token(token_t* t);
 
 #endif
