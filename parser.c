@@ -3,9 +3,204 @@ int error_type = 0;
 
 
 
+int f_state ( token_t * token ) {
+     switch (token->type) {
+        case (T_KW_RETURN):
+            if (error_type = get_next_token(token)) {
+                return error_type;
+            }
+            return epxression(token);
+            break;
+        // case (T_VAR_ID):
+        //     if (error_type = get_next_token(token)) {
+        //         error(error_type);
+        //     }
+        //     if(token->type == T_ASSIGN){
+        //         if (error_type = get_next_token(token)) {
+        //         error(error_type);
+        //         }
+        //         expression(token);
+        //     }
+        //     else
+        //         expression(token);
+        //     break;
+        case (T_FUN_ID):
+            if (error_type = get_next_token(token)) {
+                return error_type;
+            }
+            return declare(token);
+            break;
+        case (T_KW_WHILE):
+            if (error_type = get_next_token(token)) {
+                return error_type;
+            }
+            if (token->type == T_PAR_LEFT) {
+                if (error_type = get_next_token(token)) {
+                    return error_type;
+                }
+                error_type = expression(token);
+                if (error_type != NO_ERR) {
+                    return error_type;
+                }
+                if (token->type == T_PAR_RIGHT) {
+                    if (error_type = get_next_token(token)) {
+                        return error_type;
+                    }
+                    if (token->type == T_BRACE_LEFT) {
+                        if (error_type = get_next_token(token)) {
+                            return error_type;
+                        }
+                        return f_list(token);
+                    } else {
+                        return SYNTAX_ERR;
+                    }
+                } else {
+                    return SYNTAX_ERR;
+                }
+            } else {
+                return SYNTAX_ERR;
+            }
+            break;
+        case (T_KW_ELSE):
+            if ( error_type = get_next_token(token) ) {
+                return error_type;
+            }
+            if (token->type == T_BRACE_LEFT) {
+                if ( error_type = get_next_token(token) ) {
+                    return error_type;
+                }
+                error_type = f_list(token);
+                return error_type;
+            } else {
+                return SYNTAX_ERR;
+            }
+            break;
+        case (T_KW_IF):
+            if ( error_type = get_next_token(token) ) {
+                return error_type;
+            }
+            if (token->type == T_PAR_LEFT) {
+                if ( error_type = get_next_token(token) ) {
+                    return error_type;
+                }
+                error_type = expression(token);
+                if (error_type != NO_ERR) {
+                    return error_type;
+                }
+                if ( token->type == T_PAR_RIGHT ) {
+                    if ( error_type = get_next_token(token) ) {
+                        return error_type;
+                    }
+                    if ( token->type == T_BRACE_LEFT) {
+                        if ( error_type = get_next_token(token) ) {
+                            return error_type;
+                        }
+                        return f_list(token);
+                    } else {
+                        return SYNTAX_ERR;
+                    }
+                } else {
+                    return SYNTAX_ERR;
+                }
+            } else {
+                return SYNTAX_ERR;
+            }
+            break;
+        case (T_BRACE_RIGHT):
+            return NO_ERR;
+        default:
+            return SYNTAX_ERR;
+    }
+}
+
+int f_list ( token_t * token ) {
+    switch (token->type) {
+        case (T_KW_RETURN):
+        case (T_VAR_ID):
+        case (T_FUN_ID):
+            error_type = f_state(token);
+            if (error_type != NO_ERR) {
+                return error_type;
+            } 
+            if (token->type == T_SEMICOLON) {
+                if (error_type = get_next_token(token)) {
+                    return error_type;
+                }
+                return f_list(token);
+            } else {
+                return SYNTAX_ERR;
+            }
+            break;
+        case (T_KW_WHILE):
+        case (T_KW_ELSE):
+        case (T_KW_IF):
+            error_type = f_state(token);
+            if (error_type != NO_ERR) {
+                return error_type;
+            }
+            if (token->type == T_BRACE_RIGHT) {
+                if (error_type = get_next_token(token)) {
+                    return error_type;
+                }
+            } else {
+                return SYNTAX_ERR;
+            }
+            return f_list(token);
+            break;
+        default:
+            return SYNTAX_ERR;
+    }
+}
+
+int f_param ( token_t * token ) {
+    if ( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING ) {
+        if ( error_type = get_next_token(token) ) {
+            return error_type;
+        }
+        return NO_ERR;
+    } else if ( token->type == T_VAR_ID ) {
+        if ( error_type = get_next_token(token) ) {
+            return error_type;
+        }
+        return NO_ERR;
+    } else {
+        return SYNTAX_ERR;
+    }
+}
+
+int f_plist( token_t * token ) {
+    if ( token->type == T_DOT ) {
+        if (error_type = get_next_token(token)) {
+            return error_type;
+        }
+        error_type = f_param(token); 
+        if (error_type) {
+            return error_type;
+        }
+        return f_plist(token);
+    } else if ( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING || token->type == T_VAR_ID) {
+        error_type = f_param(token); 
+        if (error_type) {
+            return error_type;
+        }
+        return f_plist(token);
+    } else if ( token->type == T_PAR_RIGHT ) {
+        if (error_type = get_next_token(token)) {
+            return error_type;
+        }
+        return NO_ERR;
+    } else {
+        return SYNTAX_ERR;
+    }
+}
+
 int declare(token_t * token){
     if(token->type == T_PAR_LEFT) {
             if (error_type = get_next_token(token)) {
+                return error_type;
+            }
+            error_type = f_plist(token);
+            if (error_type) {
                 return error_type;
             }
     }
@@ -54,7 +249,7 @@ int state(token_t * token){
                     if (error_type = get_next_token(token)) {
                         return error_type;
                     }
-                    if(token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING) {
+                    if( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING ) {
                         if (error_type = get_next_token(token)) {
                             return error_type;
                         }
@@ -142,7 +337,11 @@ int state(token_t * token){
                             return error_type;
                         }
                         return st_list(token);
+                    } else {
+                        return SYNTAX_ERR;
                     }
+                } else {
+                    return SYNTAX_ERR;
                 }
             } else {
                 return SYNTAX_ERR;
@@ -168,7 +367,7 @@ int st_list(token_t * token){
                 }
                 return st_list(token);
             } else {
-                return LEX_ERR;
+                return SYNTAX_ERR;
             }
             break;
         case (T_KW_FUNCTION):
@@ -202,7 +401,7 @@ int st_list(token_t * token){
 int prog(token_t * token){
     if(token->type == T_START_SYMBOL){  // if token is <?php
         if (error_type = get_next_token(token)) {
-            return LEX_ERR;
+            return error_type;
         }
         error_type = st_list(token);
         return error_type;
