@@ -51,16 +51,17 @@ typedef enum  {
 	T_FUN_ID,				// function identifier
 	T_INT_VAL,				// integer value
 	T_DEC_VAL,				// decimal value
+	T_STRING_VAL,			// string value
 } token_type;
 
 typedef enum {
-    S_START = 100,
-    S_EOF,
-    S_MUL,
-	S_GREATER,
-	S_GREATER_EQUAL,
-	S_LESS,
-	S_LESS_EQUAL,
+    S_START = 100,			// start state
+    S_EOF,					// end of file state
+    S_MUL,					// state for multiply
+	S_GREATER,				// state for greater
+	S_GREATER_EQUAL,		// state for greater or equal
+	S_LESS,					// state for less
+	S_LESS_EQUAL,			// state for less or equal
     S_PAR_LEFT,
 	S_PAR_RIGHT,
 	S_BRACKET_LEFT,
@@ -74,22 +75,30 @@ typedef enum {
     S_NOT_EQUAL,
 	S_NOT_EQUAL_EQUAL,
 	S_VAR_ID,
-	S_KW_FUN_START,
-    S_KW_FUN,
-	S_KW_TYPE,
-    S_START_SYMBOL,
-	S_END_SYMBOL,
+	S_KW_FUN_START,			// start state for keyword or function name
+    S_KW_FUN,				// state for keyword or function name 
+	S_KW_TYPE,				// state for type keywords
+    S_START_SYMBOL,			// state for prolog
+	S_END_SYMBOL,			// state for end symbol (?>)
     S_ELSE,
 	S_IF,
 	S_FLOAT,
 	S_FUNCTION,
-	S_INT_DEC,
-	S_DEC_START,
-	S_DEC,
+	S_INT_DEC,				// state for int or decimal
+	S_DEC_START,			// start state for decimal
+	S_DEC,					// state for decimal
+	S_EXP,					// state for exponential
 	S_INT,
-	S_EXP,
-	S_EXP_END,
 	S_STRING,
+	S_ESC,
+	S_ESC_OCT_START,
+	S_ESC_OCT,
+	S_ESC_HEX_START,
+	S_ESC_HEX,
+	S_COMMENT_START,
+	S_COMMENT_LINE,
+	S_COMMENT_BLOCK,
+	S_COMMENT_BLOCK_END,
 } fm_state;
 
 typedef union {
