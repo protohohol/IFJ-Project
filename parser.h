@@ -1,7 +1,7 @@
 #ifndef _PARSER_H
 #define _PARSER_H
+#include "botomtotop.h"
 #include "scanner.h"
-#include "error.h"
 
 // char * built_in_arr [8][10] = {"reads","readi","readf","write","strlen","substring","ord","chr"};
 // typedef enum {

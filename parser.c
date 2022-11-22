@@ -11,12 +11,7 @@ int error_type = 0;
 //         }
 //     return 0;
 // }
-
-int expression (token_t * token) {
-    return NO_ERR;
-}
-
-// int decl_list (token_t * token) {
+// int dec_list (token_t * token) {
 //         switch ( if_build_f(token) ) {
 //             case F_USER:
 //                 if (error_type = get_next_token(token)) {
