@@ -19,9 +19,12 @@ void symtable_init(symtable* table) {
     for (int i = 0; i < MAX_SIZE; i++) {
         (*table)[i] = NULL;
     }
+
+    symtable_insert(table, "reads");
+
 }
 
-symtable* symtable_search(symtable* table, char* key) {
+htab_data_t* symtable_search(symtable* table, char* key) {
     if (table == NULL || key == NULL) {
         return NULL;
     }
@@ -32,7 +35,7 @@ symtable* symtable_search(symtable* table, char* key) {
     while (tmpItem != NULL) {
 
         if(!strcmp(tmpItem->key, key)) {
-            return &tmpItem;
+            return &tmpItem->data;
         }
 
         tmpItem = tmpItem->next;
@@ -41,13 +44,13 @@ symtable* symtable_search(symtable* table, char* key) {
     return NULL;
 }
 
-symtable* symtable_insert(symtable* table, char* key) {
+htab_data_t* symtable_insert(symtable* table, char* key) {
     if (table == NULL || key == NULL) {
         return NULL;
     }
 
-    htab_item_t* tmpItem = symtable_search(table, key);
-    if(tmpItem != NULL) {
+    htab_data_t* tmpData = symtable_search(table, key);
+    if(tmpData != NULL) {
         return NULL;
     }
 
@@ -78,6 +81,7 @@ symtable* symtable_insert(symtable* table, char* key) {
     }
 
     strcpy(newItem->key, key);
+    strcpy(newItem->data.id, key);
     newItem->data.global_var = 0;
     newItem->data.type = NULL;
     newItem->next = NULL;
@@ -92,7 +96,42 @@ symtable* symtable_insert(symtable* table, char* key) {
         (*table)[index] = newItem;
     }
 
-    return &newItem;
+    return &newItem->data;
+}
+
+int symtable_add_arguments (htab_data_t* data, data_type type) {
+
+    if (data == NULL) {
+        return 0;
+    }
+
+    if (type == D_INT) {
+        if (!str_add_char(data->arguments, 'i')) {
+            return 0;
+        }
+        
+    } else if (type == D_DOUBLE) {
+        if (!str_add_char(data->arguments, 'd')) {
+            return 0;
+        }
+    } else if (type == D_FLOAT) {
+        if (!str_add_char(data->arguments, 'f')) {
+            return 0;
+        }
+    } else if (type == D_STRING) {
+        if (!str_add_char(data->arguments, 's')) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int symtable_add_type (htab_data_t* data, data_type type) {
+    if (data == NULL) {
+        return 0;
+    }
+
+    data->type = type;
 }
 
 int symtable_delete (symtable* table, char* key) {
