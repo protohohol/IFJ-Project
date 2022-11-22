@@ -19,6 +19,7 @@ typedef enum {
 typedef struct {
     data_type type;
     string* arguments;
+    char* id;
     int global_var;
 
 }htab_data_t;
@@ -35,9 +36,13 @@ void symtable_init (symtable* table);
 
 int get_hash (char *key);
 
-symtable* symtable_insert (symtable* table, char* key);
+htab_data_t* symtable_insert (symtable* table, char* key);
 
-symtable* symtable_search (symtable* table, char* key);
+htab_data_t* symtable_search (symtable* table, char* key);
+
+int symtable_add_arguments (htab_data_t* data, data_type type);
+
+int symtable_add_type (htab_data_t* data, data_type type);
 
 int symtable_delete (symtable* table, char* key);
 
