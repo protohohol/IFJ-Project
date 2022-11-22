@@ -21,6 +21,20 @@ void symtable_init(symtable* table) {
     }
 
     symtable_insert(table, "reads");
+    htab_data_t* tmpData = symtable_search(table, "reads");
+    symtable_add_type(tmpData, D_STRING);
+
+    symtable_insert(table, "readi");
+    htab_data_t* tmpData = symtable_search(table, "readi");
+    symtable_add_type(tmpData, D_INT);
+
+    symtable_insert(table, "readf");
+    htab_data_t* tmpData = symtable_search(table, "readf");
+    symtable_add_type(tmpData, D_FLOAT);
+
+    symtable_insert(table, "readi");
+    htab_data_t* tmpData = symtable_search(table, "readi");
+    symtable_add_type(tmpData, D_INT);
 
 }
 
@@ -82,7 +96,9 @@ htab_data_t* symtable_insert(symtable* table, char* key) {
 
     strcpy(newItem->key, key);
     strcpy(newItem->data.id, key);
-    newItem->data.global_var = 0;
+    newItem->data.global_var = false;
+    newItem->data.argumets_amount = 0;
+    newItem->data.infinite = false;
     newItem->data.type = NULL;
     newItem->next = NULL;
 
@@ -99,44 +115,50 @@ htab_data_t* symtable_insert(symtable* table, char* key) {
     return &newItem->data;
 }
 
-int symtable_add_arguments (htab_data_t* data, data_type type) {
+bool symtable_add_arguments (htab_data_t* data, data_type type, bool infinite_args) {
 
     if (data == NULL) {
-        return 0;
+        return false;
     }
+    
+    data->infinite = infinite_args;
 
     if (type == D_INT) {
         if (!str_add_char(data->arguments, 'i')) {
-            return 0;
+            return false;
         }
-        
+        ++data->argumets_amount;
     } else if (type == D_DOUBLE) {
         if (!str_add_char(data->arguments, 'd')) {
-            return 0;
+            return false;
         }
+        ++data->argumets_amount;
     } else if (type == D_FLOAT) {
         if (!str_add_char(data->arguments, 'f')) {
-            return 0;
+            return false;
         }
+        ++data->argumets_amount;
     } else if (type == D_STRING) {
         if (!str_add_char(data->arguments, 's')) {
-            return 0;
+            return false;
         }
+        ++data->argumets_amount;
     }
-    return 1;
+    return true;
 }
 
-int symtable_add_type (htab_data_t* data, data_type type) {
+bool symtable_add_type (htab_data_t* data, data_type type) {
     if (data == NULL) {
-        return 0;
+        return false;
     }
 
     data->type = type;
+    return true;
 }
 
-int symtable_delete (symtable* table, char* key) {
+bool symtable_delete (symtable* table, char* key) {
     if(table == NULL || key == NULL) {
-        return 0;
+        return false;
     }
 
     int index = get_hash(key);
@@ -161,14 +183,14 @@ int symtable_delete (symtable* table, char* key) {
             }
 
             free(item);
-            return 1;
+            return true;
         }
         ++posCounter;
         previousItem = item;
         item = item->next;
 
     }
-    return 0;
+    return false;
     
 }
 

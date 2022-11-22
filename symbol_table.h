@@ -20,8 +20,9 @@ typedef struct {
     data_type type;
     string* arguments;
     char* id;
-    int global_var;
-
+    bool global_var;
+    int argumets_amount;
+    bool infinite;
 }htab_data_t;
 
 typedef struct htab_item {
@@ -40,11 +41,11 @@ htab_data_t* symtable_insert (symtable* table, char* key);
 
 htab_data_t* symtable_search (symtable* table, char* key);
 
-int symtable_add_arguments (htab_data_t* data, data_type type);
+bool symtable_add_arguments (htab_data_t* data, data_type type, bool infinite_args);
 
-int symtable_add_type (htab_data_t* data, data_type type);
+bool symtable_add_type (htab_data_t* data, data_type type);
 
-int symtable_delete (symtable* table, char* key);
+bool symtable_delete (symtable* table, char* key);
 
 void symtable_free (symtable* table);
 
