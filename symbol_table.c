@@ -20,21 +20,48 @@ void symtable_init(symtable* table) {
         (*table)[i] = NULL;
     }
 
-    symtable_insert(table, "reads");
-    htab_data_t* tmpData = symtable_search(table, "reads");
+    htab_data_t* tmpData = symtable_insert(table, "reads");
     symtable_add_type(tmpData, D_STRING);
 
-    symtable_insert(table, "readi");
-    htab_data_t* tmpData = symtable_search(table, "readi");
+    htab_data_t* tmpData = symtable_insert(table, "readi");
     symtable_add_type(tmpData, D_INT);
 
-    symtable_insert(table, "readf");
-    htab_data_t* tmpData = symtable_search(table, "readf");
+    htab_data_t* tmpData = symtable_insert(table, "readf");
     symtable_add_type(tmpData, D_FLOAT);
 
-    symtable_insert(table, "readi");
-    htab_data_t* tmpData = symtable_search(table, "readi");
+    htab_data_t* tmpData = symtable_insert(table, "write");
+    symtable_add_type(tmpData, D_VOID);
+    symtable_add_arguments(tmpData, D_TERM, true);
+
+    htab_data_t* tmpData = symtable_insert(table, "floatval");
+    symtable_add_type(tmpData, D_FLOAT);
+    symtable_add_arguments(tmpData, D_TERM, false);
+
+    htab_data_t* tmpData = symtable_insert(table, "intval");
     symtable_add_type(tmpData, D_INT);
+    symtable_add_arguments(tmpData, D_TERM, false);
+
+    htab_data_t* tmpData = symtable_insert(table, "strval");
+    symtable_add_type(tmpData, D_STRING);
+    symtable_add_arguments(tmpData, D_TERM, false);
+
+    htab_data_t* tmpData = symtable_insert(table, "strlen");
+    symtable_add_type(tmpData, D_INT);
+    symtable_add_arguments(tmpData, D_STRING, false);
+
+    htab_data_t* tmpData = symtable_insert(table, "substring");
+    symtable_add_type(tmpData, D_STRING);
+    symtable_add_arguments(tmpData, D_STRING, false);
+    symtable_add_arguments(tmpData, D_INT, false);
+    symtable_add_arguments(tmpData, D_INT, false);
+
+    htab_data_t* tmpData = symtable_insert(table, "ord");
+    symtable_add_type(tmpData, D_INT);
+    symtable_add_arguments(tmpData, D_STRING, false);
+
+    htab_data_t* tmpData = symtable_insert(table, "chr");
+    symtable_add_type(tmpData, D_STRING);
+    symtable_add_arguments(tmpData, D_INT, false);
 
 }
 
@@ -140,6 +167,11 @@ bool symtable_add_arguments (htab_data_t* data, data_type type, bool infinite_ar
         ++data->argumets_amount;
     } else if (type == D_STRING) {
         if (!str_add_char(data->arguments, 's')) {
+            return false;
+        }
+        ++data->argumets_amount;
+    } else if (type == D_TERM) {
+        if (!str_add_char(data->arguments, 't')) {
             return false;
         }
         ++data->argumets_amount;
