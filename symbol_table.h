@@ -14,6 +14,7 @@ typedef enum {
     D_DOUBLE,
     D_FLOAT,
     D_STRING,
+    D_TERM,
 }data_type;
 
 typedef struct {
