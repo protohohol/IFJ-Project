@@ -1,51 +1,9 @@
 #include "parser.h"
-int error_type = 0;
+int error_type;
 
 
 
-// int if_build_f (token_t * token) {
-//     for ( int i = 0; i<8; i++ ) {
-//         if(( str_cmp_const_str (token->data->string_c,built_in_arr[i]) )) {
-//                 return i+1;
-//             }
-//         }
-//     return 0;
-// }
-// int dec_list (token_t * token) {
-//         switch ( if_build_f(token) ) {
-//             case F_USER:
-//                 if (error_type = get_next_token(token)) {
-//                     return error_type;
-//                 }
-//                 return declare(token);
-//                 break;
-//             case F_SREAD:
-//                 if (error_type = get_next_token(token)) {
-//                     return error_type;
-//                 }
-//                 break;
-//             case F_IREAD:
-//                 /* code */
-//                 break;
-//             case F_FREAD:
-//                 /* code */
-//                 break;
-//             case F_WRITE:
-//                 /* code */
-//                 break;
-//             case F_STRLN:
-//                 /* code */
-//                 break;
-//             case F_SUBSTR:
-//                 /* code */
-//                 break;
-//             case F_ORD:
-//                 /* code */
-//                 break;
-//             case F_CHR:
-//                 break;
-//             }
-// }
+
 
 
 int f_state ( token_t * token ) {
@@ -281,11 +239,11 @@ int state(token_t * token){
             break;
         case (T_VAR_ID):
             if (error_type = get_next_token(token)) {
-                error(error_type);
+                return error_type;
             }
             if(token->type == T_ASSIGN){
                 if (error_type = get_next_token(token)) {
-                error(error_type);
+                return error_type;
                 }
                 expression(token);
             }

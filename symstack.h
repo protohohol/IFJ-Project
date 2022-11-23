@@ -1,3 +1,4 @@
+#include <stdbool.h>
 
 typedef enum
 {
@@ -11,6 +12,7 @@ typedef enum
 {
 	ES_PLUS,			// +
 	ES_MINUS,			// -
+	ES_CON,              // . 
 	ES_MUL,			// *
 	ES_DIV,			// /
 	ES_EQ,				// ===
@@ -21,13 +23,12 @@ typedef enum
 	ES_MTN,			// >
 	ES_LEFT_BRACKET,	// (
 	ES_RIGHT_BRACKET,	// )
-	ES_IDENTIFIER,		// ID
-	ES_INT_NUMBER,		// int
-	ES_FLOAT_NUMBER,	// float
-	ES_STRING,			// string
+	ES_ID,		// ID
+	ES_INT_LIT,		// int
+	ES_FLOAT_LIT,	// float
+	ES_STR,			// string
 	ES_END,				// $
 	ES_CATCH,			// catch for get_top_terminlal function
-	ES_START,			// start non terminal
 	ES_NON_TERM			// 
 } exp_stack_symbol;
 
@@ -47,7 +48,10 @@ typedef struct sstack {
 
 void stack_init (sstack_t * sstack);
 bool stack_push (sstack_t * sstack, exp_stack_symbol symbol, exp_type type);
+bool stack_push_after (sstack_t * sstack, exp_stack_symbol symbol, exp_type type);
 bool stack_pop(sstack_t * sstack);
 item_stack_t* get_top ( sstack_t * sstack);
+item_stack_t* get_top_term ( sstack_t * sstack);
+void stack_dispose (sstack_t * sstack);
 
 

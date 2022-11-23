@@ -19,8 +19,8 @@ typedef enum {
 	R_MUL,		// A -> A * A
 	R_DIV,		// A -> A / E
 	R_PAR,		// A -> (A)
-	ID,		    // A -> i
-	EROR,	    // rule error
+	R_ID,		    // A -> i
+	R_ERROR,	    // rule error
 } exp_rules;
 
 
