@@ -33,6 +33,7 @@ int expression (token_t * token) {
             }
             break;
         case C_LESS:
+            stack_push(exp_stack,ES_CATCH, ET_UNDEFINED);
             tmp_sym = convert_to_symbol(token);
             tmp_type = convert_to_type(token);
             stack_push(exp_stack,tmp_sym,tmp_type);
@@ -41,10 +42,14 @@ int expression (token_t * token) {
             }
             break;
         case C_MORE:
-            
+            if (1) {
+                return 0;
+            } else {
+                return SYNTAX_ERR;
+            }
             break;
         case C_NONE:
-            return SYNTAX_ERR;
+            return SYNTAX_ERR;  
             break;
         default:
             break;

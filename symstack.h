@@ -1,5 +1,35 @@
 
+typedef enum
+{
+	ET_UNDEFINED,	/// Data type undefined
+	ET_INT,		/// Integer data type
+	ET_FLOAT,	    /// Double data type
+	ET_STRING,	/// String data type
+} exp_type;
 
+typedef enum
+{
+	ES_PLUS,			// +
+	ES_MINUS,			// -
+	ES_MUL,			// *
+	ES_DIV,			// /
+	ES_EQ,				// ===
+	ES_NEQ,			// !==
+	ES_LEQ,			// <=
+	ES_LTN,			// <
+	ES_MEQ,			// >=
+	ES_MTN,			// >
+	ES_LEFT_BRACKET,	// (
+	ES_RIGHT_BRACKET,	// )
+	ES_IDENTIFIER,		// ID
+	ES_INT_NUMBER,		// int
+	ES_FLOAT_NUMBER,	// float
+	ES_STRING,			// string
+	ES_END,				// $
+	ES_CATCH,			// catch for get_top_terminlal function
+	ES_START,			// start non terminal
+	ES_NON_TERM			// 
+} exp_stack_symbol;
 
 
 typedef struct item_stack {

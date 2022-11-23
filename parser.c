@@ -47,13 +47,18 @@ int error_type = 0;
 //             }
 // }
 
+
 int f_state ( token_t * token ) {
     switch (token->type) {
         case (T_KW_RETURN):
             if (error_type = get_next_token(token)) {
                 return error_type;
             }
+            if ( token->type == T_FUN_ID ) {
+                return declare(token);
+            } else {
             return expression(token);
+            }
             break;
         case (T_VAR_ID):
             if (error_type = get_next_token(token)) {
@@ -268,21 +273,25 @@ int state(token_t * token){
             if (error_type = get_next_token(token)) {
                 return error_type;
             }
+            if ( token->type == T_FUN_ID ) {
+                return declare(token);
+            } else {
             return expression(token);
+            }
             break;
-        // case (T_VAR_ID):
-        //     if (error_type = get_next_token(token)) {
-        //         error(error_type);
-        //     }
-        //     if(token->type == T_ASSIGN){
-        //         if (error_type = get_next_token(token)) {
-        //         error(error_type);
-        //         }
-        //         expression(token);
-        //     }
-        //     else
-        //         expression(token);
-        //     break;
+        case (T_VAR_ID):
+            if (error_type = get_next_token(token)) {
+                error(error_type);
+            }
+            if(token->type == T_ASSIGN){
+                if (error_type = get_next_token(token)) {
+                error(error_type);
+                }
+                expression(token);
+            }
+            else
+                expression(token);
+            break;
         case (T_FUN_ID):
             if (error_type = get_next_token(token)) {
                 return error_type;
