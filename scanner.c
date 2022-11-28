@@ -209,7 +209,7 @@ const int get_next_token(token_t *token) {
                 break;
 
             case (S_STRING):
-                if (c > 31 && c != 34) {
+                if (c > 31 && c != 34 && c != '\\') {
                     if (!str_add_char(s, c)) {
                         str_free(s);
                         return ERROR_INTERNAL;
@@ -228,6 +228,7 @@ const int get_next_token(token_t *token) {
                     str_free(s);
                     return LEX_ERR;
                 } else if (c == '\\') {
+                    // printf("@@hi1\n");
                     state = S_ESC;
                 }
                 break;
@@ -240,6 +241,7 @@ const int get_next_token(token_t *token) {
                     }
                     state = S_STRING;
                 } else if (c == 'n') {
+                    printf("hi1\n");
                     if (!str_add_char(s, '\n')) {
                         str_free(s);
                         return ERROR_INTERNAL;
