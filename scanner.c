@@ -92,6 +92,10 @@ const int get_next_token(token_t *token) {
                     token->type = T_DOT;
                     str_free(s);
                     return NO_ERR;
+                } else if (c == ',') {
+                    token->type = T_COMMA;
+                    str_free(s);
+                    return NO_ERR;
                 } else if (c == ';') {
                     token->type = T_SEMICOLON;
                     str_free(s);
@@ -213,12 +217,13 @@ const int get_next_token(token_t *token) {
                 } else if (c == '\"') {
                     // printf("hi\n");
                     // printf("t.d.s.l : \ns.l : %d\n", token->data->string_c->length, s->allocSize);
-                    // if (!str_copy_string(token->data->string_c, s)) {
-                    //     str_free(s);
-                    //     return ERROR_INTERNAL;
-                    // }
+                    if (!str_copy_string(token->data.string_c, s)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
                     token->type = T_STRING_VAL;
-                    state = S_START;
+                    str_free(s);
+                    return NO_ERR;
                 } else if (c == '$') {
                     str_free(s);
                     return LEX_ERR;

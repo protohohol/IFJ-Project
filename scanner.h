@@ -25,6 +25,7 @@ typedef enum  {
 	T_ADD,                  // +
 	T_SUB,                  // -
 	T_DOT,                  // .
+	T_COMMA,				// ,
 	T_GREATER,              // >
 	T_GREATER_EQUAL,        // >=
 	T_LESS,                 // <
