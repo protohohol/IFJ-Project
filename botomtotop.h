@@ -5,7 +5,6 @@
 
 
 
-
 typedef enum {
     R_EQ,		// A -> A === A
 	R_NEQ,		// A -> A !== A
@@ -30,3 +29,5 @@ typedef enum {
     C_EQ,
     C_NONE,
 } exp_cond;
+
+const int convert_to_symbol (token_t * token);

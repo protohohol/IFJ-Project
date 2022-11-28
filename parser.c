@@ -176,7 +176,7 @@ int f_param ( token_t * token ) {
 }
 
 int f_plist( token_t * token ) {
-    if ( token->type == T_DOT ) {
+    if ( token->type == T_COMMA ) {
         if (error_type = get_next_token(token)) {
             return error_type;
         }

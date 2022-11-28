@@ -3,9 +3,281 @@
 
 
 
-
-int get_cond (token_t *token) {
-    return 1;
+int get_cond (token_t *token,sstack_t * stack_exp) {
+    const int tmp_symbol = convert_to_symbol(token);
+    item_stack_t * pstack = get_top_term(stack_exp);
+    const int tmp_stack_symbol = pstack->symbol;
+    switch ( tmp_symbol ) {
+        case ES_PLUS:
+        case ES_MINUS:
+        case ES_CON:
+            switch ( tmp_stack_symbol ) {
+                case ES_PLUS:
+                case ES_MINUS:
+                case ES_CON:
+                    return C_MORE; 
+                case ES_MUL:
+                case ES_DIV:
+                    return C_LESS ;
+                case ES_MTN:
+                case ES_MEQ:
+                case ES_LTN:
+                case ES_LEQ:
+                    return C_MORE;
+                case ES_EQ:
+                case ES_NEQ:
+                    return C_MORE;
+                case ES_ID:
+                case ES_INT_LIT:
+                case ES_FLOAT_LIT:
+                case ES_STR:
+                    return C_LESS ;
+                case T_PAR_LEFT:
+                    return C_LESS ;
+                case T_PAR_RIGHT:
+                    return C_MORE;
+                case ES_END:
+                    return C_MORE;
+                default:
+                    return C_NONE;
+            }
+            break;
+        case ES_MUL:
+        case ES_DIV:
+            switch ( tmp_stack_symbol ) {
+                case ES_PLUS:
+                case ES_MINUS:
+                case ES_CON:
+                    return C_MORE; 
+                case ES_MUL:
+                case ES_DIV:
+                    return C_MORE ;
+                case ES_MTN:
+                case ES_MEQ:
+                case ES_LTN:
+                case ES_LEQ:
+                    return C_MORE;
+                case ES_EQ:
+                case ES_NEQ:
+                    return C_MORE;
+                case ES_ID:
+                case ES_INT_LIT:
+                case ES_FLOAT_LIT:
+                case ES_STR:
+                    return C_LESS ;
+                case T_PAR_LEFT:
+                    return C_LESS ;
+                case T_PAR_RIGHT:
+                    return C_MORE;
+                case ES_END:
+                    return C_MORE;
+                default:
+                    return C_NONE;
+            }
+            break;
+        case ES_MTN:
+        case ES_MEQ:
+        case ES_LTN:
+        case ES_LEQ:
+            switch ( tmp_stack_symbol ) {
+                case ES_PLUS:
+                case ES_MINUS:
+                case ES_CON:
+                    return C_LESS; 
+                case ES_MUL:
+                case ES_DIV:
+                    return C_LESS ;
+                case ES_MTN:
+                case ES_MEQ:
+                case ES_LTN:
+                case ES_LEQ:
+                    return C_MORE;
+                case ES_EQ:
+                case ES_NEQ:
+                    return C_MORE;
+                case ES_ID:
+                case ES_INT_LIT:
+                case ES_FLOAT_LIT:
+                case ES_STR:
+                    return C_LESS ;
+                case T_PAR_LEFT:
+                    return C_LESS ;
+                case T_PAR_RIGHT:
+                    return C_MORE;
+                case ES_END:
+                    return C_MORE;
+                default:
+                    return C_NONE;
+            }
+            break;
+        case ES_EQ:
+        case ES_NEQ:
+            switch ( tmp_stack_symbol ) {
+                case ES_PLUS:
+                case ES_MINUS:
+                case ES_CON:
+                    return C_LESS; 
+                case ES_MUL:
+                case ES_DIV:
+                    return C_LESS ;
+                case ES_MTN:
+                case ES_MEQ:
+                case ES_LTN:
+                case ES_LEQ:
+                    return C_LESS;
+                case ES_EQ:
+                case ES_NEQ:
+                    return C_MORE;
+                case ES_ID:
+                case ES_INT_LIT:
+                case ES_FLOAT_LIT:
+                case ES_STR:
+                    return C_LESS ;
+                case T_PAR_LEFT:
+                    return C_LESS ;
+                case T_PAR_RIGHT:
+                    return C_MORE;
+                case ES_END:
+                    return C_MORE;
+                default:
+                    return C_NONE;
+            }
+            break;
+        case ES_ID:
+        case ES_INT_LIT:
+        case ES_FLOAT_LIT:
+        case ES_STR:
+            switch ( tmp_stack_symbol ) {
+                case ES_PLUS:
+                case ES_MINUS:
+                case ES_CON:
+                    return C_MORE; 
+                case ES_MUL:
+                case ES_DIV:
+                    return C_MORE ;
+                case ES_MTN:
+                case ES_MEQ:
+                case ES_LTN:
+                case ES_LEQ:
+                    return C_MORE;
+                case ES_EQ:
+                case ES_NEQ:
+                    return C_MORE;
+                case ES_ID:
+                case ES_INT_LIT:
+                case ES_FLOAT_LIT:
+                case ES_STR:
+                    return C_NONE ;
+                case T_PAR_LEFT:
+                    return C_NONE ;
+                case T_PAR_RIGHT:
+                    return C_MORE;
+                case ES_END:
+                    return C_MORE;
+                default:
+                    return C_NONE;
+            }
+            break;
+        case T_PAR_LEFT:
+            switch ( tmp_stack_symbol ) {
+                case ES_PLUS:
+                case ES_MINUS:
+                case ES_CON:
+                    return C_LESS; 
+                case ES_MUL:
+                case ES_DIV:
+                    return C_LESS ;
+                case ES_MTN:
+                case ES_MEQ:
+                case ES_LTN:
+                case ES_LEQ:
+                    return C_LESS;
+                case ES_EQ:
+                case ES_NEQ:
+                    return C_LESS;
+                case ES_ID:
+                case ES_INT_LIT:
+                case ES_FLOAT_LIT:
+                case ES_STR:
+                    return C_LESS ;
+                case T_PAR_LEFT:
+                    return C_LESS ;
+                case T_PAR_RIGHT:
+                    return C_EQ;
+                case ES_END:
+                    return C_NONE;
+                default:
+                    return C_NONE;
+            }
+            break;
+        case T_PAR_RIGHT:
+            switch ( tmp_stack_symbol ) {
+                case ES_PLUS:
+                case ES_MINUS:
+                case ES_CON:
+                    return C_MORE; 
+                case ES_MUL:
+                case ES_DIV:
+                    return C_MORE;
+                case ES_MTN:
+                case ES_MEQ:
+                case ES_LTN:
+                case ES_LEQ:
+                    return C_MORE;
+                case ES_EQ:
+                case ES_NEQ:
+                    return C_MORE;
+                case ES_ID:
+                case ES_INT_LIT:
+                case ES_FLOAT_LIT:
+                case ES_STR:
+                    return C_NONE ;
+                case T_PAR_LEFT:
+                    return C_NONE ;
+                case T_PAR_RIGHT:
+                    return C_MORE;
+                case ES_END:
+                    return C_MORE;
+                default:
+                    return C_NONE;
+            }
+            break;
+        case ES_END:
+            switch ( tmp_stack_symbol ) {
+                case ES_PLUS:
+                case ES_MINUS:
+                case ES_CON:
+                    return C_LESS; 
+                case ES_MUL:
+                case ES_DIV:
+                    return C_LESS;
+                case ES_MTN:
+                case ES_MEQ:
+                case ES_LTN:
+                case ES_LEQ:
+                    return C_LESS;
+                case ES_EQ:
+                case ES_NEQ:
+                    return C_LESS;
+                case ES_ID:
+                case ES_INT_LIT:
+                case ES_FLOAT_LIT:
+                case ES_STR:
+                    return C_LESS ;
+                case T_PAR_LEFT:
+                    return C_LESS ;
+                case T_PAR_RIGHT:
+                    return C_NONE;
+                case ES_END:
+                    return C_NONE;
+                default:
+                    return C_NONE;
+            }
+            break;
+        default:
+            return C_NONE;
+            break;
+    }
 }
 
 const int convert_to_symbol (token_t * token) {
@@ -36,17 +308,33 @@ const int convert_to_symbol (token_t * token) {
 		return ES_RIGHT_BRACKET;
 	case T_VAR_ID:
 		return ES_ID;
-	case T_KW_INT:
+	case T_INT_VAL:
 		return ES_INT_LIT;
-	case T_KW_FLOAT:
+	case T_DEC_VAL:
 		return ES_FLOAT_LIT;
-	case T_KW_STRING:
+	case T_STRING_VAL:
 		return ES_STR;
 	}
 }
 
-int convert_to_type (token_t * token){
-    return 1;
+int convert_to_type ( token_t * token ) {
+    switch ( token->type ) {
+    case T_VAR_ID:
+        return check_type_of_var();
+        break;
+    case T_INT_VAL:
+        return ET_INT;
+        break;
+    case T_DEC_VAL:
+        return ET_FLOAT;
+        break; 
+    case T_STRING_VAL:
+        return ET_STRING;
+        break;
+    default:
+        return ET_UNDEFINED;
+        break;
+    }
 }
 
 bool find_catch ( int * count , sstack_t * sstack) {
@@ -74,8 +362,7 @@ int rule_test (int count, item_stack_t * op1, item_stack_t * op2, item_stack_t *
             rule = R_ERROR;
         }
     } else if ( count == 3 ) {
-        if ( (op1->symbol == ES_LEFT_BRACKET) & (op2->symbol == ES_NON_TERM) & (op3->symbol == ES_RIGHT_BRACKET) )
-        {
+        if ( (op1->symbol == ES_LEFT_BRACKET) & (op2->symbol == ES_NON_TERM) & (op3->symbol == ES_RIGHT_BRACKET) ) {
             rule =  R_PAR;
         } else if ( op1->symbol == ES_NON_TERM && op3->symbol == ES_NON_TERM ) {
             switch ( op2->symbol )
@@ -141,9 +428,8 @@ int expression (token_t * token) {
     bool found;
     int count;
     stack_push(exp_stack,ES_END,ET_UNDEFINED);
-    while( ( token->type != T_SEMICOLON ) & ( ( get_top(exp_stack) )->symbol != ES_END ) ) {
-        switch (get_cond(token))
-        {
+    while( ( convert_to_symbol(token) != ES_END ) & ( ( get_top(exp_stack) )->symbol != ES_END ) ) {
+        switch (get_cond(token,exp_stack)) {
         case C_EQ:
             tmp_sym = convert_to_symbol(token);
             tmp_type = convert_to_type(token);
