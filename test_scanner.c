@@ -118,7 +118,7 @@ void print_token ( token_t * token) {
 		}
         break;
 	case T_STRING_VAL:
-		printf("string-lit : \t%s\n", token->data.string_c->str);
+		printf("string-lit : \t\"%s\"\n", token->data.string_c->str);
 		if (str_init(&s)) {
 			token->data.string_c = &s;
 		}

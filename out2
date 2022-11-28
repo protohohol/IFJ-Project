@@ -8,7 +8,7 @@ int-lit : 	1
 ;
 id : 	write
 (
-string-lit : 	Zadejte cislo pro vypocet faktorialu: 
+string-lit : 	"Zadejte cislo pro vypocet faktorialu: "
 )
 ;
 id : 	$a
@@ -80,8 +80,8 @@ int-lit : 	0
 {
 id : 	write
 (
-string-lit : 	Faktorial nelze spocitat
-
+string-lit : 	"Faktorial nelze spocitat
+"
 )
 ;
 }
@@ -96,12 +96,12 @@ id : 	$a
 ;
 id : 	write
 (
-string-lit : 	Vysledek je: 
+string-lit : 	"Vysledek je: "
 ,
 id : 	$vysl
 ,
-string-lit : 	
-
+string-lit : 	"
+"
 )
 ;
 }
@@ -110,8 +110,8 @@ else
 {
 id : 	write
 (
-string-lit : 	Chyba pri nacitani celeho cisla!
-
+string-lit : 	"Chyba pri nacitani celeho cisla!
+"
 )
 ;
 }

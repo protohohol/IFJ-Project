@@ -17,12 +17,12 @@ void
 {
 id : 	write
 (
-string-lit : 	Hello from IFJ
+string-lit : 	"Hello from IFJ"
 ,
 id : 	$year
 ,
-string-lit : 	
-
+string-lit : 	"
+"
 )
 ;
 }

@@ -38,12 +38,12 @@ int-lit : 	1
 ;
 id : 	write
 (
-string-lit : 	calling g with 
+string-lit : 	"calling g with "
 ,
 id : 	$x
 ,
-string-lit : 	
-
+string-lit : 	"
+"
 )
 ;
 id : 	$res
@@ -76,12 +76,12 @@ int-lit : 	0
 {
 id : 	write
 (
-string-lit : 	calling f with 
+string-lit : 	"calling f with "
 ,
 id : 	$x
 ,
-string-lit : 	
-
+string-lit : 	"
+"
 )
 ;
 id : 	$x
@@ -111,12 +111,12 @@ int-lit : 	10
 ;
 id : 	write
 (
-string-lit : 	res: 
+string-lit : 	"res: "
 ,
 id : 	$res
 ,
-string-lit : 	
-
+string-lit : 	"
+"
 )
 ;
 ?>
