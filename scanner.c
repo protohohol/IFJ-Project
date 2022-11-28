@@ -56,7 +56,8 @@ const int get_next_token(token_t *token) {
         return ERROR_INTERNAL;
     }
 
-    string *s;
+    string l_s;
+    string *s = &l_s;
     if (!str_init(s)) {
         return ERROR_INTERNAL;
     }
@@ -68,6 +69,8 @@ const int get_next_token(token_t *token) {
 
     while (true) {
         c = getc(source);
+        // printf("s len : %d\n", s->allocSize);
+        // printf("c : %c\ns : %s\n", c, s->str);
 
         switch (state) {
             case (S_START):
@@ -165,8 +168,10 @@ const int get_next_token(token_t *token) {
                 } else if (c == '*') {
                     state = S_COMMENT_BLOCK;
                 } else {
+                    ungetc(c, source);
                     str_free(s);
-                    return LEX_ERR;
+                    token->type = T_DIV;
+                    return NO_ERR;
                 }
                 break;
 
@@ -206,10 +211,12 @@ const int get_next_token(token_t *token) {
                         return ERROR_INTERNAL;
                     }
                 } else if (c == '\"') {
-                    if (!str_copy_string(token->data->string_c, s)) {
-                        str_free(s);
-                        return ERROR_INTERNAL;
-                    }
+                    // printf("hi\n");
+                    // printf("t.d.s.l : \ns.l : %d\n", token->data->string_c->length, s->allocSize);
+                    // if (!str_copy_string(token->data->string_c, s)) {
+                    //     str_free(s);
+                    //     return ERROR_INTERNAL;
+                    // }
                     token->type = T_STRING_VAL;
                     state = S_START;
                 } else if (c == '$') {
@@ -403,7 +410,8 @@ const int get_next_token(token_t *token) {
                 } else {
                     ungetc(c, source);
                     token->type = T_INT_VAL;
-                    token->data->int_c = atoi(s->str);
+                    // printf("t.d.s.l : %d\n", token->data->string_c->length);
+                    token->data.int_c = atoi(s->str);
                     str_free(s);
                     return NO_ERR;
                 }
@@ -450,7 +458,7 @@ const int get_next_token(token_t *token) {
                 } else {
                     ungetc(c, source);
                     token->type = T_DEC_VAL;
-                    token->data->double_c = strtod(s->str, NULL);
+                    token->data.double_c = strtod(s->str, NULL);
                     str_free(s);
                     return NO_ERR;
                 }
@@ -465,7 +473,7 @@ const int get_next_token(token_t *token) {
                 } else {
                     ungetc(c, source);
                     token->type = T_VAR_ID;
-                    if (!str_copy_string(token->data->string_c, s)) {
+                    if (!str_copy_string(token->data.string_c, s)) {
                         str_free(s);
                         return ERROR_INTERNAL;
                     }
@@ -628,7 +636,7 @@ const int get_next_token(token_t *token) {
                 } else {
                     ungetc(c, source);
                     if (!is_keyword(s, token) || !is_type(s, token)) {
-                        if (!str_copy_string(token->data->string_c, s)) {
+                        if (!str_copy_string(token->data.string_c, s)) {
                             str_free(s);
                             return ERROR_INTERNAL;
                         }

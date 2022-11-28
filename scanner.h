@@ -112,7 +112,7 @@ typedef union {
 
 typedef struct token {
     token_type type; 	// token type
-    data_u *data; 		// token content
+    data_u data; 		// token content
 } token_t;
 
 /**
