@@ -41,6 +41,9 @@ void print_token ( token_t * token) {
 	case T_VAR_ID:
 		printf("id : \t%s\n", token->data.string_c->str);
         break;
+	case T_FUN_ID:
+		printf("id : \t%s\n", token->data.string_c->str);
+        break;
 	case T_INT_VAL:
 		printf("int-lit : \t%d\n", token->data.int_c);
 		string s;
@@ -50,15 +53,21 @@ void print_token ( token_t * token) {
         break;
 	case T_DEC_VAL:
 		printf("float_lit\n");
+		if (str_init(&s)) {
+			token->data.string_c = &s;
+		}
         break;
 	case T_STRING_VAL:
 		printf("string-lit\n");
+		if (str_init(&s)) {
+			token->data.string_c = &s;
+		}
         break;
 	case T_START_SYMBOL:
 		printf("<?php\n");
         break;
 	default:
-		printf("default\n");
+		printf("default : %d\n", token->type);
 		break;
 	}
 }

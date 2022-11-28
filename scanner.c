@@ -104,7 +104,7 @@ const int get_next_token(token_t *token) {
                     token->type = T_PAR_LEFT;
                     str_free(s);
                     return NO_ERR;
-                } else if (c == '(') {
+                } else if (c == ')') {
                     token->type = T_PAR_RIGHT;
                     str_free(s);
                     return NO_ERR;
