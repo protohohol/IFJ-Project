@@ -156,7 +156,7 @@ const int get_next_token(token_t *token) {
                     token->type = T_EOF;
                     str_free(s);
                     return NO_ERR;
-                } else if (c == '\"') {
+                } else if (c == '\"' || c == '\'') {
                     state = S_STRING;
                 } else if (c == '/') {
                     state = S_COMMENT_START;
@@ -209,12 +209,12 @@ const int get_next_token(token_t *token) {
                 break;
 
             case (S_STRING):
-                if (c > 31 && c != 34 && c != '\\') {
+                if (c > 31 && c != 34 && c != '\\' && c != '\'') {
                     if (!str_add_char(s, c)) {
                         str_free(s);
                         return ERROR_INTERNAL;
                     }
-                } else if (c == '\"') {
+                } else if (c == '\"' || c == '\'') {
                     // printf("hi\n");
                     // printf("t.d.s.l : \ns.l : %d\n", token->data->string_c->length, s->allocSize);
                     if (!str_copy_string(token->data.string_c, s)) {
@@ -241,7 +241,7 @@ const int get_next_token(token_t *token) {
                     }
                     state = S_STRING;
                 } else if (c == 'n') {
-                    printf("hi1\n");
+                    // printf("hi1\n");
                     if (!str_add_char(s, '\n')) {
                         str_free(s);
                         return ERROR_INTERNAL;
@@ -606,7 +606,9 @@ const int get_next_token(token_t *token) {
                 if (c == '=') {
                     state = S_NOT_EQUAL;
                 } else {
-                    return LEX_ERR;
+                    ungetc(c, source);
+                    str_free(s);
+                    return NO_ERR;
                 }
                 break;
 

@@ -2,6 +2,12 @@
 #include "error.h"
 void print_token ( token_t * token) {
     switch (token->type) {
+	case T_EOL:
+		printf("eol\n");
+        break;
+	case T_EOF:
+		printf("eof\n");
+        break;
 	case T_ADD:
 		printf("+\n");
         break;
@@ -14,29 +20,83 @@ void print_token ( token_t * token) {
 	case T_DIV:
 		printf("/\n");
         break;
+	case T_DOT:
+		printf(".\n");
+        break;
+	case T_COMMA:
+		printf(",\n");
+        break;
+	case T_GREATER:
+		printf(">\n");
+        break;
+	case T_GREATER_EQUAL:
+		printf(">=\n");
+        break;
+	case T_LESS:
+		printf("<\n");
+        break;
+	case T_LESS_EQUAL:
+		printf("<=\n");
+        break;
 	case T_ASSIGN:
 		printf("=\n");
         break;
 	case T_NOT_EQUAL:
 		printf("!==\n");
         break;
-	case T_LESS_EQUAL:
-		printf("<=\n");
-        break;
-	case T_LESS:
-		printf("<\n");
-        break;
-	case T_GREATER_EQUAL:
-		printf(">=\n");
-        break;
-	case T_GREATER:
-		printf(">\n");
-        break;
 	case T_PAR_LEFT:
 		printf("(\n");
         break;
 	case T_PAR_RIGHT:
 		printf(")\n");
+        break;
+	case T_BRACE_LEFT:
+		printf("{\n");
+        break;
+	case T_BRACE_RIGHT:
+		printf("}\n");
+        break;
+	case T_SEMICOLON:
+		printf(";\n");
+        break;
+	case T_COLON:
+		printf(":\n");
+        break;
+	case T_EQUAL:
+		printf("===\n");
+        break;
+	case T_END_SYMBOL:
+		printf("?>\n");
+        break;
+	case T_KW_ELSE:
+		printf("else\n");
+        break;
+	case T_KW_FLOAT:
+		printf("float\n");
+        break;
+	case T_KW_FUNCTION:
+		printf("function\n");
+        break;
+	case T_KW_IF:
+		printf("if\n");
+        break;
+	case T_KW_INT:
+		printf("int\n");
+        break;
+	case T_KW_NULL:
+		printf("null\n");
+        break;
+	case T_KW_RETURN:
+		printf("return\n");
+        break;
+	case T_KW_STRING:
+		printf("string\n");
+        break;
+	case T_KW_VOID:
+		printf("void\n");
+        break;
+	case T_KW_WHILE:
+		printf("whlie\n");
         break;
 	case T_VAR_ID:
 		printf("id : \t%s\n", token->data.string_c->str);
@@ -52,13 +112,13 @@ void print_token ( token_t * token) {
 		}
         break;
 	case T_DEC_VAL:
-		printf("float_lit : %f\n", token->data.double_c);
+		printf("float_lit : \t%f\n", token->data.double_c);
 		if (str_init(&s)) {
 			token->data.string_c = &s;
 		}
         break;
 	case T_STRING_VAL:
-		printf("string-lit : %s\n", token->data.string_c->str);
+		printf("string-lit : \t%s\n", token->data.string_c->str);
 		if (str_init(&s)) {
 			token->data.string_c = &s;
 		}

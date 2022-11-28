@@ -1,0 +1,123 @@
+<?php
+id : 	declare
+(
+id : 	strict_types
+=
+int-lit : 	1
+)
+;
+function
+id : 	f
+(
+id : 	int
+id : 	$x
+)
+:
+id : 	int
+{
+if
+(
+id : 	$x
+<
+int-lit : 	10
+)
+{
+return
+id : 	$x
+-
+int-lit : 	1
+;
+}
+else
+{
+id : 	$x
+=
+id : 	$x
+-
+int-lit : 	1
+;
+id : 	write
+(
+string-lit : 	calling g with 
+,
+id : 	$x
+,
+string-lit : 	
+
+)
+;
+id : 	$res
+=
+id : 	g
+(
+id : 	$x
+)
+;
+return
+id : 	$res
+;
+}
+}
+function
+id : 	g
+(
+id : 	int
+id : 	$x
+)
+:
+id : 	int
+{
+if
+(
+id : 	$x
+>
+int-lit : 	0
+)
+{
+id : 	write
+(
+string-lit : 	calling f with 
+,
+id : 	$x
+,
+string-lit : 	
+
+)
+;
+id : 	$x
+=
+id : 	f
+(
+id : 	$x
+)
+;
+return
+id : 	$x
+;
+}
+else
+{
+return
+int-lit : 	200
+;
+}
+}
+id : 	$res
+=
+id : 	g
+(
+int-lit : 	10
+)
+;
+id : 	write
+(
+string-lit : 	res: 
+,
+id : 	$res
+,
+string-lit : 	
+
+)
+;
+?>
+0

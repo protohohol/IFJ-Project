@@ -1,0 +1,89 @@
+<?php
+id : 	declare
+(
+id : 	strict_types
+=
+int-lit : 	1
+)
+;
+id : 	write
+(
+string-lit : 	Zadejte cislo pro vypocet faktorialu
+
+)
+;
+id : 	$a
+=
+id : 	readi
+(
+)
+;
+if
+(
+id : 	$a
+===
+null
+)
+{
+id : 	write
+(
+string-lit : 	Chyba pri nacitani celeho cisla!
+
+)
+;
+}
+else
+{
+}
+if
+(
+id : 	$a
+<
+int-lit : 	0
+)
+{
+id : 	write
+(
+string-lit : 	Faktorial nelze spocitat
+
+)
+;
+}
+else
+{
+id : 	$vysl
+=
+int-lit : 	1
+;
+whlie
+(
+id : 	$a
+>
+int-lit : 	0
+)
+{
+id : 	$vysl
+=
+id : 	$vysl
+*
+id : 	$a
+;
+id : 	$a
+=
+id : 	$a
+-
+int-lit : 	1
+;
+}
+id : 	write
+(
+string-lit : 	Vysledek je: 
+,
+id : 	$vysl
+,
+string-lit : 	
+
+)
+;
+}
+0
