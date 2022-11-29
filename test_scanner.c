@@ -123,8 +123,8 @@ void print_token ( token_t * token) {
 			token->data.string_c = &s;
 		}
         break;
-	case T_START_SYMBOL:
-		printf("<?php\n");
+	case T_PROLOG:
+		printf("start\n");
         break;
 	default:
 		printf("default : %d\n", token->type);

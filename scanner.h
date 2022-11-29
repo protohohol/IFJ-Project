@@ -40,6 +40,7 @@ typedef enum  {
 	T_EQUAL,                // ===
 	T_NOT_EQUAL,            // !==
     T_START_SYMBOL,         // <?php
+	T_PROLOG,				// prolog (with declare...)
 	T_END_SYMBOL,           // ?>
     T_KW_ELSE,              // keyword "else"
 	T_KW_IF,                // keyword "if"
@@ -79,10 +80,14 @@ typedef enum {
     S_NOT_EQUAL,
 	S_NOT_EQUAL_EQUAL,
 	S_VAR_ID,
-	S_KW_FUN_START,			// start state for keyword or function name
+	// S_KW_FUN_START,			// start state for keyword or function name
     S_KW_FUN,				// state for keyword or function name 
 	S_KW_TYPE,				// state for type keywords
     S_START_SYMBOL,			// state for prolog
+	// S_START_SYMBOL_CONT,	// state for prolog continue
+	// S_START_SYMBOL_COMMENT, // state for prolog with comment
+	// S_START_SYMBOL_L_C,		// state for prolog with line comment
+	// S_START_SYMBOL_B_C,		// state for prolog with block comment
 	S_END_SYMBOL,			// state for end symbol (?>)
     S_ELSE,
 	S_IF,
