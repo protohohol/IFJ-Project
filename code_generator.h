@@ -18,12 +18,12 @@ typedef struct DLLElement{
     taCode data;
     struct DLLElement *previousElement;
     struct DLLElement *nextElement;
-}*DLLElementPointer;
+}*DLLElementPtr;
 
 typedef struct {
-    DLLElementPointer firstElement;
-    DLLElementPointer lastElement;
-    DLLElementPointer activeElement;
+    DLLElementPtr firstElement;
+    DLLElementPtr lastElement;
+    DLLElementPtr activeElement;
 }DLList;
 
 void DLL_Init( DLList* list);
