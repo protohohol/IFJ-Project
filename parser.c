@@ -22,11 +22,17 @@ int f_state ( token_t * token ) {
             if (error_type = get_next_token(token)) {
                 return error_type;
             }
-            if(token->type == T_ASSIGN){
+            if( token->type == T_ASSIGN ){
                 if (error_type = get_next_token(token)) {
                     return error_type;
                 }
-                return expression(token);
+                if ( token->type == T_FUN_ID ) {
+                    return declare(token);
+                } else if ( token->type == T_VAR_ID || token->type == T_INT_VAL || token->type == T_DEC_VAL || token->type == T_STRING_VAL  ) {
+                    return expression(token);    
+                } else {
+                    return SYNTAX_ERR;
+                }
             }
             else
                 return expression(token);
@@ -158,14 +164,8 @@ int f_list ( token_t * token ) {
             return SYNTAX_ERR;
     }
 }
-
-int f_param ( token_t * token ) {
-    if ( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING ) {
-        if ( error_type = get_next_token(token) ) {
-            return error_type;
-        }
-        return NO_ERR;
-    } else if ( token->type == T_VAR_ID ) {
+int f_param_d ( token_t * token ) {
+    if ( token->type == T_STRING_VAL || token->type == T_DEC_VAL || token->type == T_INT_VAL|| T_VAR_ID ) {
         if ( error_type = get_next_token(token) ) {
             return error_type;
         }
@@ -174,6 +174,51 @@ int f_param ( token_t * token ) {
         return SYNTAX_ERR;
     }
 }
+
+int f_plist_d( token_t * token ) {
+    if ( token->type == T_COMMA ) {
+        if (error_type = get_next_token(token)) {
+            return error_type;
+        }
+        error_type = f_param_d(token);
+        if (error_type) {
+            return error_type;
+        }
+        return f_plist_d(token);
+    } else if ( token->type == T_DEC_VAL || token->type == T_INT_VAL || token->type == T_STRING_VAL || token->type == T_VAR_ID ) {
+        error_type = f_param_d(token);
+        if (error_type) {
+            return error_type;
+        }
+        return f_plist_d(token);
+    } else if ( token->type == T_PAR_RIGHT ) {
+        if (error_type = get_next_token(token)) {
+            return error_type;
+        }
+        return NO_ERR;
+    } else {
+        return SYNTAX_ERR;
+    }
+}
+
+int f_param ( token_t * token ) {
+    if ( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING ) {
+        if ( error_type = get_next_token(token) ) {
+            return error_type;
+        }
+        if (token->type == T_VAR_ID) {
+            if (error_type = get_next_token(token)) {
+                return error_type;
+            }
+            return NO_ERR;
+        } else {
+            return SYNTAX_ERR;
+        }
+    } else {
+        return SYNTAX_ERR;
+    }
+}
+
 
 int f_plist( token_t * token ) {
     if ( token->type == T_COMMA ) {
@@ -185,7 +230,7 @@ int f_plist( token_t * token ) {
             return error_type;
         }
         return f_plist(token);
-    } else if ( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING || token->type == T_VAR_ID) {
+    } else if ( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING) {
         error_type = f_param(token);
         if (error_type) {
             return error_type;
@@ -206,7 +251,7 @@ int declare(token_t * token){
             if (error_type = get_next_token(token)) {
                 return error_type;
             }
-            error_type = f_plist(token);
+            error_type = f_plist_d(token);
             if (error_type) {
                 return error_type;
             }
@@ -226,6 +271,7 @@ int define (token_t * token) {
 }
 
 int state(token_t * token){
+    printf("i am in state\n");
     switch (token->type) {
         case (T_KW_RETURN):
             if (error_type = get_next_token(token)) {
@@ -238,17 +284,24 @@ int state(token_t * token){
             }
             break;
         case (T_VAR_ID):
+            //check_sem();
             if (error_type = get_next_token(token)) {
                 return error_type;
             }
-            if(token->type == T_ASSIGN){
+            if( token->type == T_ASSIGN ){
                 if (error_type = get_next_token(token)) {
-                return error_type;
+                    return error_type;
                 }
-                expression(token);
+                if ( token->type == T_FUN_ID ) {
+                    return state(token);
+                } else if ( token->type == T_VAR_ID || token->type == T_INT_VAL || token->type == T_DEC_VAL || token->type == T_STRING_VAL  ) {
+                    return expression(token);    
+                } else {
+                    return SYNTAX_ERR;
+                }
             }
             else
-                expression(token);
+                return expression(token);//tut eben'
             break;
         case (T_FUN_ID):
             if (error_type = get_next_token(token)) {
@@ -376,6 +429,7 @@ int state(token_t * token){
 }
 
 int st_list(token_t * token){
+    printf("i am in st_list\n");
     switch (token->type) {
         case (T_KW_RETURN):
         case (T_VAR_ID):
@@ -414,6 +468,7 @@ int st_list(token_t * token){
             return NO_ERR;
             break;
         case (T_EOF):
+            
             return NO_ERR;
             break;
         default:
@@ -422,7 +477,7 @@ int st_list(token_t * token){
 }
 
 int prog(token_t * token){
-    if(token->type == T_START_SYMBOL){  // if token is <?php
+    if(token->type == T_PROLOG){  // if token is <?php
         if (error_type = get_next_token(token)) {
             return error_type;
         }
@@ -435,10 +490,16 @@ int prog(token_t * token){
 }
 
 int main(){
-    token_t * token;
-    if ((error_type = get_next_token(token)) == 0) {
-        error_type = prog(token);
+    token_t  token;
+    string s;
+	if (str_init(&s)) {
+		token.data.string_c = &s;
+	}
+    set_source(stdin);
+    if ((error_type = get_next_token(&token)) == 0) {
+        error_type = prog(&token);
     }
+    printf("%d\n",error_type);
     return error_type;
 }
 

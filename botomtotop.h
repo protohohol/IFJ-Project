@@ -31,3 +31,4 @@ typedef enum {
 } exp_cond;
 
 const int convert_to_symbol (token_t * token);
+int convert_to_type ( token_t * token );

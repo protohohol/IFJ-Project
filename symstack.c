@@ -1,11 +1,12 @@
 #include "symstack.h"
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 
 
 void stack_init (sstack_t * sstack) {
-    sstack->top = NULL;     
+	sstack->top = NULL;
 }
 
 bool stack_push (sstack_t * sstack, exp_stack_symbol symbol, exp_type type) {
@@ -31,19 +32,27 @@ bool stack_push_after (sstack_t * sstack, exp_stack_symbol symbol, exp_type type
    			}
 			new_item->symbol = symbol;
 			new_item->etype = type;
-			if ( prev != NULL) {
-				new_item->next = prev->next;
-				prev->next = new_item;
-			} else {
+			if ( prev == NULL) {
 				new_item->next = sstack->top;
 				sstack->top = new_item;
+			} else {
+				new_item->next = prev->next;
+				prev->next = new_item;
 			}
 			return true;
 		}
-		tmp = tmp->next;
 		prev = tmp;
+		tmp = tmp->next;
 	}
 	return false;
+}
+
+bool stack_pop_mult ( sstack_t * sstack, int count ) {
+    for ( int i = 0; i < count; i++)
+	{
+		stack_pop(sstack);
+	}
+	
 }
 
 bool stack_pop(sstack_t * sstack) {
@@ -54,10 +63,6 @@ bool stack_pop(sstack_t * sstack) {
 		return true;
 	}
 	return false;
-}
-
-bool stack_pop_mult ( sstack_t * sstack, int count ) {
-    return true;
 }
 
 item_stack_t* get_top ( sstack_t * sstack) {
