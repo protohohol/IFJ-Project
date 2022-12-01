@@ -6,12 +6,17 @@
 
 #include "scanner.h"
 #include "symbol_table.h"
+#include "str.h"
+
+typedef struct {
+    string value;
+}operator_t;
 
 typedef struct {
     void* operant_1;
     void* operant_2;
     void* result;
-    void* operator;
+    operator_t operator;
 }taCode;
 
 typedef struct DLLElement{
