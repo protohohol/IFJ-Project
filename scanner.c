@@ -230,6 +230,9 @@ const int get_next_token(token_t *token) {
                 } else if (c == '\\') {
                     // printf("@@hi1\n");
                     state = S_ESC;
+                } else {
+                    str_free(s);
+                    return LEX_ERR;
                 }
                 break;
 
