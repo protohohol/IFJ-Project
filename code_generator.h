@@ -12,7 +12,6 @@ typedef enum {
     F_GF,   //global frame
     F_LF,   //local frame
     F_TF,   //temporary frame
-    F_DF,    //default
 }frame_type;
 
 typedef enum {
