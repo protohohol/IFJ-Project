@@ -129,6 +129,13 @@ typedef struct token {
 void set_source(FILE* f);
 
 /**
+ * @brief Sets string to be written to
+ * 
+ * @param src pointer to source string
+ */
+void set_src_str(string *src);
+
+/**
  * @brief Get the Next Token object
  * 
  * @param t pointer to token

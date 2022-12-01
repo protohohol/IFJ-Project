@@ -2,10 +2,15 @@
 #include "error.h"
 
 FILE *source;
+string *src_str;
 
 void set_source(FILE *f)
 {
     source = f;
+}
+
+void set_src_str(string *src) {
+    src_str = src;
 }
 
 bool is_keyword(string *s, token_t *token) {
@@ -52,10 +57,11 @@ bool is_type(string *s, token_t *token) {
 }
 
 const int get_next_token(token_t *token) {
-    if (source == NULL) {
+    if (source == NULL || src_str == NULL) {
         return ERROR_INTERNAL;
     }
 
+    token->data.string_c = src_str;
     string l_s;
     string *s = &l_s;
     if (!str_init(s)) {
