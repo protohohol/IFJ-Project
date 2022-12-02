@@ -13,6 +13,21 @@ void set_src_str(string *src) {
     src_str = src;
 }
 
+bool is_type(string *s, token_t *token) {
+    if (!str_cmp_const_str(s, "float")) {
+        token->type = T_KW_FLOAT;
+        return true;
+    } else if (!str_cmp_const_str(s, "int")) {
+        token->type = T_KW_INT;
+        return true;
+    } else if (!str_cmp_const_str(s, "string")) {
+        token->type = T_KW_STRING;
+        return true;
+    } else {
+        return false;
+    }
+}
+
 bool is_keyword(string *s, token_t *token) {
     if (!str_cmp_const_str(s, "else")) {
         token->type = T_KW_ELSE;
@@ -40,21 +55,6 @@ bool is_keyword(string *s, token_t *token) {
             token->type = T_FUN_ID;
         }
         token->type = T_FUN_ID;
-        return false;
-    }
-}
-
-bool is_type(string *s, token_t *token) {
-    if (!str_cmp_const_str(s, "float")) {
-        token->type = T_KW_FLOAT;
-        return true;
-    } else if (!str_cmp_const_str(s, "int")) {
-        token->type = T_KW_INT;
-        return true;
-    } else if (!str_cmp_const_str(s, "string")) {
-        token->type = T_KW_STRING;
-        return true;
-    } else {
         return false;
     }
 }
