@@ -36,6 +36,9 @@ bool is_keyword(string *s, token_t *token) {
         token->type = T_KW_WHILE;
         return true;
     } else {
+        if (!is_type(s, token)) {
+            token->type = T_FUN_ID;
+        }
         token->type = T_FUN_ID;
         return false;
     }
@@ -698,7 +701,7 @@ const int get_next_token(token_t *token) {
                     }
                 } else {
                     ungetc(c, source);
-                    if (!is_keyword(s, token) || !is_type(s, token)) {
+                    if (!is_keyword(s, token) && !is_type(s, token)) {
                         if (!str_copy_string(token->data.string_c, s)) {
                             str_free(s);
                             return ERROR_INTERNAL;

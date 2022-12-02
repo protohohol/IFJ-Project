@@ -492,10 +492,11 @@ int prog(token_t * token){
 int main(){
     token_t  token;
     string s;
-	if (str_init(&s)) {
-		token.data.string_c = &s;
+	if (!str_init(&s)) {
+		return 1;
 	}
     set_source(stdin);
+    set_src_str(&s);
     if ((error_type = get_next_token(&token)) == 0) {
         error_type = prog(&token);
     }

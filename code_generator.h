@@ -11,7 +11,7 @@
 
 
 typedef enum {
-    I_MOVE,             
+    I_MOVE,
     I_CREATEFRAME,
     I_PUSHFRAME,
     I_POPFRAME,
