@@ -12,7 +12,6 @@ typedef enum {
     D_VOID,
     D_INT,
     D_DOUBLE,
-    D_FLOAT,
     D_STRING,
     D_TERM,
 }data_type;
