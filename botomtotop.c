@@ -31,6 +31,7 @@ int get_cond (token_t *token,sstack_t * stack_exp) {
                 case ES_INT_LIT:
                 case ES_FLOAT_LIT:
                 case ES_STR:
+                case ES_NULL:
                     return C_MORE ;
                 case ES_LEFT_BRACKET:
                     return C_LESS ;
@@ -64,6 +65,7 @@ int get_cond (token_t *token,sstack_t * stack_exp) {
                 case ES_INT_LIT:
                 case ES_FLOAT_LIT:
                 case ES_STR:
+                case ES_NULL:
                     return C_MORE ;
                 case ES_LEFT_BRACKET:
                     return C_LESS ;
@@ -99,6 +101,7 @@ int get_cond (token_t *token,sstack_t * stack_exp) {
                 case ES_INT_LIT:
                 case ES_FLOAT_LIT:
                 case ES_STR:
+                case ES_NULL:
                     return C_MORE ;
                 case ES_LEFT_BRACKET:
                     return C_LESS ;
@@ -132,6 +135,7 @@ int get_cond (token_t *token,sstack_t * stack_exp) {
                 case ES_INT_LIT:
                 case ES_FLOAT_LIT:
                 case ES_STR:
+                case ES_NULL:
                     return C_MORE ;
                 case ES_LEFT_BRACKET:
                     return C_LESS ;
@@ -147,6 +151,7 @@ int get_cond (token_t *token,sstack_t * stack_exp) {
         case ES_INT_LIT:
         case ES_FLOAT_LIT:
         case ES_STR:
+        case ES_NULL:
             switch ( tmp_stack_symbol ) {
                 case ES_PLUS:
                 case ES_MINUS:
@@ -167,6 +172,7 @@ int get_cond (token_t *token,sstack_t * stack_exp) {
                 case ES_INT_LIT:
                 case ES_FLOAT_LIT:
                 case ES_STR:
+                case ES_NULL:
                     return C_NONE ;
                 case ES_LEFT_BRACKET:
                     return C_LESS ;
@@ -199,6 +205,7 @@ int get_cond (token_t *token,sstack_t * stack_exp) {
                 case ES_INT_LIT:
                 case ES_FLOAT_LIT:
                 case ES_STR:
+                case ES_NULL:
                     return C_NONE ;
                 case ES_LEFT_BRACKET:
                     return C_LESS ;
@@ -231,6 +238,7 @@ int get_cond (token_t *token,sstack_t * stack_exp) {
                 case ES_INT_LIT:
                 case ES_FLOAT_LIT:
                 case ES_STR:
+                case ES_NULL:
                     return C_MORE ;
                 case ES_LEFT_BRACKET:
                     return C_EQ ;
@@ -263,6 +271,7 @@ int get_cond (token_t *token,sstack_t * stack_exp) {
                 case ES_INT_LIT:
                 case ES_FLOAT_LIT:
                 case ES_STR:
+                case ES_NULL:
                     return C_MORE ;
                 case ES_LEFT_BRACKET:
                     return C_NONE ;
@@ -316,6 +325,8 @@ const int convert_to_symbol (token_t * token) {
 		return ES_FLOAT_LIT;
 	case T_STRING_VAL:
 		return ES_STR;
+    case T_KW_NULL:
+		return ES_NULL;
     default :
         return ES_END;
 	}
@@ -362,16 +373,16 @@ void tac_generate ( ) {
     return;
 }
 int check_sem ( exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stack_t * op3, exp_type * type) { 
-    *type = 0;
-    return 0;
-} 
+    *type = ET_UNDEFINED;
+    return 0; 
+}
 
 int rule_test (int count, item_stack_t * op1, item_stack_t * op2, item_stack_t * op3, sstack_t * exp_stack) {
     exp_rules rule;
     int error_type;
     exp_type tmptype;
     if ( count == 1 ) {
-        if ( op1->symbol == ES_ID || op1->symbol == ES_INT_LIT || op1->symbol == ES_FLOAT_LIT || op1->symbol == ES_STR ) {
+        if ( op1->symbol == ES_ID || op1->symbol == ES_INT_LIT || op1->symbol == ES_FLOAT_LIT || op1->symbol == ES_STR || op1->symbol == ES_NULL ) {
             rule = R_ID;
         } else {
             rule = R_ERROR;
@@ -379,41 +390,45 @@ int rule_test (int count, item_stack_t * op1, item_stack_t * op2, item_stack_t *
     } else if ( count == 3 ) {
         if ( (op1->symbol == ES_LEFT_BRACKET) & (op2->symbol == ES_NON_TERM) & (op3->symbol == ES_RIGHT_BRACKET) ) {
             rule =  R_PAR;
+            printf("par\n");
         } else if ( op1->symbol == ES_NON_TERM && op3->symbol == ES_NON_TERM ) {
             switch ( op2->symbol )
             {
             case ES_PLUS:
                 rule = R_ADD;
+                printf("ADD\n");
                 break;
             case ES_MINUS:
-                rule = R_ADD;
+                rule = R_SUB;
                 break;
             case ES_CON:
-                rule = R_ADD;
+                rule = R_CON;
                 break;
             case ES_MUL:
-                rule = R_ADD;
+                printf("MUL\n");
+                rule = R_MUL;
                 break;
             case ES_DIV:
-                rule = R_ADD;
+                rule = R_DIV;
                 break;
             case ES_EQ:
-                rule = R_ADD;
+                printf("EQ\n");
+                rule = R_EQ;
                 break;
             case ES_NEQ:
-                rule = R_ADD;
+                rule = R_NEQ;
                 break;
             case ES_LEQ:
-                rule = R_ADD;
+                rule = R_LEQ;
                 break;
             case ES_LTN:
-                rule = R_ADD;
+                rule = R_L;
                 break;
             case ES_MEQ:
-                rule = R_ADD;
+                rule = R_GREQ;
                 break;
             case ES_MTN:
-                rule = R_ADD;
+                rule = R_GR;
                 break;
             default:
                 rule = R_ERROR;
@@ -437,13 +452,11 @@ int rule_test (int count, item_stack_t * op1, item_stack_t * op2, item_stack_t *
         }
         stack_pop_mult(exp_stack,count+1);
         stack_push(exp_stack, ES_NON_TERM, tmptype);
- 
     }
     return NO_ERR;
 } 
 
 int expression (token_t * token) {
-    string s;
     printf("i am in expressions\n");
     int error_type;
     sstack_t exp_stack;
@@ -457,45 +470,41 @@ int expression (token_t * token) {
     int count;
     stack_push(&exp_stack,ES_END,ET_UNDEFINED);
     while( !( ( convert_to_symbol(token) == ES_END ) && ( ( get_top_term(&exp_stack) )->symbol == ES_END ) ) ) {
-        printf("i am in while\n");
-        printf("ES %d\n",( get_top(&exp_stack) )->symbol);
+        //printf( "%d\n",(get_top_term(&exp_stack) )->symbol);
         switch (get_cond(token,&exp_stack)) {
         case C_EQ:
-            printf("i am in C_EQ\n");
+            //printf("i am in C_EQ\n");
             tmp_sym = convert_to_symbol(token);
             tmp_type = convert_to_type(token);
             stack_push(&exp_stack,tmp_sym,tmp_type); // TUT PROVERKU DOBAV JESTLI NE VPADLU
-            token->data.string_c = &s;
-            if (error_type = get_next_token(token)) {
+            if ( ( error_type = get_next_token(token) ) ) {
                 return error_type;
             }
             break;
         case C_LESS:
-            printf("i am in C_LESS\n");
+            //printf("i am in C_LESS\n");
             stack_push_after(&exp_stack,ES_CATCH, ET_UNDEFINED);
             tmp_sym = convert_to_symbol(token);
             tmp_type = convert_to_type(token);
             stack_push(&exp_stack,tmp_sym,tmp_type);
-            token->data.string_c = &s;
-            if (error_type = get_next_token(token)) {
+            if ( ( error_type = get_next_token(token) ) ) {
                 return error_type;
             }
             break;
         case C_MORE:
-            printf("ES-1 %d\n",( get_top(&exp_stack) )->next->symbol);
-            printf("i am in C_MORE\n");
+            //printf("i am in C_MORE\n");
             found = find_catch(&count,&exp_stack);
-            printf("count: %d\n",count);
             if (found && ( count == 3)) {
                 op_1 = exp_stack.top->next->next;
                 op_2 = exp_stack.top->next;
                 op_3 = exp_stack.top;
-                if ( error_type = rule_test ( count, op_1, op_2, op_3, &exp_stack ) ) {
+                if ( ( error_type = rule_test ( count, op_1, op_2, op_3, &exp_stack ) ) ) {
                     return error_type;
                 }
+                //printf( "%d\n",(get_top_term(&exp_stack) )->symbol);
             } else if ( found && ( count == 1 ) ) {
                 op_1 = exp_stack.top;
-                if ( error_type = rule_test ( count, op_1, NULL, NULL, &exp_stack ) ) {
+                if ( ( error_type = rule_test ( count, op_1, NULL, NULL, &exp_stack ) ) ) {
                     return error_type;
                 }
             }
@@ -504,8 +513,12 @@ int expression (token_t * token) {
             }
             break;
         case C_NONE:
-            printf("i am in C_NONE\n");
-            return SYNTAX_ERR;  
+            //printf("i am in C_NONE\n");
+            if (( ( get_top_term(&exp_stack) )->symbol != ES_END )) {
+                return SYNTAX_ERR;  
+            } else {
+                return 0;
+            }  
             break;
         }
     }

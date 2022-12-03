@@ -27,6 +27,7 @@ typedef enum
 	ES_INT_LIT,		// int
 	ES_FLOAT_LIT,	// float
 	ES_STR,			// string
+	ES_NULL,        // null value
 	ES_END,				// $
 	ES_CATCH,			// catch for get_top_terminlal function
 	ES_NON_TERM			// 

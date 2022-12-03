@@ -2,14 +2,26 @@
 int error_type;
 
 
-
-
-
-
+data_type convert_to_symtable_datatype(exp_type type) {
+    switch ( type )
+    {
+    case ET_FLOAT:
+        return D_FLOAT;
+    case ET_INT:
+        return D_INT;
+    case ET_STRING:
+        return D_STRING;
+    default:
+        return 0;
+    }
+    return D_VOID;
+}
+ 
 int f_state ( token_t * token ) {
+    printf("i am in f_state\n");
     switch (token->type) {
         case (T_KW_RETURN):
-            if (error_type = get_next_token(token)) {
+            if ( ( error_type = get_next_token(token) ) ) {
                 return error_type;
             }
             if ( token->type == T_FUN_ID ) {
@@ -19,11 +31,11 @@ int f_state ( token_t * token ) {
             }
             break;
         case (T_VAR_ID):
-            if (error_type = get_next_token(token)) {
+            if ( ( error_type = get_next_token(token) ) ) {
                 return error_type;
             }
             if( token->type == T_ASSIGN ){
-                if (error_type = get_next_token(token)) {
+                if (( error_type = get_next_token(token) )) {
                     return error_type;
                 }
                 if ( token->type == T_FUN_ID ) {
@@ -38,17 +50,18 @@ int f_state ( token_t * token ) {
                 return expression(token);
             break;
         case (T_FUN_ID):
-            if (error_type = get_next_token(token)) {
+            if (( error_type = get_next_token(token) )) {
                 return error_type;
             }
             return declare(token);
             break;
         case (T_KW_WHILE):
-            if (error_type = get_next_token(token)) {
+            printf("I am in WHILE\n");
+            if (( error_type = get_next_token(token) )) {
                 return error_type;
             }
             if (token->type == T_PAR_LEFT) {
-                if (error_type = get_next_token(token)) {
+                if (( error_type = get_next_token(token) )) {
                     return error_type;
                 }
                 error_type = expression(token);
@@ -56,11 +69,11 @@ int f_state ( token_t * token ) {
                     return error_type;
                 }
                 if (token->type == T_PAR_RIGHT) {
-                    if (error_type = get_next_token(token)) {
+                    if (( error_type = get_next_token(token) )) {
                         return error_type;
                     }
                     if (token->type == T_BRACE_LEFT) {
-                        if (error_type = get_next_token(token)) {
+                        if (( error_type = get_next_token(token) )) {
                             return error_type;
                         }
                         return f_list(token);
@@ -75,11 +88,12 @@ int f_state ( token_t * token ) {
             }
             break;
         case (T_KW_ELSE):
-            if ( error_type = get_next_token(token) ) {
+            printf("i am in else \n");
+            if ( ( error_type = get_next_token(token) ) ) {
                 return error_type;
             }
             if (token->type == T_BRACE_LEFT) {
-                if ( error_type = get_next_token(token) ) {
+                if ( ( error_type = get_next_token(token) ) ) {
                     return error_type;
                 }
                 error_type = f_list(token);
@@ -89,23 +103,21 @@ int f_state ( token_t * token ) {
             }
             break;
         case (T_KW_IF):
-            if ( error_type = get_next_token(token) ) {
+            printf("i am in if \n");
+            if ( ( error_type = get_next_token(token) ) ) {
                 return error_type;
             }
             if (token->type == T_PAR_LEFT) {
-                if ( error_type = get_next_token(token) ) {
-                    return error_type;
-                }
                 error_type = expression(token);
                 if (error_type != NO_ERR) {
                     return error_type;
                 }
                 if ( token->type == T_PAR_RIGHT ) {
-                    if ( error_type = get_next_token(token) ) {
+                    if ( ( error_type = get_next_token(token) ) ) {
                         return error_type;
                     }
                     if ( token->type == T_BRACE_LEFT) {
-                        if ( error_type = get_next_token(token) ) {
+                        if ( ( error_type = get_next_token(token) ) ) {
                             return error_type;
                         }
                         return f_list(token);
@@ -127,6 +139,7 @@ int f_state ( token_t * token ) {
 }
 
 int f_list ( token_t * token ) {
+    printf("i am in f_list\n");
     switch (token->type) {
         case (T_KW_RETURN):
         case (T_VAR_ID):
@@ -136,7 +149,7 @@ int f_list ( token_t * token ) {
                 return error_type;
             }
             if (token->type == T_SEMICOLON) {
-                if (error_type = get_next_token(token)) {
+                if (( error_type = get_next_token(token) )) {
                     return error_type;
                 }
                 return f_list(token);
@@ -152,21 +165,26 @@ int f_list ( token_t * token ) {
                 return error_type;
             }
             if (token->type == T_BRACE_RIGHT) {
-                if (error_type = get_next_token(token)) {
+                if (( error_type = get_next_token(token) )) {
                     return error_type;
                 }
             } else {
                 return SYNTAX_ERR;
             }
             return f_list(token);
+            
             break;
+        case (T_BRACE_RIGHT):
+            printf("i am out }\n");
+            return NO_ERR;
         default:
             return SYNTAX_ERR;
     }
 }
-int f_param_d ( token_t * token ) {
+
+int f_param_declare ( token_t * token ) {
     if ( token->type == T_STRING_VAL || token->type == T_DEC_VAL || token->type == T_INT_VAL|| T_VAR_ID ) {
-        if ( error_type = get_next_token(token) ) {
+        if ( ( error_type = get_next_token(token) ) ) {
             return error_type;
         }
         return NO_ERR;
@@ -175,24 +193,24 @@ int f_param_d ( token_t * token ) {
     }
 }
 
-int f_plist_d( token_t * token ) {
+int f_plist_declare( token_t * token ) {
     if ( token->type == T_COMMA ) {
-        if (error_type = get_next_token(token)) {
+        if (( error_type = get_next_token(token) )) {
             return error_type;
         }
-        error_type = f_param_d(token);
+        error_type = f_param_declare(token);
         if (error_type) {
             return error_type;
         }
-        return f_plist_d(token);
+        return f_plist_declare(token);
     } else if ( token->type == T_DEC_VAL || token->type == T_INT_VAL || token->type == T_STRING_VAL || token->type == T_VAR_ID ) {
-        error_type = f_param_d(token);
+        error_type = f_param_declare(token);
         if (error_type) {
             return error_type;
         }
-        return f_plist_d(token);
+        return f_plist_declare(token);
     } else if ( token->type == T_PAR_RIGHT ) {
-        if (error_type = get_next_token(token)) {
+        if (( error_type = get_next_token(token) )) {
             return error_type;
         }
         return NO_ERR;
@@ -203,11 +221,11 @@ int f_plist_d( token_t * token ) {
 
 int f_param ( token_t * token ) {
     if ( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING ) {
-        if ( error_type = get_next_token(token) ) {
+        if ( ( error_type = get_next_token(token) ) ) {
             return error_type;
         }
         if (token->type == T_VAR_ID) {
-            if (error_type = get_next_token(token)) {
+            if (( error_type = get_next_token(token) )) {
                 return error_type;
             }
             return NO_ERR;
@@ -219,10 +237,10 @@ int f_param ( token_t * token ) {
     }
 }
 
-
 int f_plist( token_t * token ) {
+    printf("%d\n",token->type);
     if ( token->type == T_COMMA ) {
-        if (error_type = get_next_token(token)) {
+        if (( error_type = get_next_token(token) )) {
             return error_type;
         }
         error_type = f_param(token);
@@ -231,90 +249,101 @@ int f_plist( token_t * token ) {
         }
         return f_plist(token);
     } else if ( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING) {
+        printf("p_list int\n");
         error_type = f_param(token);
         if (error_type) {
             return error_type;
         }
         return f_plist(token);
     } else if ( token->type == T_PAR_RIGHT ) {
-        if (error_type = get_next_token(token)) {
+        if (( error_type = get_next_token(token) )) {
             return error_type;
         }
         return NO_ERR;
     } else {
+        printf("hihi\n");
         return SYNTAX_ERR;
     }
 }
 
 int declare(token_t * token){
+    printf("i am in declare\n");
     if(token->type == T_PAR_LEFT) {
-            if (error_type = get_next_token(token)) {
+            if (( error_type = get_next_token(token) )) {
                 return error_type;
             }
-            error_type = f_plist_d(token);
-            if (error_type) {
-                return error_type;
-            }
+            error_type = f_plist_declare(token);
+            return error_type;
+    } else {
+        return SYNTAX_ERR;
     }
 }
 
 int define (token_t * token) {
+    printf("i am in define\n");
     if(token->type == T_PAR_LEFT) {
-            if (error_type = get_next_token(token)) {
+            if (( error_type = get_next_token(token) )) {
                 return error_type;
             }
             error_type = f_plist(token);
-            if (error_type) {
-                return error_type;
-            }
+            return error_type;
+    } else { 
+        return SYNTAX_ERR;
     }
 }
 
 int state(token_t * token){
     printf("i am in state\n");
     switch (token->type) {
-        case (T_KW_RETURN):
-            if (error_type = get_next_token(token)) {
-                return error_type;
-            }
-            if ( token->type == T_FUN_ID ) {
-                return declare(token);
-            } else {
-            return expression(token);
-            }
-            break;
+        // case (T_KW_RETURN):
+        //     //generate_code("return", NULL, NULL, );
+        //     if (( error_type = get_next_token(token) )) {
+        //         return error_type;
+        //     }
+        //     if ( token->type == T_FUN_ID ) {
+        //         return declare(token);
+        //     } else {
+        //     return expression(token);
+        //     }
+        //     break;
         case (T_VAR_ID):
-            //check_sem();
-            if (error_type = get_next_token(token)) {
+            //exp_type * final_type;
+            // if( ( symtable_search ( symt,token->data.string_c->str ) ) == NULL ) {
+            //     symtable_insert( symt, token->data.string_c->str );
+            // }
+            if (( error_type = get_next_token(token) )) {
                 return error_type;
             }
             if( token->type == T_ASSIGN ){
-                if (error_type = get_next_token(token)) {
+                if (( error_type = get_next_token(token) )) {
                     return error_type;
                 }
                 if ( token->type == T_FUN_ID ) {
                     return state(token);
                 } else if ( token->type == T_VAR_ID || token->type == T_INT_VAL || token->type == T_DEC_VAL || token->type == T_STRING_VAL  ) {
-                    return expression(token);    
+                    return expression(token);
                 } else {
                     return SYNTAX_ERR;
                 }
+                //symtable_add_type( (symtable_search ( symt,token->data.string_c->str ) ), ( convert_to_symtable_datatype ( final_type ) ) );
+
+                //genreate_code("=,E_last,NULL,tmp");//псведокод
             }
             else
                 return expression(token);//tut eben'
             break;
         case (T_FUN_ID):
-            if (error_type = get_next_token(token)) {
+            if (( error_type = get_next_token(token) )) {
                 return error_type;
             }
             return declare(token);
             break;
         case (T_KW_FUNCTION):
-            if (error_type = get_next_token(token)) {
+            if (( error_type = get_next_token(token) )) {
                 return error_type;
             }
             if (token->type == T_FUN_ID){
-                if (error_type = get_next_token(token)) {
+                if (( error_type = get_next_token(token) )) {
                     return error_type;
                 }
                 error_type = define(token);
@@ -322,15 +351,16 @@ int state(token_t * token){
                     return error_type;
                 }
                 if(token->type == T_COLON) {
-                    if (error_type = get_next_token(token)) {
+                    if (( error_type = get_next_token(token) )) {
                         return error_type;
                     }
                     if( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING ) {
-                        if (error_type = get_next_token(token)) {
+                        if (( error_type = get_next_token(token) )) {
                             return error_type;
+                        return error_type;
                         }
-                        if(token->type == T_BRACE_RIGHT){
-                            if (error_type = get_next_token(token)) {
+                        if(token->type == T_BRACE_LEFT){
+                            if (( error_type = get_next_token(token) )) {
                                 return error_type;
                             }
                             return f_list(token);
@@ -348,11 +378,11 @@ int state(token_t * token){
             }
             break;
         case (T_KW_WHILE):
-            if (error_type = get_next_token(token)) {
+            if (( error_type = get_next_token(token) )) {
                 return error_type;
             }
             if (token->type == T_PAR_LEFT) {
-                if (error_type = get_next_token(token)) {
+                if (( error_type = get_next_token(token) )) {
                     return error_type;
                 }
                 error_type = expression(token);
@@ -360,11 +390,11 @@ int state(token_t * token){
                     return error_type;
                 }
                 if (token->type == T_PAR_RIGHT) {
-                    if (error_type = get_next_token(token)) {
+                    if (( error_type = get_next_token(token) )) {
                         return error_type;
                     }
                     if (token->type == T_BRACE_LEFT) {
-                        if (error_type = get_next_token(token)) {
+                        if (( error_type = get_next_token(token) )) {
                             return error_type;
                         }
                         return st_list(token);
@@ -379,46 +409,46 @@ int state(token_t * token){
             }
             break;
         case (T_KW_ELSE):
-            if ( error_type = get_next_token(token) ) {
+            printf("i am in else\n");
+            if ( ( error_type = get_next_token(token) ) ) {
                 return error_type;
             }
             if (token->type == T_BRACE_LEFT) {
-                if ( error_type = get_next_token(token) ) {
+                if ( ( error_type = get_next_token(token) ) ) {
                     return error_type;
                 }
-                error_type = st_list(token);
+                error_type = f_list(token);
                 return error_type;
             } else {
                 return SYNTAX_ERR;
             }
             break;
         case (T_KW_IF):
-            if ( error_type = get_next_token(token) ) {
+            printf("i am in if \n");
+            if ( ( error_type = get_next_token(token) ) ) {
                 return error_type;
             }
             if (token->type == T_PAR_LEFT) {
-                if ( error_type = get_next_token(token) ) {
-                    return error_type;
-                }
                 error_type = expression(token);
                 if (error_type != NO_ERR) {
                     return error_type;
                 }
-                if ( token->type == T_PAR_RIGHT ) {
-                    if ( error_type = get_next_token(token) ) {
-                        return error_type;
-                    }
+                // if ( token->type == T_PAR_RIGHT ) {
+                //     if ( ( error_type = get_next_token(token) ) ) {
+                //         return error_type;
+                //     }
                     if ( token->type == T_BRACE_LEFT) {
-                        if ( error_type = get_next_token(token) ) {
+                        if ( ( error_type = get_next_token(token) ) ) {
                             return error_type;
                         }
-                        return st_list(token);
+                        return f_list(token);
                     } else {
                         return SYNTAX_ERR;
                     }
-                } else {
-                    return SYNTAX_ERR;
-                }
+                // } else {
+                //     printf("i am here\n");
+                //     return SYNTAX_ERR;
+                // }
             } else {
                 return SYNTAX_ERR;
             }
@@ -439,7 +469,7 @@ int st_list(token_t * token){
                 return error_type;
             }
             if (token->type == T_SEMICOLON) {
-                if (error_type = get_next_token(token)) {
+                if (( error_type = get_next_token(token) )) {
                     return error_type;
                 }
                 return st_list(token);
@@ -456,7 +486,7 @@ int st_list(token_t * token){
                 return error_type;
             }
             if (token->type == T_BRACE_RIGHT) {
-                if (error_type = get_next_token(token)) {
+                if (( error_type = get_next_token(token) )) {
                     return error_type;
                 }
             } else {
@@ -468,7 +498,6 @@ int st_list(token_t * token){
             return NO_ERR;
             break;
         case (T_EOF):
-            
             return NO_ERR;
             break;
         default:
@@ -477,8 +506,8 @@ int st_list(token_t * token){
 }
 
 int prog(token_t * token){
-    if(token->type == T_PROLOG){  // if token is <?php
-        if (error_type = get_next_token(token)) {
+    if(token->type == T_PROLOG){  // if token is <?php white symbol declare(strictypes=1);
+        if (( error_type = get_next_token(token) )) {
             return error_type;
         }
         error_type = st_list(token);
@@ -492,9 +521,9 @@ int prog(token_t * token){
 int main(){
     token_t  token;
     string s;
-	if (!str_init(&s)) {
-		return 1;
-	}
+    if (!str_init(&s)) {
+        return 1;
+    }
     set_source(stdin);
     set_src_str(&s);
     if ((error_type = get_next_token(&token)) == 0) {
@@ -503,5 +532,8 @@ int main(){
     printf("%d\n",error_type);
     return error_type;
 }
+
+
+
 
 

@@ -1,6 +1,7 @@
 #include "scanner.h"
 #include "symstack.h"
 #include "error.h"
+#include "symbol_table.h"
 
 
 
