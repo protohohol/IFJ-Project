@@ -7,6 +7,7 @@
 #include "scanner.h"
 #include "symbol_table.h"
 #include "str.h"
+#include "code_generator.h"
 
 typedef enum {
     F_GF,   //global frame
@@ -16,7 +17,7 @@ typedef enum {
 
 typedef struct {
     string value;
-    token_type type;
+    instructions type;
     frame_type frame;
     bool tmp;
     bool local;
