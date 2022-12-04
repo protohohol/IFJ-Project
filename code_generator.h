@@ -8,8 +8,6 @@
 #include "symbol_table.h"
 #include "str.h"
 
-
-
 typedef enum {
     I_MOVE,
     I_CREATEFRAME,
@@ -80,9 +78,5 @@ typedef enum {
     I_DPRINT,
 
 }instructions;
-
-
-
-
 
 #endif

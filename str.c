@@ -56,6 +56,16 @@ bool str_copy_string(string* target, string* source) {
     return true;
 }
 
+char* str_copy_const_string(string* source) {
+    // printf("hi!\n");
+    char tmp[source->length];
+    for (int i = 0; i < source->length; i++) {
+        tmp[i] = source->str[i];
+        printf("tmp[%d] = %c\n", i, tmp[i]);
+    }
+    return &tmp[0];
+}
+
 int str_cmp_string(string* s1, string* s2) {
     return strcmp(s1->str, s2->str);
 }

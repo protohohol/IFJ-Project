@@ -1,5 +1,7 @@
 #include "scanner.h"
 #include "error.h"
+#include <string.h>
+
 void print_token ( token_t * token) {
     switch (token->type) {
 	case T_EOL:
@@ -99,10 +101,10 @@ void print_token ( token_t * token) {
 		printf("whlie\n");
         break;
 	case T_VAR_ID:
-		printf("id : \t%s\n", token->data.string_c->str);
+		printf("var id : \t%s\n", token->data.string_c->str);
         break;
 	case T_FUN_ID:
-		printf("id : \t%s\n", token->data.string_c->str);
+		printf("fun id : \t%s\n", token->data.string_c->str);
         break;
 	case T_INT_VAL:
 		printf("int-lit : \t%d\n", token->data.int_c);
@@ -135,19 +137,33 @@ void print_token ( token_t * token) {
 int main() {
     token_t token;
 	string s;
-	if (str_init(&s)) {
-		token.data.string_c = &s;
-	}
+	char* tmp;
+	bool flag = true;
+	bool p_flag = false;
+	// if (str_init(&s)) {
+	// 	token.data.string_c = &s;
+	// }
     // int i = 3; 
     int error_type;
 	set_source(stdin);
+	set_src_str(&s);
 	while ((error_type = get_next_token(&token)) == 0 && token.type != T_EOF) {
 		// printf("%d\n", token.type);
+		if (token.type == T_VAR_ID && flag) {
+			tmp = str_copy_const_string(token.data.string_c);
+			// tmp = token.data.string_c->str;
+			// memcpy(tmp, token.data.string_c->str, token.data.string_c->length);
+			flag = false;
+			p_flag = true;
+		}
+		if (p_flag) {
+			printf("###%s###\n", tmp);
+		}
 		print_token(&token);
-		token.data.string_c = &s;
+		// token.data.string_c = &s;
 		// printf("t.d.s.l : %d\n", token.data->string_c->length);
 	}
-	str_free(&s);
+	// str_free(&s);
 	printf("%d\n",error_type);
 	return error_type;
     // if (error_type == get_next_token(&token)) {

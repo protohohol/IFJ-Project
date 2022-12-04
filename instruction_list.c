@@ -230,7 +230,6 @@ void DLL_Previous( DLList *list ) {
 	}
 }
 
-
 int DLL_IsActive( DLList *list ) {
 	return (list->activeElement != NULL);
 }

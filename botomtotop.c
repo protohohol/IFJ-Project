@@ -1,7 +1,25 @@
 #include "botomtotop.h"
 
+symtable symt;
+char* id;
+int ass_flag;
+exp_type* type;
 
+void set_symtable(symtable source) {
+    *symt = *source;
+}
 
+void set_id (char* source) {
+    id = source;
+}
+
+void set_flag(bool source) {
+    ass_flag = source;
+}
+
+void set_type(exp_type* source) {
+    type = source;
+}
 
 int get_cond (token_t *token,sstack_t * stack_exp) {
     const int tmp_symbol = convert_to_symbol(token);
@@ -372,9 +390,36 @@ bool find_catch ( int * count , sstack_t * sstack) {
 void tac_generate ( ) {
     return;
 }
-int check_sem ( exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stack_t * op3, exp_type * type) { 
-    *type = ET_UNDEFINED;
-    return 0; 
+int check_sem ( exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stack_t * op3, exp_type * type) {
+    switch (rule) {
+        case (R_ID):
+            if (op1->etype == ET_UNDEFINED) {
+                return SEM_ERR_UNDEFINED_VAR;
+            } else if (op1->etype == ET_INT) {
+                *type = ET_INT;
+            } else if (op1->etype == ET_FLOAT) {
+                // printf("hi2\n");
+                *type = ET_FLOAT;
+            } else if (op1->etype == ET_STRING) {
+                // printf("hi3\n");
+                *type = ET_STRING;
+            }
+            return NO_ERR;
+
+        case (R_ADD):
+            // printf("t1 : %d\tt2 : %d\tt3 : %d\n", op1->etype, op2->etype, op3->etype);
+            if (op1->etype == ET_INT && op3->etype == ET_INT) {
+                *type = ET_INT;
+            } else if ((op1->etype == ET_INT || op1->etype == ET_FLOAT) && (op3->etype == ET_INT || op3->etype == ET_FLOAT)) {
+                *type = ET_FLOAT;
+            } else {
+                return SEM_ERR_TYPE_COMPAT;
+            }
+            return NO_ERR;
+
+        default:
+            return -1;
+    }
 }
 
 int rule_test (int count, item_stack_t * op1, item_stack_t * op2, item_stack_t * op3, sstack_t * exp_stack) {
@@ -452,6 +497,7 @@ int rule_test (int count, item_stack_t * op1, item_stack_t * op2, item_stack_t *
         }
         stack_pop_mult(exp_stack,count+1);
         stack_push(exp_stack, ES_NON_TERM, tmptype);
+        *type = tmptype;
     }
     return NO_ERR;
 } 
@@ -469,6 +515,9 @@ int expression (token_t * token) {
     bool found;
     int count;
     stack_push(&exp_stack,ES_END,ET_UNDEFINED);
+    // if (ass_flag) {
+    //     ass_flag = false;
+    // }
     while( !( ( convert_to_symbol(token) == ES_END ) && ( ( get_top_term(&exp_stack) )->symbol == ES_END ) ) ) {
         //printf( "%d\n",(get_top_term(&exp_stack) )->symbol);
         switch (get_cond(token,&exp_stack)) {
@@ -484,26 +533,32 @@ int expression (token_t * token) {
         case C_LESS:
             //printf("i am in C_LESS\n");
             stack_push_after(&exp_stack,ES_CATCH, ET_UNDEFINED);
+            // printf("token type : %d\n", token->type);
             tmp_sym = convert_to_symbol(token);
             tmp_type = convert_to_type(token);
+            // printf("tmp_type : %d\n", tmp_type);
             stack_push(&exp_stack,tmp_sym,tmp_type);
+            // printf("push : %d\n", get_top(&exp_stack)->etype);
             if ( ( error_type = get_next_token(token) ) ) {
                 return error_type;
             }
             break;
         case C_MORE:
             //printf("i am in C_MORE\n");
+            // printf("push more : %d\n", get_top(&exp_stack)->etype);
             found = find_catch(&count,&exp_stack);
-            if (found && ( count == 3)) {
+            if (found && ( count == 3)) { 
                 op_1 = exp_stack.top->next->next;
                 op_2 = exp_stack.top->next;
                 op_3 = exp_stack.top;
+                // printf("op1 : %d\top2 : %d\top3 : %d\n", op_1->etype, op_2->etype, op_3->etype);
                 if ( ( error_type = rule_test ( count, op_1, op_2, op_3, &exp_stack ) ) ) {
                     return error_type;
                 }
                 //printf( "%d\n",(get_top_term(&exp_stack) )->symbol);
             } else if ( found && ( count == 1 ) ) {
                 op_1 = exp_stack.top;
+                // printf("op1 else if: %d\n", op_1->etype);
                 if ( ( error_type = rule_test ( count, op_1, NULL, NULL, &exp_stack ) ) ) {
                     return error_type;
                 }

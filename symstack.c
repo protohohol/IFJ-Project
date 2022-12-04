@@ -52,7 +52,7 @@ bool stack_pop_mult ( sstack_t * sstack, int count ) {
 	{
 		stack_pop(sstack);
 	}
-	
+	return true;
 }
 
 bool stack_pop(sstack_t * sstack) {
@@ -77,6 +77,7 @@ item_stack_t* get_top_term ( sstack_t * sstack) {
 		}
 		tmp = tmp->next;
 	}
+	return NULL;
 }
 
 void stack_dispose (sstack_t * sstack) { 

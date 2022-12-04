@@ -4,18 +4,18 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdlib.h>
 #include "str.h"
 
 #define MAX_SIZE 25000
 
 typedef enum {
-    D_VOID,
     D_INT,
-    D_DOUBLE,
     D_FLOAT,
+    D_VOID,
     D_STRING,
     D_TERM,
-}data_type;
+} data_type;
 
 typedef struct {
     data_type type;
@@ -24,13 +24,13 @@ typedef struct {
     bool global_var;
     int argumets_amount;
     bool infinite;
-}htab_data_t;
+} htab_data_t;
 
 typedef struct htab_item {
     htab_data_t data;
     char* key;
     struct htab_item* next;
-}htab_item_t;
+} htab_item_t;
 
 typedef htab_item_t* symtable[MAX_SIZE];
 
