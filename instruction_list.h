@@ -17,18 +17,15 @@ typedef enum {
 
 typedef struct {
     string value;
-    instructions type;
+    data_type type;
     frame_type frame;
-    bool tmp;
-    bool local;
-    bool label;
-} operator_t;
+} operand_t;
 
 typedef struct {
-    void* operand_1;
-    void* operand_2;
-    void* result;
-    operator_t operator;
+    operand_t operand_1;
+    operand_t operand_2;
+    operand_t result;
+    instructions operator;
 } taCode;
 
 typedef struct DLLElement{
