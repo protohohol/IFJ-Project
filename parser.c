@@ -184,7 +184,7 @@ int f_list ( token_t * token ) {
 }
 
 int f_param_declare ( token_t * token ) {
-    if ( token->type == T_STRING_VAL || token->type == T_DEC_VAL || token->type == T_INT_VAL|| T_VAR_ID ) {
+    if ( token->type == T_STRING_VAL || token->type == T_DEC_VAL || token->type == T_INT_VAL || T_VAR_ID ) {
         if ( ( error_type = get_next_token(token) ) ) {
             return error_type;
         }
@@ -339,7 +339,7 @@ int state(token_t * token) {
                     return SYNTAX_ERR;
                 }
             }
-            else
+            else {
                 if (!f_flag) {
                     symtable_delete(&symt, tmp->id);
                     return SEM_ERR_UNDEFINED_VAR;
@@ -347,6 +347,7 @@ int state(token_t * token) {
                 set_flag(true);
                 set_id(tmp->id);
                 return expression(token);//tut eben'
+            }
             break;
         case (T_FUN_ID):
             if (( error_type = get_next_token(token) )) {

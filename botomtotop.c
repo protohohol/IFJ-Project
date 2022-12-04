@@ -1,12 +1,12 @@
 #include "botomtotop.h"
 
-symtable symt;
+symtable symt_l;
 char* id;
 int ass_flag;
 exp_type* type;
 
 void set_symtable(symtable source) {
-    *symt = *source;
+    *symt_l = *source;
 }
 
 void set_id (char* source) {
