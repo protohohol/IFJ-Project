@@ -59,14 +59,6 @@ bool str_add_char(string* s, char c);
 bool str_copy_string(string* target, string* source);
 
 /**
- * @brief copies content of source string to target const string
- * 
- * @param target pointer to target const string
- * @param source pointer to source string
- */
-char* str_copy_const_string(string* source);
-
-/**
  * @brief compares two strings
  * 
  * @param s1 pointer to first string

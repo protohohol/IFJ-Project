@@ -33,7 +33,6 @@ typedef enum
 	ES_NON_TERM			// 
 } exp_stack_symbol;
 
-
 typedef struct item_stack {
     exp_stack_symbol symbol;
     exp_type etype;
@@ -44,9 +43,6 @@ typedef struct sstack {
     item_stack_t * top;
 } sstack_t;
 
-
-
-
 void stack_init (sstack_t * sstack);
 bool stack_push (sstack_t * sstack, exp_stack_symbol symbol, exp_type type);
 bool stack_push_after (sstack_t * sstack, exp_stack_symbol symbol, exp_type type);
@@ -55,5 +51,3 @@ bool stack_pop_mult ( sstack_t * sstack, int count );
 item_stack_t* get_top ( sstack_t * sstack);
 item_stack_t* get_top_term ( sstack_t * sstack);
 void stack_dispose (sstack_t * sstack);
-
-

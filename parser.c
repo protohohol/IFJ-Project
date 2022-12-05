@@ -336,7 +336,7 @@ int state(token_t * token) {
                     if (result == NO_ERR) {
                         symtable_add_type(tmp, ( convert_to_symtable_datatype (final_type) ));
                         printf("tmp : %d\n", tmp->type);
-                        //generate_code("=,E_last,NULL,tmp"); псведокод
+                        // generate_code("=,E_last,NULL,tmp"); псведокод
                     }
                     return result;
                 } else {
