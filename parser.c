@@ -40,6 +40,9 @@ int f_state ( token_t * token ) {
                     return error_type;
                 }
                 if ( token->type == T_FUN_ID ) {
+                    if ( ( error_type = get_next_token(token) ) ) {
+                        return error_type;
+                    }
                     return declare(token);
                 } else if ( token->type == T_VAR_ID || token->type == T_INT_VAL || token->type == T_DEC_VAL || token->type == T_STRING_VAL  ) {
                     return expression(token);    
@@ -51,6 +54,7 @@ int f_state ( token_t * token ) {
                 return expression(token);
             break;
         case (T_FUN_ID):
+            //printf("%d\n%s\n",token->type,token->data.string_c->str);
             if (( error_type = get_next_token(token) )) {
                 return error_type;
             }
@@ -113,10 +117,10 @@ int f_state ( token_t * token ) {
                 if (error_type != NO_ERR) {
                     return error_type;
                 }
-                if ( token->type == T_PAR_RIGHT ) {
-                    if ( ( error_type = get_next_token(token) ) ) {
-                        return error_type;
-                    }
+                //if ( token->type == T_PAR_RIGHT ) {
+                    // if ( ( error_type = get_next_token(token) ) ) {
+                    //     return error_type;
+                    // }
                     if ( token->type == T_BRACE_LEFT) {
                         if ( ( error_type = get_next_token(token) ) ) {
                             return error_type;
@@ -125,9 +129,9 @@ int f_state ( token_t * token ) {
                     } else {
                         return SYNTAX_ERR;
                     }
-                } else {
-                    return SYNTAX_ERR;
-                }
+                //} else {
+                //    return SYNTAX_ERR;
+                //}
             } else {
                 return SYNTAX_ERR;
             }
@@ -371,7 +375,7 @@ int state(token_t * token) {
                     if (( error_type = get_next_token(token) )) {
                         return error_type;
                     }
-                    if( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING ) {
+                    if( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING || token->type == T_KW_VOID ) {
                         if (( error_type = get_next_token(token) )) {
                             return error_type;
                         return error_type;

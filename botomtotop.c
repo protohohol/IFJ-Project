@@ -313,6 +313,8 @@ const int convert_to_symbol (token_t * token) {
 		return ES_PLUS;
 	case T_SUB:
 		return ES_MINUS;
+    case T_DOT:
+        return ES_CON;
 	case T_MUL:
 		return ES_MUL;
 	case T_DIV:
@@ -391,35 +393,38 @@ void tac_generate ( ) {
     return;
 }
 int check_sem ( exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stack_t * op3, exp_type * type) {
-    switch (rule) {
-        case (R_ID):
-            if (op1->etype == ET_UNDEFINED) {
-                return SEM_ERR_UNDEFINED_VAR;
-            } else if (op1->etype == ET_INT) {
-                *type = ET_INT;
-            } else if (op1->etype == ET_FLOAT) {
-                // printf("hi2\n");
-                *type = ET_FLOAT;
-            } else if (op1->etype == ET_STRING) {
-                // printf("hi3\n");
-                *type = ET_STRING;
-            }
-            return NO_ERR;
+    // switch (rule) {
+    //     case (R_ID):
+    //         if (op1->etype == ET_UNDEFINED) {
+    //             return SEM_ERR_UNDEFINED_VAR;
+    //         } else if (op1->etype == ET_INT) {
+    //             *type = ET_INT;
+    //         } else if (op1->etype == ET_FLOAT) {
+    //             // printf("hi2\n");
+    //             *type = ET_FLOAT;
+    //         } else if (op1->etype == ET_STRING) {
+    //             // printf("hi3\n");
+    //             *type = ET_STRING;
+    //         }
+    //         return NO_ERR;
+    //     case (R_MUL):
+    //     case (R_SUB):
+    //     case (R_ADD):
+    //         // printf("t1 : %d\tt2 : %d\tt3 : %d\n", op1->etype, op2->etype, op3->etype);
+    //         if (op1->etype == ET_INT && op3->etype == ET_INT) {
+    //             *type = ET_INT;
+    //         } else if ((op1->etype == ET_INT || op1->etype == ET_FLOAT) && (op3->etype == ET_INT || op3->etype == ET_FLOAT)) {
+    //             *type = ET_FLOAT;
+    //         } else {
+    //             return SEM_ERR_TYPE_COMPAT;
+    //         }
+    //         return NO_ERR;
 
-        case (R_ADD):
-            // printf("t1 : %d\tt2 : %d\tt3 : %d\n", op1->etype, op2->etype, op3->etype);
-            if (op1->etype == ET_INT && op3->etype == ET_INT) {
-                *type = ET_INT;
-            } else if ((op1->etype == ET_INT || op1->etype == ET_FLOAT) && (op3->etype == ET_INT || op3->etype == ET_FLOAT)) {
-                *type = ET_FLOAT;
-            } else {
-                return SEM_ERR_TYPE_COMPAT;
-            }
-            return NO_ERR;
-
-        default:
-            return -1;
-    }
+    //     default:
+    //         return -1;
+    // }
+    *type = ET_UNDEFINED;
+    return NO_ERR;
 }
 
 int rule_test (int count, item_stack_t * op1, item_stack_t * op2, item_stack_t * op3, sstack_t * exp_stack) {
