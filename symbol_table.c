@@ -11,9 +11,9 @@ int get_hash(char *key) {
   return (result % MAX_SIZE);
 }
 
-void symtable_init(symtable* table) {
+bool symtable_init(symtable* table) {
     if (table == NULL) {
-        return;
+        return false;
     }
 
     for (int i = 0; i < MAX_SIZE; i++) {
@@ -62,7 +62,7 @@ void symtable_init(symtable* table) {
     // htab_data_t* tmpData = symtable_insert(table, "chr");
     // symtable_add_type(tmpData, D_STRING);
     // symtable_add_arguments(tmpData, D_INT, false);
-
+    return true;
 }
 
 htab_data_t* symtable_search(symtable* table, char* key) {
@@ -255,6 +255,81 @@ void symtable_free(symtable* table) {
         }
 
         (*table)[i] = NULL;
-    } 
+    }
 }
 
+void symtable_stack_init(symtable_stack_t* stack) {
+    // if (stack == NULL) {
+    //     return false;
+    // }
+
+    // symtable tmp;
+    // stack->top->symt = &tmp;
+
+    // stack->top->next = NULL;
+    // stack->top->prev = NULL;
+    // return symtable_init(stack->top->symt);
+
+    stack->top = NULL;
+}
+
+void symtable_stack_pop(symtable_stack_t* stack) {
+    if (stack == NULL || stack->top == NULL) {
+        return;
+    }
+
+    symtable_level_t* current;
+    do {
+        current = stack->top;
+    } while (current->next != NULL);
+
+    if (current->prev != NULL) {
+        current->prev->next = NULL;
+    }
+
+    symtable_free(current->symt);
+}
+
+void symtable_stack_free(symtable_stack_t* stack) {
+    if (stack == NULL || stack->top == NULL) {
+        return;
+    }
+
+    while (stack->top->next != NULL) {
+        symtable_stack_pop(stack);
+    }
+
+    symtable_stack_pop(stack);
+}
+
+symtable_level_t* symtable_stack_push(symtable_stack_t* stack, symtable* symt) {
+    if (stack == NULL || symt == NULL) {
+        return NULL;
+    }
+
+    // symtable tmp;
+    // if(!symtable_init(&tmp)) {
+    //     return NULL;
+    // }
+
+    if (stack->top == NULL) {
+        stack->top = (symtable_level_t*) malloc(sizeof(symtable_level_t));
+        stack->top->next = NULL;
+        stack->top->prev = NULL;
+        stack->top->symt = symt;
+        return stack->top;
+    }
+
+    symtable_level_t* current;
+    do {
+        current = stack->top;
+    } while (current->next != NULL);
+
+    symtable_level_t* l_tmp = (symtable_level_t*) malloc(sizeof(symtable_level_t));
+    l_tmp->symt = symt;
+    l_tmp->prev = current;
+    l_tmp->next = NULL;
+
+    current->next = l_tmp;
+    return l_tmp;
+}

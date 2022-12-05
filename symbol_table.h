@@ -34,7 +34,17 @@ typedef struct htab_item {
 
 typedef htab_item_t* symtable[MAX_SIZE];
 
-void symtable_init (symtable* table);
+typedef struct symtable_level {
+    symtable* symt;
+    struct symtable_level* next;
+    struct symtable_level* prev;
+} symtable_level_t;
+
+typedef struct symtable_stack {
+    symtable_level_t* top;
+} symtable_stack_t;
+
+bool symtable_init (symtable* table);
 
 int get_hash (char *key);
 
@@ -49,5 +59,13 @@ bool symtable_add_type (htab_data_t* data, data_type type);
 bool symtable_delete (symtable* table, char* key);
 
 void symtable_free (symtable* table);
+
+void symtable_stack_init(symtable_stack_t* stack);
+
+void symtable_stack_free(symtable_stack_t* stack);
+
+symtable_level_t* symtable_stack_push(symtable_stack_t* stack, symtable* symt);
+
+void symtable_stack_pop(symtable_stack_t* stack);
 
 #endif

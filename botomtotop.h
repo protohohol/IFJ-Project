@@ -36,9 +36,10 @@ typedef enum {
 
 const int convert_to_symbol (token_t * token);
 int convert_to_type (token_t * token);
-void set_symtable(symtable source);
+void set_symtable(symtable* source);
 void set_id (char* source);
 void set_flag(bool source);
+// void set_par(bool source);
 void set_type(exp_type* source);
 
 #endif

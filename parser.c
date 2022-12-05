@@ -20,6 +20,11 @@ data_type convert_to_symtable_datatype(exp_type type) {
  
 int f_state ( token_t * token ) {
     printf("i am in f_state\n");
+    bool f_flag = false;
+    htab_data_t* tmp;
+    exp_type final_type;
+    set_type(&final_type);
+
     switch (token->type) {
         case (T_KW_RETURN):
             if ( ( error_type = get_next_token(token) ) ) {
@@ -31,28 +36,49 @@ int f_state ( token_t * token ) {
             return expression(token);
             }
             break;
+
         case (T_VAR_ID):
-            if ( ( error_type = get_next_token(token) ) ) {
+            if( (tmp = symtable_search(&symt, token->data.string_c->str) ) == NULL ) {
+                // printf("### : %s\n", token->data.string_c->str);
+                tmp = symtable_insert(&symt, token->data.string_c->str);
+            } else {
+                f_flag = true;
+            }
+            if (( error_type = get_next_token(token) )) {
                 return error_type;
             }
-            if( token->type == T_ASSIGN ){
+            if (token->type == T_ASSIGN) {
                 if (( error_type = get_next_token(token) )) {
                     return error_type;
                 }
-                if ( token->type == T_FUN_ID ) {
-                    if ( ( error_type = get_next_token(token) ) ) {
-                        return error_type;
+                if (token->type == T_FUN_ID) {
+                    return f_state(token);
+                } else if (token->type == T_VAR_ID || token->type == T_INT_VAL || token->type == T_DEC_VAL || token->type == T_STRING_VAL) {
+                    int result = expression(token);
+                    if (result == NO_ERR) {
+                        symtable_add_type(tmp, ( convert_to_symtable_datatype (final_type) ));
+                        printf("############tmp : %d\n", tmp->type);
+                        // generate_code("=,E_last,NULL,tmp"); псведокод
                     }
-                    return declare(token);
-                } else if ( token->type == T_VAR_ID || token->type == T_INT_VAL || token->type == T_DEC_VAL || token->type == T_STRING_VAL  ) {
-                    return expression(token);    
+                    return result;
                 } else {
                     return SYNTAX_ERR;
                 }
             }
-            else
-                return expression(token);
+            else {
+                if (!f_flag) {
+                    symtable_delete(&symt, tmp->id);
+                    return SEM_ERR_UNDEFINED_VAR;
+                }
+                set_flag(true);
+                set_id(tmp->id);
+                // if (symtable_search(&symt, tmp->id) == NULL) {
+                //     printf("NULL!!\n");
+                // }
+                return expression(token); // tut eben'
+            }
             break;
+
         case (T_FUN_ID):
             //printf("%d\n%s\n",token->type,token->data.string_c->str);
             if (( error_type = get_next_token(token) )) {
@@ -60,6 +86,7 @@ int f_state ( token_t * token ) {
             }
             return declare(token);
             break;
+
         case (T_KW_WHILE):
             printf("I am in WHILE\n");
             if (( error_type = get_next_token(token) )) {
@@ -92,6 +119,7 @@ int f_state ( token_t * token ) {
                 return SYNTAX_ERR;
             }
             break;
+
         case (T_KW_ELSE):
             printf("i am in else \n");
             if ( ( error_type = get_next_token(token) ) ) {
@@ -107,6 +135,7 @@ int f_state ( token_t * token ) {
                 return SYNTAX_ERR;
             }
             break;
+
         case (T_KW_IF):
             printf("i am in if \n");
             if ( ( error_type = get_next_token(token) ) ) {
@@ -136,8 +165,10 @@ int f_state ( token_t * token ) {
                 return SYNTAX_ERR;
             }
             break;
+
         case (T_BRACE_RIGHT):
             return NO_ERR;
+
         default:
             return SYNTAX_ERR;
     }
@@ -146,6 +177,9 @@ int f_state ( token_t * token ) {
 int f_list ( token_t * token ) {
     printf("i am in f_list\n");
     switch (token->type) {
+        case (T_INT_VAL):
+        case (T_STRING_VAL):
+        case (T_DEC_VAL):
         case (T_KW_RETURN):
         case (T_VAR_ID):
         case (T_FUN_ID):
@@ -188,7 +222,7 @@ int f_list ( token_t * token ) {
 }
 
 int f_param_declare ( token_t * token ) {
-    if ( token->type == T_STRING_VAL || token->type == T_DEC_VAL || token->type == T_INT_VAL || T_VAR_ID ) {
+    if ( token->type == T_STRING_VAL || token->type == T_DEC_VAL || token->type == T_INT_VAL || token->type == T_VAR_ID ) {
         if ( ( error_type = get_next_token(token) ) ) {
             return error_type;
         }
@@ -226,10 +260,26 @@ int f_plist_declare( token_t * token ) {
 
 int f_param ( token_t * token ) {
     if ( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING ) {
+        data_type tmp;
+        switch (token->type) {
+            case (T_KW_FLOAT):
+                tmp = D_FLOAT;
+                break;
+            case (T_KW_INT):
+                tmp = D_INT;
+                break;
+            case (T_KW_STRING):
+                tmp = D_STRING;
+                break;
+            default:
+                break;
+        }
         if ( ( error_type = get_next_token(token) ) ) {
             return error_type;
         }
         if (token->type == T_VAR_ID) {
+            htab_data_t* item = symtable_insert(&symt, token->data.string_c->str);
+            symtable_add_type(item, tmp);
             if (( error_type = get_next_token(token) )) {
                 return error_type;
             }
@@ -286,7 +336,7 @@ int declare(token_t * token) {
 
 int define (token_t * token) {
     printf("i am in define\n");
-    if(token->type == T_PAR_LEFT) {
+    if (token->type == T_PAR_LEFT) {
             if (( error_type = get_next_token(token) )) {
                 return error_type;
             }
@@ -301,7 +351,7 @@ int state(token_t * token) {
     printf("i am in state\n");
     bool f_flag = false;
     htab_data_t* tmp;
-    exp_type final_type; // НАДО БЛЯТЬ ДОПОЛНИТЬ СУКА 
+    exp_type final_type;
     set_type(&final_type);
     switch (token->type) {
         // case (T_KW_RETURN):
@@ -335,7 +385,7 @@ int state(token_t * token) {
                     int result = expression(token);
                     if (result == NO_ERR) {
                         symtable_add_type(tmp, ( convert_to_symtable_datatype (final_type) ));
-                        printf("tmp : %d\n", tmp->type);
+                        printf("############tmp : %d\n", tmp->type);
                         // generate_code("=,E_last,NULL,tmp"); псведокод
                     }
                     return result;
@@ -350,15 +400,20 @@ int state(token_t * token) {
                 }
                 set_flag(true);
                 set_id(tmp->id);
-                return expression(token);//tut eben'
+                // if (symtable_search(&symt, tmp->id) == NULL) {
+                //     printf("NULL!!\n");
+                // }
+                return expression(token); // tut eben'
             }
             break;
+
         case (T_FUN_ID):
             if (( error_type = get_next_token(token) )) {
                 return error_type;
             }
             return declare(token);
             break;
+
         case (T_KW_FUNCTION):
             if (( error_type = get_next_token(token) )) {
                 return error_type;
@@ -414,11 +469,12 @@ int state(token_t * token) {
                     if (( error_type = get_next_token(token) )) {
                         return error_type;
                     }
+                    // printf("tt : %d\n", token->type);
                     if (token->type == T_BRACE_LEFT) {
                         if (( error_type = get_next_token(token) )) {
                             return error_type;
                         }
-                        return st_list(token);
+                        return f_list(token);
                     } else {
                         return SYNTAX_ERR;
                     }
@@ -450,14 +506,18 @@ int state(token_t * token) {
                 return error_type;
             }
             if (token->type == T_PAR_LEFT) {
+                if ( ( error_type = get_next_token(token) ) ) {
+                    return error_type;
+                }
+                // set_par(true);
                 error_type = expression(token);
                 if (error_type != NO_ERR) {
                     return error_type;
                 }
-                // if ( token->type == T_PAR_RIGHT ) {
-                //     if ( ( error_type = get_next_token(token) ) ) {
-                //         return error_type;
-                //     }
+                if ( token->type == T_PAR_RIGHT ) {
+                    if ( ( error_type = get_next_token(token) ) ) {
+                        return error_type;
+                    }
                     if ( token->type == T_BRACE_LEFT) {
                         if ( ( error_type = get_next_token(token) ) ) {
                             return error_type;
@@ -466,10 +526,10 @@ int state(token_t * token) {
                     } else {
                         return SYNTAX_ERR;
                     }
-                // } else {
-                //     printf("i am here\n");
-                //     return SYNTAX_ERR;
-                // }
+                } else {
+                    printf("i am here\n");
+                    return SYNTAX_ERR;
+                }
             } else {
                 return SYNTAX_ERR;
             }
@@ -481,7 +541,11 @@ int state(token_t * token) {
 
 int st_list(token_t * token) {
     printf("i am in st_list\n");
+    // printf("tt : %d\n", token->type);
     switch (token->type) {
+        case (T_INT_VAL):
+        case (T_STRING_VAL):
+        case (T_DEC_VAL):
         case (T_KW_RETURN):
         case (T_VAR_ID):
         case (T_FUN_ID):
@@ -540,16 +604,31 @@ int prog(token_t * token){
 }
 
 int main(){
-    token_t  token;
+    token_t token;
     string s;
-    symtable_init(&symt);
-    set_symtable(symt);
+    // symtable_stack_t st_stack;
+    // symtable symt2;
+    // symtable_stack_init(&st_stack);
+    if (!symtable_init(&symt)) {
+        return ERROR_INTERNAL;
+    }
+    // if (!symtable_init(&symt2)) {
+    //     return ERROR_INTERNAL;
+    // }
+    set_symtable(&symt);
     set_flag(false);
+    // set_par(false);
     if (!str_init(&s)) {
         return 1;
     }
     set_source(stdin);
     set_src_str(&s);
+    // symtable_insert(&symt, "aboba");
+    // symtable_insert(&symt2, "hubabon");
+    // symtable_stack_push(&st_stack, &symt);
+    // symtable_stack_push(&st_stack, &symt2);
+    // printf("symt : %s\tsymt2 : %s\n", symtable_search(st_stack.top->symt, "aboba")->id, symtable_search(st_stack.top->next->symt, "hubabon")->id);
+    // symtable_stack_pop(&st_stack);
     if ((error_type = get_next_token(&token)) == 0) {
         error_type = prog(&token);
     }

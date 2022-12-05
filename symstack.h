@@ -2,10 +2,11 @@
 
 typedef enum
 {
-	ET_UNDEFINED,	/// Data type undefined
-	ET_INT,		/// Integer data type
-	ET_FLOAT,	    /// Double data type
-	ET_STRING,	/// String data type
+	ET_UNDEFINED,	// Data type undefined
+	ET_INT,		// Integer data type
+	ET_FLOAT,	    // Double data type
+	ET_STRING,	// String data type
+	ET_NULL,	
 } exp_type;
 
 typedef enum
