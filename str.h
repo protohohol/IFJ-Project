@@ -49,6 +49,16 @@ void str_clear(string* s);
 bool str_add_char(string* s, char c);
 
 /**
+ * @brief adds char to the end of string
+ * 
+ * @param target pointer to string
+ * @param str chars to be added
+ * @return true if adding was successful
+ * @return false if adding was not successful
+ */
+bool str_add_more_chars(string* target, char* str);
+
+/**
  * @brief add function name in "name-" format to target string
  * 
  * @param target pointer to string

@@ -38,6 +38,15 @@ bool str_add_char(string* s, char c) {
     return true;
 }
 
+bool str_add_more_chars(string* target, char* str) {
+    for (int i = 0; i < strlen(str); i++) {
+        if (!str_add_char(target, str[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool str_copy_string(string* target, string* source) {
     // printf("s.l : %d\ts.as : %d\ts.s : %s\n", source->length, source->allocSize, source->str);
     // printf("t.l : %d\tt.as : %d\tt.s : %s\n", target->length, target->allocSize, target->str);
