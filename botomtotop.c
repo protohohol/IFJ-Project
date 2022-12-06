@@ -374,9 +374,12 @@ int convert_to_type ( token_t * token ) {
     htab_data_t* tmp;
     switch ( token->type ) {
     case T_VAR_ID:
-        tmp = symtable_search(symt_l, token->data.string_c->str);
-        return data_to_exp(tmp->type);
-
+        if ((tmp = symtable_search(symt_l, token->data.string_c->str)) != NULL) {
+            return data_to_exp(tmp->type);
+        } else {
+            printf("мы в пизде\n");
+            return ET_UNDEFINED;
+        }
     case T_INT_VAL:
         return ET_INT;
 
@@ -608,9 +611,11 @@ int expression (token_t * token) {
         case C_LESS:
             printf("i am in C_LESS\n");
             stack_push_after(&exp_stack,ES_CATCH, ET_UNDEFINED);
-            // printf("token type : %d\n", token->type);
+            printf("token type : %d\n", token->type);
             tmp_sym = convert_to_symbol(token);
+            printf("token type : %d\n", token->type);
             tmp_type = convert_to_type(token);
+            printf("token type : %d\n", token->type);
             // printf("tmp_type : %d\n", tmp_type);
             stack_push(&exp_stack,tmp_sym,tmp_type);
             // printf("push : %d\n", get_top(&exp_stack)->etype);

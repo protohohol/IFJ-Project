@@ -85,7 +85,115 @@ char convert_to_char(token_t* token) {
             return ' '; // error
     }
 }
- 
+
+int kostyluka (token_t * token) {
+    while(token->type != T_KW_FUNCTION && token->type != T_EOF && token->type != T_END_SYMBOL) {
+        if (( error_type = get_next_token(token) )) {
+                return error_type;
+        }
+    }
+    if(token->type == T_EOF || token->type == T_END_SYMBOL){
+        return NO_ERR;
+    }
+    if (( error_type = get_next_token(token) )) {
+        return error_type;
+    }
+    printf("type:   %d\n", token->type);
+    if (token->type == T_FUN_ID) {
+        symtable_stack_push(&symt_stack);
+        htab_data_t* item = symtable_insert(symt_stack.top->symt, token->data.string_c->str);
+        str_copy_string(&fun_name,token->data.string_c);
+        item->is_defined = false;
+        if (( error_type = get_next_token(token) )) {
+            return error_type;
+        }
+        if (token->type == T_PAR_LEFT)
+        {
+            if (( error_type = get_next_token(token) )) {
+                return error_type;
+            }
+            error_type = f_plist_kostylga(token);
+            if(error_type)
+                return error_type;
+        
+            if(token->type == T_COLON) {
+                if (( error_type = get_next_token(token) )) {
+                    return error_type;
+                }
+                if ( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING || token->type == T_KW_VOID ) {
+                    data_type d_tmp = convert_to_d_type(token);
+                    if(symtable_add_type(symtable_search(symt_stack.top->symt, fun_name.str), d_tmp));
+                    printf("ebanina %d\n", token->type);
+                    return kostyluka(token);
+                }
+                else {
+                    printf("1\n");
+                    return SYNTAX_ERR;
+                }
+            } else {
+                printf("22\n");
+                return SYNTAX_ERR;
+            }
+        } else {
+            printf("3\n");
+            return SYNTAX_ERR;
+        }
+    } else {
+        printf("4\n");
+        return SYNTAX_ERR;
+    }
+    return SEM_ERR_OTHER;
+}
+
+int f_plist_kostylga( token_t * token ) {
+    printf("%d\n",token->type);
+    if ( token->type == T_COMMA ) {
+        if (( error_type = get_next_token(token) )) {
+            return error_type;
+        }
+        error_type = f_param_kostylga(token);
+        if (error_type) {
+            return error_type;
+        }
+        return f_plist_kostylga(token);
+    } else if ( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING) {
+        printf("p_list int\n");
+        error_type = f_param_kostylga(token);
+        if (error_type) {
+            return error_type;
+        }
+        return f_plist_kostylga(token);
+    } else if ( token->type == T_PAR_RIGHT ) {
+        if (( error_type = get_next_token(token) )) {
+            return error_type;
+        }
+        return NO_ERR;
+    } else {
+        printf("hihi\n");
+        return SYNTAX_ERR;
+    }
+}
+
+int f_param_kostylga ( token_t * token ) {
+    if ( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING ) {
+        if ( ( error_type = get_next_token(token) ) ) {
+            return error_type;
+        }
+        if (token->type == T_VAR_ID) {
+            if (( error_type = get_next_token(token) )) {
+                return error_type;
+            }
+            return NO_ERR;
+        } else {
+            return SYNTAX_ERR;
+        }
+    } else {
+        return SYNTAX_ERR;
+    }
+}
+
+
+
 int f_state ( token_t * token ) {
     printf("i am in f_state\n");
     bool f_flag = false;
@@ -106,8 +214,8 @@ int f_state ( token_t * token ) {
                 int result = expression(token);
                 printf("it is good\n");
                 if (result == NO_ERR) {
-                    if( (item_tmp = (symtable_search(symt_stack.top->symt, fun_name.str)) != NULL) ) {
-                        if (!item_tmp->type == convert_exp_to_d_type(final_type)) {
+                    if( (item_tmp = (symtable_search(symt_stack.top->symt, fun_name.str))) != NULL)  {
+                        if (!(item_tmp->type == convert_exp_to_d_type(final_type))) {
                             return SEM_ERR_WRONG_PARAM;
                         } else {
                             return result;
@@ -303,7 +411,6 @@ int f_list ( token_t * token ) {
         case (T_KW_WHILE):
         case (T_KW_ELSE):
         case (T_KW_IF):
-            set_symtable(symt_stack.active->symt);
             error_type = f_state(token);
             if (error_type != NO_ERR) {
                 return error_type;
@@ -568,9 +675,19 @@ int state(token_t * token) {
             }
             if (token->type == T_FUN_ID) {
                 symtable_stack_push(&symt_stack);
-                htab_data_t* item = symtable_insert(symt_stack.top->symt, token->data.string_c->str);
+                htab_data_t* item = symtable_search(symt_stack.top->symt, token->data.string_c->str);
+                if (item == NULL) {
+                    item = symtable_insert(symt_stack.top->symt, token->data.string_c->str);
+                    item->is_defined = true;
+                } else {
+                    if (item->is_defined) {
+                        return SEM_ERR_UNDEFINED_FUNCTION;
+                    } else {
+                        item->is_defined = true;
+                    }                    
+                } 
                 str_copy_string(&fun_name,token->data.string_c);
-                printf("%s\n",fun_name.str);
+                printf("dvatanka %s\n",fun_name.str);
                 item->is_defined = true;
                 if (( error_type = get_next_token(token) )) {
                     return error_type;
@@ -597,6 +714,7 @@ int state(token_t * token) {
                             if (( error_type = get_next_token(token) )) {
                                 return error_type;
                             }
+                            set_symtable(symt_stack.active->symt);
                             return f_list(token);
                         } else {
                             return SYNTAX_ERR;
@@ -865,6 +983,18 @@ int main() {
     // symtable_stack_push(&st_stack, &symt2);
     // printf("symt : %s\tsymt2 : %s\n", symtable_search(st_stack.top->symt, "aboba")->id, symtable_search(st_stack.top->next->symt, "hubabon")->id);
     // symtable_stack_pop(&st_stack);
+    if ((error_type = get_next_token(&token)) == 0) {
+        error_type = kostyluka(&token);
+    }
+    printf("ja debil %d\n",error_type);
+    if (error_type) {
+        return error_type;
+    }
+    if (fseek(stdin, 0L, SEEK_SET)) {
+        perror("stdin");
+        exit(EXIT_FAILURE);
+    }
+    set_source(stdin);
     if ((error_type = get_next_token(&token)) == 0) {
         error_type = prog(&token);
     }
