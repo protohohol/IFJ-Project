@@ -409,5 +409,8 @@ void print_instruction(DLList* list) {
 				printf("DPRINT %s\n", list->activeElement->data.operand_1.out.str);
 				break;
 		}
+		str_free(list->activeElement->data.result.out.str);
+		str_free(list->activeElement->data.operand_1.out.str);
+		str_free(list->activeElement->data.operand_2.out.str);
 	}
 }
