@@ -16,7 +16,8 @@ typedef enum {
 } frame_type;
 
 typedef struct {
-    string value;
+    string out;
+    char* value;
     data_type type;
     frame_type frame;
 } operand_t;
