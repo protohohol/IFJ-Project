@@ -24,6 +24,7 @@ typedef struct {
     bool global_var;
     int argumets_amount;
     bool infinite;
+    bool is_defined;
 } htab_data_t;
 
 typedef struct htab_item {
@@ -42,6 +43,7 @@ typedef struct symtable_level {
 
 typedef struct symtable_stack {
     symtable_level_t* top;
+    symtable_level_t* active;
 } symtable_stack_t;
 
 bool symtable_init (symtable* table);
@@ -64,7 +66,7 @@ void symtable_stack_init(symtable_stack_t* stack);
 
 void symtable_stack_free(symtable_stack_t* stack);
 
-symtable_level_t* symtable_stack_push(symtable_stack_t* stack, symtable* symt);
+symtable_level_t* symtable_stack_push(symtable_stack_t* stack);
 
 void symtable_stack_pop(symtable_stack_t* stack);
 

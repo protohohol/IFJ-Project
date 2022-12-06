@@ -44,9 +44,37 @@ void str_clear(string* s);
  * @param s pointer to string
  * @param c char to be added
  * @return true if adding was successful
- * @return false adding was not successful
+ * @return false if adding was not successful
  */
 bool str_add_char(string* s, char c);
+
+/**
+ * @brief add function name in "name-" format to target string
+ * 
+ * @param target pointer to string
+ * @param name function name to be added
+ * @return true if adding was successful
+ * @return false if adding was not successful
+ */
+bool str_add_fun_name(string* target, char* name);
+
+/**
+ * @brief checks if function name exists in string
+ * 
+ * @param target pointer to string
+ * @param name function name to be found
+ * @return true if function name is in string
+ * @return false if function was not found
+ */
+bool str_find_fun_name(string* target, char* name);
+
+/**
+ * @brief gets last function name from string
+ * 
+ * @param source poiter to string
+ * @param target pointer to char to be written in
+ */
+void str_get_last_fun_name(string* source, char** target);
 
 /**
  * @brief copies content of source string to target string

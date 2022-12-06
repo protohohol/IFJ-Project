@@ -597,7 +597,7 @@ int expression (token_t * token) {
         //printf( "%d\n",(get_top_term(&exp_stack) )->symbol);
         switch (get_cond(token,&exp_stack)) {
         case C_EQ:
-            printf("i am in C_EQ\n");
+            // printf("i am in C_EQ\n");
             tmp_sym = convert_to_symbol(token);
             tmp_type = convert_to_type(token);
             stack_push(&exp_stack,tmp_sym,tmp_type); // TUT PROVERKU DOBAV JESTLI NE VPADLU
@@ -608,12 +608,12 @@ int expression (token_t * token) {
         case C_LESS:
             printf("i am in C_LESS\n");
             stack_push_after(&exp_stack,ES_CATCH, ET_UNDEFINED);
-            printf("token type : %d\n", token->type);
+            // printf("token type : %d\n", token->type);
             tmp_sym = convert_to_symbol(token);
             tmp_type = convert_to_type(token);
-            printf("tmp_type : %d\n", tmp_type);
+            // printf("tmp_type : %d\n", tmp_type);
             stack_push(&exp_stack,tmp_sym,tmp_type);
-            printf("push : %d\n", get_top(&exp_stack)->etype);
+            // printf("push : %d\n", get_top(&exp_stack)->etype);
             if ( ( error_type = get_next_token(token) ) ) {
                 return error_type;
             }
@@ -643,7 +643,7 @@ int expression (token_t * token) {
             }
             break;
         case C_NONE:
-            printf("i am in C_NONE\n");
+            // printf("i am in C_NONE\n");
             if (( ( get_top_term(&exp_stack) )->symbol != ES_END )) {
                 return SYNTAX_ERR;  
             } else {

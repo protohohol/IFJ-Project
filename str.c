@@ -63,3 +63,82 @@ int str_cmp_string(string* s1, string* s2) {
 int str_cmp_const_str(string* s1, char* s2) {
     return strcmp(s1->str, s2);
 }
+
+bool str_add_fun_name(string* target, char* name) {
+    if (target->length == 0) {
+        if (!str_add_char(target, '-')) {
+            return false;
+        }
+    }
+
+    for (int i = 0; i < strlen(name); i++) {
+        if (!str_add_char(target, name[i])) {
+            return false;
+        }
+    }
+
+    if (!str_add_char(target, '-')) {
+        return false;
+    }
+    return true;
+}
+
+bool str_find_fun_name(string* target, char* name) {
+    bool start_flag = false;
+    string tmp;
+    if (!str_init(&tmp)) {
+        return false;
+    }
+
+    for (int i = 0; i < target->length; i++) {
+        if (!start_flag && target->str[i] == '-') {
+            start_flag = true;
+        } else if (start_flag && target->str[i] != '-') {
+            if (!str_add_char(&tmp, target->str[i])) {
+                str_free(&tmp);
+                return false;
+            }
+        } else {
+            if (!str_cmp_const_str(&tmp, name)) {
+                return true;
+            } else {
+                str_clear(&tmp);
+            }
+        }
+    }
+
+    str_free(&tmp);
+    return false;
+}
+
+void str_get_last_fun_name(string* source, char** target) {
+    if (source->length == 0) {
+        return;
+    }
+
+    string tmp;
+    int i = source->length-1;
+    if (!str_init(&tmp)) {
+        return;
+    }
+
+    while (source->str[--i] != '-') {
+    }
+
+    while (++i < source->length-1) {
+        if (!str_add_char(&tmp, source->str[i])) {
+            str_free(&tmp);
+            return;
+        }
+    }
+
+    *target = (char *) malloc((tmp.length + 1) * __CHAR_BIT__);
+    if (*target == NULL) {
+        str_free(&tmp);
+        return;
+    }
+    
+    strncpy(*target, tmp.str, tmp.length + 1);
+
+    str_free(&tmp);
+}

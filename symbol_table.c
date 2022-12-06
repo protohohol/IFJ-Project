@@ -19,6 +19,7 @@ bool symtable_init(symtable* table) {
     for (int i = 0; i < MAX_SIZE; i++) {
         (*table)[i] = NULL;
     }
+    // printf("@@hi@@\n");
 
     // htab_data_t* tmpData = symtable_insert(table, "reads");
     // symtable_add_type(tmpData, D_STRING);
@@ -101,20 +102,20 @@ htab_data_t* symtable_insert(symtable* table, char* key) {
         return NULL;
     }
 
-    newItem->key = (char*)malloc((strlen(key) + 1) * sizeof(char));
+    newItem->key = (char*) malloc((strlen(key) + 1) * sizeof(char));
     if (newItem->key == NULL) {
         free(newItem);
         return NULL;
     }
 
-    newItem->data.id = (char*)malloc((strlen(key) + 1) * sizeof(char));
+    newItem->data.id = (char*) malloc((strlen(key) + 1) * sizeof(char));
     if (newItem->data.id == NULL) {
         free(newItem->key);
         free(newItem);
         return NULL;
     }
 
-    newItem->data.arguments = (string*)malloc(sizeof(string));
+    newItem->data.arguments = (string*) malloc(sizeof(string));
     if (newItem->data.arguments == NULL) {
         free(newItem->key);
         free(newItem->data.id);
@@ -135,6 +136,7 @@ htab_data_t* symtable_insert(symtable* table, char* key) {
     newItem->data.global_var = false;
     newItem->data.argumets_amount = 0;
     newItem->data.infinite = false;
+    newItem->data.is_defined = false;
     // newItem->data.type = NULL;
     newItem->next = NULL;
 
@@ -231,30 +233,38 @@ bool symtable_delete (symtable* table, char* key) {
 }
 
 void symtable_free(symtable* table) {
-    if(table == NULL) {
+    if (table == NULL) {
         return;
     }
+    // printf("table size : %d\n", sizeof(*table));
 
     htab_item_t* tmpItem_next = NULL;
 
     for (int i = 0; i < MAX_SIZE; i++) {
         htab_item_t* tmpItem = (*table)[i];
-
         while (tmpItem != NULL) {
+            // printf("@@hi1\n");
             tmpItem_next = tmpItem->next;
-
+            // printf("@@hi2\n");
             free(tmpItem->key);
+            // printf("@@hi3\n");
 
             if (tmpItem->data.arguments != NULL) {
+                // printf("@@hi4\n");
                 str_free(tmpItem->data.arguments);
+                // printf("@@hi5\n");
                 free(tmpItem->data.arguments);
+                // printf("@@hi6\n");
             }
 
             free(tmpItem);
-            tmpItem = tmpItem_next;       
+            // printf("@@hi7\n");
+            tmpItem = tmpItem_next;
+            // printf("@@hi8\n");
         }
 
         (*table)[i] = NULL;
+        // printf("@@hi9\n");
     }
 }
 
@@ -271,6 +281,7 @@ void symtable_stack_init(symtable_stack_t* stack) {
     // return symtable_init(stack->top->symt);
 
     stack->top = NULL;
+    stack->active = NULL;
 }
 
 void symtable_stack_pop(symtable_stack_t* stack) {
@@ -278,13 +289,17 @@ void symtable_stack_pop(symtable_stack_t* stack) {
         return;
     }
 
-    symtable_level_t* current;
-    do {
-        current = stack->top;
-    } while (current->next != NULL);
+    symtable_level_t* current = stack->top;
+    while (current->next != NULL) {
+        current = current->next;
+    }
 
     if (current->prev != NULL) {
         current->prev->next = NULL;
+    }
+
+    if (stack->active == current) {
+        stack->active = current->prev;
     }
 
     symtable_free(current->symt);
@@ -294,16 +309,16 @@ void symtable_stack_free(symtable_stack_t* stack) {
     if (stack == NULL || stack->top == NULL) {
         return;
     }
-
     while (stack->top->next != NULL) {
         symtable_stack_pop(stack);
+        // printf("hi\n");
     }
 
     symtable_stack_pop(stack);
 }
 
-symtable_level_t* symtable_stack_push(symtable_stack_t* stack, symtable* symt) {
-    if (stack == NULL || symt == NULL) {
+symtable_level_t* symtable_stack_push(symtable_stack_t* stack) {
+    if (stack == NULL) {
         return NULL;
     }
 
@@ -313,23 +328,50 @@ symtable_level_t* symtable_stack_push(symtable_stack_t* stack, symtable* symt) {
     // }
 
     if (stack->top == NULL) {
+        // printf("size : %d\tsize symt : %d\n", sizeof(symtable_level_t), sizeof(symtable));
         stack->top = (symtable_level_t*) malloc(sizeof(symtable_level_t));
+        if (stack->top == NULL) {
+            return NULL;
+        }
+        stack->top->symt = (symtable*) malloc(sizeof(symtable));
+        if (stack->top->symt == NULL) {
+            return NULL;
+        }
         stack->top->next = NULL;
         stack->top->prev = NULL;
-        stack->top->symt = symt;
+        if(!symtable_init(stack->top->symt)) {
+            // printf("@@hi@@\n");
+            free(stack->top);
+            return NULL;
+        }
+        stack->active = stack->top;
         return stack->top;
     }
 
-    symtable_level_t* current;
-    do {
-        current = stack->top;
-    } while (current->next != NULL);
+    symtable_level_t* current = stack->top;
+    while (current->next != NULL) {
+        current = current->next;
+    }
 
-    symtable_level_t* l_tmp = (symtable_level_t*) malloc(sizeof(symtable_level_t));
-    l_tmp->symt = symt;
-    l_tmp->prev = current;
-    l_tmp->next = NULL;
+    current->next = (symtable_level_t*) malloc(sizeof(symtable_level_t));
+    if (current->next == NULL) {
+        symtable_stack_free(stack);
+        return NULL;
+    }
+    current->next->symt = (symtable*) malloc(sizeof(symtable));
+    if (current->next->symt == NULL) {
+            symtable_stack_free(stack);
+            return NULL;
+    }
+    if(!symtable_init(current->next->symt)) {
+        // printf("@@hi@@\n");
+        symtable_stack_free(stack);
+        return NULL;
+    }
+    // current->next->symt = symt;
+    current->next->next = NULL;
+    current->next->prev = current;
 
-    current->next = l_tmp;
-    return l_tmp;
+    stack->active = current->next;
+    return current->next;
 }
