@@ -15,6 +15,7 @@ typedef enum {
     D_VOID,
     D_STRING,
     D_TERM,
+    D_UNDEFINED,
 } data_type;
 
 typedef struct {
