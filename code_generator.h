@@ -77,6 +77,8 @@ typedef enum {
     I_BREAK,
     I_DPRINT,
 
+    I_COMMENT,
+
 }instructions;
 
 #endif
