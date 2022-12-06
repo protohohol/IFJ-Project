@@ -457,6 +457,8 @@ int state(token_t * token) {
     htab_data_t* tmp;
     exp_type final_type;
     set_type(&final_type);
+    htab_data_t* item_tmp;
+
     switch (token->type) {
         // case (T_KW_RETURN):
         //     //generate_code("return", NULL, NULL, );
@@ -484,8 +486,12 @@ int state(token_t * token) {
                     return error_type;
                 }
                 if (token->type == T_FUN_ID) {
+                    item_tmp = symtable_search(symt_stack.top->symt, token->data.string_c->str);
+                    symtable_add_type(tmp, item_tmp->type);
+                    printf("id : %s\ttype : %d\n", tmp->id, tmp->type);
                     return declare(token);
                 } else if (token->type == T_VAR_ID || token->type == T_INT_VAL || token->type == T_DEC_VAL || token->type == T_STRING_VAL) {
+                    set_symtable(symt_stack.top->symt);
                     int result = expression(token);
                     if (result == NO_ERR) {
                         symtable_add_type(tmp, ( convert_exp_to_d_type (final_type) ));
@@ -511,7 +517,7 @@ int state(token_t * token) {
             }
             break;
 
-        case (T_FUN_ID):
+        case (T_FUN_ID):            
             return declare(token);
             break;
 
@@ -609,6 +615,7 @@ int state(token_t * token) {
             break;
         case (T_KW_IF):
             printf("i am in if \n");
+            set_symtable(symt_stack.top->symt);
             if ( ( error_type = get_next_token(token) ) ) {
                 return error_type;
             }
@@ -669,10 +676,8 @@ int st_list(token_t * token) {
                 return SYNTAX_ERR;
             }
             break;
+
         case (T_KW_FUNCTION):
-        case (T_KW_WHILE):
-        case (T_KW_ELSE):
-        case (T_KW_IF):
             error_type = state(token);
             if (error_type != NO_ERR) {
                 return error_type;
@@ -690,12 +695,32 @@ int st_list(token_t * token) {
             }
             return st_list(token);
             break;
+            
+        case (T_KW_WHILE):
+        case (T_KW_ELSE):
+        case (T_KW_IF):
+            error_type = state(token);
+            if (error_type != NO_ERR) {
+                return error_type;
+            }
+            if (token->type == T_BRACE_RIGHT) {
+                if (( error_type = get_next_token(token) )) {
+                    return error_type;
+                }
+            } else {
+                return SYNTAX_ERR;
+            }
+            return st_list(token);
+            break;
+
         case (T_END_SYMBOL):
             return NO_ERR;
             break;
+
         case (T_EOF):
             return NO_ERR;
             break;
+
         default:
             return SYNTAX_ERR;
     }
@@ -736,6 +761,48 @@ int main() {
     //     return ERROR_INTERNAL;
     // }
     symtable_stack_push(&symt_stack);
+    htab_data_t* tmpData1 = symtable_insert(symt_stack.top->symt, "reads");
+    symtable_add_type(tmpData1, D_STRING);
+
+    htab_data_t* tmpData2 = symtable_insert(symt_stack.top->symt, "readi");
+    symtable_add_type(tmpData2, D_INT);
+
+    htab_data_t* tmpData3 = symtable_insert(symt_stack.top->symt, "readf");
+    symtable_add_type(tmpData3, D_FLOAT);
+
+    htab_data_t* tmpData4 = symtable_insert(symt_stack.top->symt, "write");
+    symtable_add_type(tmpData4, D_VOID);
+    symtable_add_arguments(tmpData4, D_TERM, true);
+
+    htab_data_t* tmpData5 = symtable_insert(symt_stack.top->symt, "floatval");
+    symtable_add_type(tmpData5, D_FLOAT);
+    symtable_add_arguments(tmpData5, D_TERM, false);
+
+    htab_data_t* tmpData6 = symtable_insert(symt_stack.top->symt, "intval");
+    symtable_add_type(tmpData6, D_INT);
+    symtable_add_arguments(tmpData6, D_TERM, false);
+
+    htab_data_t* tmpData7 = symtable_insert(symt_stack.top->symt, "strval");
+    symtable_add_type(tmpData7, D_STRING);
+    symtable_add_arguments(tmpData7, D_TERM, false);
+
+    htab_data_t* tmpData8 = symtable_insert(symt_stack.top->symt, "strlen");
+    symtable_add_type(tmpData8, D_INT);
+    symtable_add_arguments(tmpData8, D_STRING, false);
+
+    htab_data_t* tmpData9 = symtable_insert(symt_stack.top->symt, "substring");
+    symtable_add_type(tmpData9, D_STRING);
+    symtable_add_arguments(tmpData9, D_STRING, false);
+    symtable_add_arguments(tmpData9, D_INT, false);
+    symtable_add_arguments(tmpData9, D_INT, false);
+
+    htab_data_t* tmpData10 = symtable_insert(symt_stack.top->symt, "ord");
+    symtable_add_type(tmpData10, D_INT);
+    symtable_add_arguments(tmpData10, D_STRING, false);
+
+    htab_data_t* tmpData11 = symtable_insert(symt_stack.top->symt, "chr");
+    symtable_add_type(tmpData11, D_STRING);
+    symtable_add_arguments(tmpData11, D_INT, false);
     // if (!symtable_init(&symt2)) {
     //     return ERROR_INTERNAL;
     // }
