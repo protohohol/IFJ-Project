@@ -5,6 +5,7 @@ symtable_stack_t symt_stack;
 string fun_name;
 string fun_list;
 int param_counter;
+DLList inst_list;
 
 /**
  * @brief converts exp_type to data_type
@@ -917,6 +918,7 @@ int main() {
     // printf("1 : %d\t2 : %d\t3 : %d\t4 : %d\n", str_find_fun_name(&fun_list, "aboba"), str_find_fun_name(&fun_list, "gogoga"), str_find_fun_name(&fun_list, "lologa"), str_find_fun_name(&fun_list, "abafsda"));
     symtable_stack_init(&symt_stack);
     param_counter = 0;
+    DLL_Init(&inst_list);
     // symtable_stack_t st_stack;
     // symtable symt2;
     // symtable_stack_init(&st_stack);
@@ -977,6 +979,7 @@ int main() {
     }
     set_source(stdin);
     set_src_str(&s);
+    set_inst_list(&inst_list);
     // symtable_insert(&symt, "aboba");
     // symtable_insert(&symt2, "hubabon");
     // symtable_stack_push(&st_stack, &symt);

@@ -8,6 +8,7 @@
 #include "symbol_table.h"
 #include "str.h"
 #include "code_generator.h"
+#include "symstack.h"
 
 typedef enum {
     F_GF,   //global frame

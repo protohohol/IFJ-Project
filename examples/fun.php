@@ -12,7 +12,7 @@ int  /* deklarace funkce */ {
   }
 }
 
-function g(int $x):int{
+function gint( $x):int{
   if ($x > 0) {
     write("calling f with ", $x, "\n");
     $x = f($x);// modifikace parametru x, ale az po zavolani funkce f

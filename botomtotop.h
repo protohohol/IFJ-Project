@@ -5,7 +5,7 @@
 #include "symstack.h"
 #include "error.h"
 #include "symbol_table.h"
-
+#include "instruction_list.h"
 
 
 
@@ -41,5 +41,6 @@ void set_id (char* source);
 void set_flag(bool source);
 // void set_par(bool source);
 void set_type(exp_type* source);
+void set_inst_list(DLList* source);
 
 #endif

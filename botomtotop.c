@@ -5,6 +5,7 @@ char* id;
 bool ass_flag;
 // bool par_flag;
 exp_type* type;
+DLList* i_list;
 
 void set_symtable(symtable* source) {
     symt_l = source;
@@ -24,6 +25,10 @@ void set_flag(bool source) {
 
 void set_type(exp_type* source) {
     type = source;
+}
+
+void set_inst_list(DLList* source) {
+    i_list = source;
 }
 
 exp_type data_to_exp(data_type source) {
@@ -443,7 +448,8 @@ int check_sem ( exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_sta
                 *type = ET_FLOAT;
             } else if ((op1->etype == ET_INT || op1->etype == ET_FLOAT) && (op3->etype == ET_INT || op3->etype == ET_FLOAT)) {
                 if (op1->etype == ET_INT) {
-                    // generate(retype(op1, float));
+                    taCode data;
+                    data.operand_1.type = ;
                 } else {
                     // generate(retype(op3, float));
                 }

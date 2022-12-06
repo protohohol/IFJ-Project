@@ -215,7 +215,6 @@ void print_instruction(DLList* list) {
 				printf("# %s\n", list->activeElement->data.operand_1.out.str);
 				break;
 
-
 			case I_MOVE:
 				printf("MOVE %s %s\n", list->activeElement->data.result.out.str, list->activeElement->data.operand_1.out.str);
 				break;
