@@ -95,7 +95,7 @@ htab_data_t* symtable_insert(symtable* table, char* key) {
     newItem->data.argumets_amount = 0;
     newItem->data.infinite = false;
     newItem->data.is_defined = false;
-    // newItem->data.type = NULL;
+    newItem->data.type = D_UNDEFINED;
     newItem->next = NULL;
 
     int index = get_hash(key);

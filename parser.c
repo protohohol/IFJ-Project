@@ -2,7 +2,7 @@
 
 int error_type;
 symtable_stack_t symt_stack;
-char* fun_name;
+string fun_name;
 string fun_list;
 int param_counter;
 
@@ -90,6 +90,7 @@ int f_state ( token_t * token ) {
     printf("i am in f_state\n");
     bool f_flag = false;
     htab_data_t* tmp;
+    htab_data_t* item_tmp;
     exp_type final_type;
     set_type(&final_type);
 
@@ -103,15 +104,17 @@ int f_state ( token_t * token ) {
                 return declare(token);
             } else {
                 int result = expression(token);
+                printf("it is good\n");
                 if (result == NO_ERR) {
-                    if (!(symtable_search(symt_stack.active->symt, fun_name)->type == convert_exp_to_d_type(final_type))) {
-                        return SEM_ERR_WRONG_PARAM;
-                    }
+                    if( (item_tmp = (symtable_search(symt_stack.top->symt, fun_name.str)) != NULL) ) {
+                        if (!item_tmp->type == convert_exp_to_d_type(final_type)) {
+                            return SEM_ERR_WRONG_PARAM;
+                        } else {
+                            return result;
+                        }
+                    } //else таже ебень
                 }
-                return result;
             }
-            break;
-
         case (T_VAR_ID):
             set_symtable(symt_stack.active->symt);
             if( (tmp = symtable_search(symt_stack.active->symt, token->data.string_c->str) ) == NULL ) {
@@ -129,13 +132,28 @@ int f_state ( token_t * token ) {
                     return error_type;
                 }
                 if (token->type == T_FUN_ID) {
-                    htab_data_t* item = symtable_search(symt_stack.top->symt, token->data.string_c->str);
-                    if (item != NULL) {
-                        // printf("\t\t\t\t\t\tNOT NULL\n");
-                        symtable_add_type(tmp, item->type);
-                        // printf("type : %d\n", symtable_search(symt_stack.top->symt, tmp->id)->type);
+                     /*
+                    Sematick check: 
+                    If we found the defined function, we retype our variable to type, that function retruns
+                    Else we create a temporary definition in table, and add that to list of undefined but used fucntions
+                    in the end of analysis we will check, if it was defined late.
+                    */
+                    if((item_tmp = symtable_search(symt_stack.top->symt, token->data.string_c->str))==NULL) {
+                        tmp = symtable_insert(symt_stack.top->symt,token->data.string_c->str);
+                        tmp->is_defined = false;
+                        str_add_fun_name(&fun_list,token->data.string_c->str);
+                        error_type = declare(token);
+                        if (error_type) {
+                            return error_type;
+                        }
+                        symtable_add_type(tmp, item_tmp->type);/// Жестойчайшая поебень уровня смерть
+                    }   else {
+                        printf("that's okay, %d %d \n",tmp->type, item_tmp->type);
+                        symtable_add_type(tmp, item_tmp->type);
+
+                        return declare(token);
                     }
-                    return declare(token);
+                    return SEM_ERR_OTHER;
                 } else if (token->type == T_VAR_ID || token->type == T_INT_VAL || token->type == T_DEC_VAL || token->type == T_STRING_VAL) {
                     int result = expression(token);
                     if (result == NO_ERR) {
@@ -363,7 +381,7 @@ int f_plist_declare( token_t * token ) {
 int f_param ( token_t * token ) {
     if ( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING ) {
         data_type tmp = convert_to_d_type(token);
-        if (!symtable_add_arguments(symtable_search(symt_stack.top->symt, fun_name), tmp, false)) {
+        if (!symtable_add_arguments(symtable_search(symt_stack.top->symt, fun_name.str), tmp, false)) {
             return ERROR_INTERNAL;
         }
         // printf("\targ : %s\n", symtable_search(symt_stack.top->symt, fun_name)->arguments->str);
@@ -460,21 +478,22 @@ int state(token_t * token) {
     htab_data_t* item_tmp;
 
     switch (token->type) {
-        // case (T_KW_RETURN):
-        //     //generate_code("return", NULL, NULL, );
-        //     if (( error_type = get_next_token(token) )) {
-        //         return error_type;
-        //     }
-        //     if ( token->type == T_FUN_ID ) {
-        //         return declare(token);
-        //     } else {
-        //     return expression(token);
-        //     }
-        //     break;
+        case (T_KW_RETURN):
+            //generate_code("return", NULL, NULL, );
+            if (( error_type = get_next_token(token) )) {
+                return error_type;
+            }
+            if ( token->type == T_FUN_ID ) {
+                return declare(token);
+            } else {
+            return expression(token);
+            }
+            break;
         case (T_VAR_ID):
             if( (tmp = symtable_search(symt_stack.top->symt, token->data.string_c->str) ) == NULL ) {
                 // printf("### : %s\n", token->data.string_c->str);
                 tmp = symtable_insert(symt_stack.top->symt, token->data.string_c->str);
+                printf("type of ininitialized variable: %d \n",tmp->type);
             } else {
                 f_flag = true;
             }
@@ -486,15 +505,31 @@ int state(token_t * token) {
                     return error_type;
                 }
                 if (token->type == T_FUN_ID) {
-                    item_tmp = symtable_search(symt_stack.top->symt, token->data.string_c->str);
-                    symtable_add_type(tmp, item_tmp->type);
-                    printf("id : %s\ttype : %d\n", tmp->id, tmp->type);
-                    return declare(token);
+                    /*
+                    Sematick check: 
+                    If we found the defined function, we retype our variable to type, that function retruns
+                    Else we create a temporary definition in table, and add that to list of undefined but used fucntions
+                    in the end of analysis we will check, if it was defined late.
+                    */
+                    if((item_tmp = symtable_search(symt_stack.top->symt, token->data.string_c->str))==NULL) {
+                        tmp = symtable_insert(symt_stack.top->symt,token->data.string_c->str);
+                        tmp->is_defined = false;
+                        str_add_fun_name(&fun_list,token->data.string_c->str);
+                        error_type = declare(token);
+                        if (error_type) {
+                            return error_type;
+                        }
+                        symtable_add_type(tmp, item_tmp->type);/// Жестойчайшая поебень уровня смерть
+                    }   else {
+                        symtable_add_type(tmp, item_tmp->type);
+                        return declare(token);
+                    }
+                    return SEM_ERR_OTHER;
                 } else if (token->type == T_VAR_ID || token->type == T_INT_VAL || token->type == T_DEC_VAL || token->type == T_STRING_VAL) {
-                    set_symtable(symt_stack.top->symt);
+                    //set_symtable(symt_stack.top->symt);
                     int result = expression(token);
                     if (result == NO_ERR) {
-                        symtable_add_type(tmp, ( convert_exp_to_d_type (final_type) ));
+                        symtable_add_type(tmp, ( convert_exp_to_d_type (final_type) )); 
                         // printf("############tmp : %d\n", tmp->type);
                         // generate_code("=,E_last,NULL,tmp"); псведокод
                     }
@@ -504,6 +539,11 @@ int state(token_t * token) {
                 }
             }
             else {
+                 /*    
+                We have an expression without assign, so we set_flag, thats displays, that we are not in assign
+                Same way we set id, that we need to process in expression function 
+                Before that we need to delete a item in table, if we created it before, so we checking the f_flag
+                */
                 if (!f_flag) {
                     symtable_delete(symt_stack.top->symt, tmp->id);
                     return SEM_ERR_UNDEFINED_VAR;
@@ -513,11 +553,12 @@ int state(token_t * token) {
                 // if (symtable_search(&symt, tmp->id) == NULL) {
                 //     printf("NULL!!\n");
                 // }
-                return expression(token); // tut eben'
+                return expression(token); 
             }
             break;
 
-        case (T_FUN_ID):            
+        case (T_FUN_ID):
+            // Та же ебень, только в профиль             
             return declare(token);
             break;
 
@@ -528,7 +569,8 @@ int state(token_t * token) {
             if (token->type == T_FUN_ID) {
                 symtable_stack_push(&symt_stack);
                 htab_data_t* item = symtable_insert(symt_stack.top->symt, token->data.string_c->str);
-                fun_name = token->data.string_c->str;
+                str_copy_string(&fun_name,token->data.string_c);
+                printf("%s\n",fun_name.str);
                 item->is_defined = true;
                 if (( error_type = get_next_token(token) )) {
                     return error_type;
@@ -543,7 +585,10 @@ int state(token_t * token) {
                     }
                     if ( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING || token->type == T_KW_VOID ) {
                         data_type d_tmp = convert_to_d_type(token);
-                        symtable_add_type(symtable_search(symt_stack.top->symt, fun_name), d_tmp);
+                        if(symtable_add_type(symtable_search(symt_stack.top->symt, fun_name.str), d_tmp))
+                            printf("that's okay, %d %d \n",d_tmp, symtable_search(symt_stack.top->symt, fun_name.str)->type);
+                        else 
+                            printf("it is really bad\n");
                         // printf("\t\t\t\ttype : %d\n", symtable_search(symt_stack.top->symt, fun_name)->type);
                         if (( error_type = get_next_token(token) )) {
                             return error_type;
@@ -683,8 +728,8 @@ int st_list(token_t * token) {
                 return error_type;
             }
             if (token->type == T_BRACE_RIGHT) {
-                if (fun_name != NULL) {
-                    fun_name = NULL;
+                if (fun_name.str[0] != '\0') {
+                    str_clear(&fun_name);
                     symtable_stack_pop(&symt_stack);
                 }
                 if (( error_type = get_next_token(token) )) {
@@ -742,8 +787,8 @@ int prog(token_t * token){
 int main() {
     token_t token;
     string s;
-    fun_name = NULL;
     str_init(&fun_list);
+    str_init(&fun_name);
     // str_add_fun_name(&fun_list, "aboba");
     // str_add_fun_name(&fun_list, "gogoga");
     // str_add_fun_name(&fun_list, "lologa");
