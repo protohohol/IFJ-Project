@@ -11,6 +11,7 @@ void DLL_Dispose( DLList *list ) {
 		DLLElementPtr tmpElement = list->firstElement;
 		while(tmpElement->nextElement != NULL) { 
 			DLLElementPtr tmpElementNext = tmpElement->nextElement;
+			free_data_value(&tmpElement->data);
 			free(tmpElement);
 			tmpElement = tmpElementNext;
 		}
@@ -21,20 +22,30 @@ void DLL_Dispose( DLList *list ) {
 }
 
 
-void DLL_InsertFirst( DLList *list, taCode data ) {
+void DLL_InsertFirst( DLList *list, taCode* data ) {
 	DLLElementPtr newElement  = (DLLElementPtr)malloc(sizeof(struct DLLElement)); 
 	if (newElement == NULL) {
 		return;
     }
 	if (list->firstElement == NULL && list->lastElement == NULL) {
-		newElement->data = data;
+		init_data(&newElement->data);
+		if (!insert_data(&newElement->data, data)) {
+			free(newElement);
+			DLL_Dispose(list);
+			return;
+		}
 		newElement->nextElement = NULL;
 		newElement->previousElement = NULL;
 		list->firstElement = newElement;
 		list->lastElement = newElement;
 	}
 	else { 
-		newElement->data = data;
+		init_data(&newElement->data);
+		if (!insert_data(&newElement->data, data)) {
+			free(newElement);
+			DLL_Dispose(list);
+			return;
+		}
 		list->firstElement->previousElement = newElement;
 		newElement->nextElement = list->firstElement;
 		newElement->previousElement = NULL;
@@ -43,14 +54,21 @@ void DLL_InsertFirst( DLList *list, taCode data ) {
 }
 
 
-void DLL_InsertLast( DLList *list, taCode data ) {
+void DLL_InsertLast( DLList *list, taCode* data ) {
 	DLLElementPtr newElement  = (DLLElementPtr)malloc(sizeof(struct DLLElement)); 
 	if (newElement == NULL) {
 		return;
     }
 	if (list->firstElement == NULL && list->lastElement == NULL) {
-		
-		newElement->data = data;
+		// printf("in last if\n");
+		init_data(&newElement->data);
+		if (!insert_data(&newElement->data, data)) {
+			// printf("in false nahuy\n");
+			free(newElement);
+			DLL_Dispose(list);
+			return;
+		}
+		// printf("new data val op1 : %s\n", newElement->data.operand_1.value);
 		newElement->nextElement = NULL;
 		newElement->previousElement = NULL;
 		list->lastElement = newElement;
@@ -58,7 +76,12 @@ void DLL_InsertLast( DLList *list, taCode data ) {
 	}
 	else { 
 		list->lastElement->nextElement = newElement;
-		newElement->data = data;
+		init_data(&newElement->data);
+		if (!insert_data(&newElement->data, data)) {
+			free(newElement);
+			DLL_Dispose(list);
+			return;
+		}
 		newElement->nextElement = NULL;
 		newElement->previousElement = list->lastElement;
 		list->lastElement = newElement;
@@ -108,6 +131,7 @@ void DLL_DeleteFirst( DLList *list ) {
 			list->firstElement = tmpElement->nextElement;
 			list->firstElement->previousElement = NULL; 
 		}
+		free_data_value(&tmpElement->data);
 		free(tmpElement);
 	}
 }
@@ -126,7 +150,7 @@ void DLL_DeleteLast( DLList *list ) {
 			list->lastElement = tmpElement->previousElement;
 			list->lastElement->nextElement = NULL;
 		}
-
+		free_data_value(&tmpElement->data);
 		free(tmpElement);
 	}
 }
@@ -141,7 +165,7 @@ void DLL_DeleteAfter( DLList *list ) {
 			list->activeElement->nextElement = NULL;
 			list->lastElement = list->activeElement;
 		}
-		
+		free_data_value(&tmpElement->data);
 		free(tmpElement);
 	}
 }
@@ -156,12 +180,12 @@ void DLL_DeleteBefore( DLList *list ) {
 			list->activeElement->previousElement = NULL;
 			list->firstElement = list->activeElement;
 		}
-		
+		free_data_value(&tmpElement->data);
 		free(tmpElement);
 	}
 }
 
-void DLL_InsertAfter( DLList *list, taCode data ) {
+void DLL_InsertAfter( DLList *list, taCode* data ) {
 	if (list->activeElement != NULL) {
 		DLLElementPtr newElement  = (DLLElementPtr)malloc(sizeof(struct DLLElement));
 		if (newElement == NULL) {
@@ -174,14 +198,19 @@ void DLL_InsertAfter( DLList *list, taCode data ) {
 				newElement->nextElement = NULL;
 				list->lastElement = newElement;
 			}
-			newElement->data = data;
+			init_data(&newElement->data);
+			if (!insert_data(&newElement->data, data)) {
+				free(newElement);
+				DLL_Dispose(list);
+				return;
+			}
 			newElement->previousElement = list->activeElement;
 			list->activeElement->nextElement = newElement;
 		}
 	}
 }
 
-void DLL_InsertBefore( DLList *list, taCode data ) {
+void DLL_InsertBefore( DLList *list, taCode* data ) {
 	if (list->activeElement != NULL) {
 		DLLElementPtr newElement  = (DLLElementPtr)malloc(sizeof(struct DLLElement));
 		if (newElement == NULL) {
@@ -194,7 +223,12 @@ void DLL_InsertBefore( DLList *list, taCode data ) {
 				newElement->previousElement = NULL;
 				list->firstElement = newElement;
 			}
-			newElement->data = data;
+			init_data(&newElement->data);
+			if (!insert_data(&newElement->data, data)) {
+				free(newElement);
+				DLL_Dispose(list);
+				return;
+			}
 			newElement->nextElement = list->activeElement;
 			list->activeElement->previousElement = newElement;
 		}
@@ -209,9 +243,12 @@ void DLL_GetValue( DLList *list, taCode *dataPtr ) {
 	}
 }
 
-void DLL_SetValue( DLList *list, taCode data ) {
+void DLL_SetValue( DLList *list, taCode* data ) {
 	if (list->activeElement != NULL) {
-		list->activeElement->data = data;
+		if (!insert_data(&list->activeElement->data, data)) {
+			DLL_Dispose(list);
+			return;
+		}
 	}
 }
 
@@ -242,12 +279,18 @@ void init_data(taCode* target) {
 }
 
 bool set_operand_value(operand_t* target, char* source) {
-	if (target == NULL || source == NULL) {
+	if (target == NULL) {
 		return false;
 	}
 
+	if (source == NULL) {
+		target->value = NULL;
+		return true;
+	}
+
 	target->value = (char*) malloc((strlen(source)+1) * __CHAR_BIT__);
-	strcpy(target->value, source);
+	strncpy(target->value, source, strlen(source) + 1);
+	// printf("TESTING BLYAT : %s\n", target->value);
 	return true;
 }
 
@@ -268,3 +311,32 @@ void free_data_value(taCode* target) {
 		free(target->result.value);
 	}
 }
+
+bool insert_data(taCode* target, taCode* source) {
+	*target = *source;
+	// printf("in insert_data\n");
+	
+	if (!set_operand_value(&target->operand_1, source->operand_1.value)) {
+		free_data_value(target);
+		return false;
+	}
+	// printf("target op 1 : %s\n", target->operand_1.value);
+	if (!set_operand_value(&target->operand_2, source->operand_2.value)) {
+		free_data_value(target);
+		return false;
+	}
+	if (!set_operand_value(&target->result, source->result.value)) {
+		free_data_value(target);
+		return false;
+	}
+
+	return true;
+}
+
+// void clear_data(taCode* source) {
+// 	if (source == NULL) {
+// 		return;
+// 	}
+
+// 	source->operator
+// }

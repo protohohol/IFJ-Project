@@ -155,7 +155,7 @@ taCode* pregenerating_instructions(taCode data) {
 		str_add_more_chars(&data.result.out, data.result.value);
 
 	} 
-
+	
 	if(data.operand_1.value != NULL) {
 		if(!str_init(&data.operand_1.out)) {
 			return NULL;

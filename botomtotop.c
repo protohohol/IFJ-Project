@@ -479,6 +479,7 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
     switch (rule) {
         case (R_ID):
             if (op1->etype == ET_UNDEFINED) {
+                free_data_value(&data);
                 return SEM_ERR_UNDEFINED_VAR;
             } else if (op1->etype == ET_INT) {
                 *type = ET_INT;
@@ -489,10 +490,14 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                 // printf("hi3\n");
                 *type = ET_STRING;
             }
-            data.operand_1.type = exp_to_data(op1->etype);
-            set_operand_value(&data.operand_1, op1->value);
-            data.operator = I_DEFVAR;
-            DLL_InsertLast(i_list, data);
+            // data.operand_1.type = exp_to_data(op1->etype);
+            // set_operand_value(&data.operand_1, op1->value); // dobavit proverku blya po bratski realno nado
+            // data.operator = I_DEFVAR;
+            // DLL_InsertLast(i_list, &data);
+            // taCode tmp;
+            // DLL_GetLast(i_list, &tmp);
+            // printf("\t\t\t\t\t\ttestim jebat : %s\t\t\t\t\top : %s\t\t\t\t\t\tdata : %s\n", tmp.operand_1.value, op1->value, data.operand_1.value);
+            free_data_value(&data);
             return NO_ERR;
         case (R_MUL):
         case (R_SUB):
@@ -504,7 +509,6 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                 *type = ET_FLOAT;
             } else if ((op1->etype == ET_INT || op1->etype == ET_FLOAT) && (op3->etype == ET_INT || op3->etype == ET_FLOAT)) {
                 if (op1->etype == ET_INT) {
-                    // taCode data;
                     // data.operand_1.type = exp_to_data(op1->etype);
                     // generate(retype(op1, float));
                 } else {
@@ -512,8 +516,24 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                 }
                 *type = ET_FLOAT;
             } else {
-                return SEM_ERR_TYPE_COMPAT;
+                free_data_value(&data);
+                return SEM_ERR_TYPE_COMPAT; // надо поменять все ретерны на запись в переменной или добавить фри перед каждым ретерном
             }
+
+            if (rule == R_MUL) {
+                data.operator = I_MUL;
+            } else if (rule == R_ADD) {
+                data.operator = I_ADD;
+            } else {
+                data.operator = R_SUB;
+            }
+
+            data.operand_1.frame = F_GF;
+            data.operand_1.type = exp_to_data(op1->etype);
+            set_operand_value(&data.result, "tmp1");
+            data.operator = I_ADD;
+            
+            free_data_value(&data);
             return NO_ERR;
 
         case (R_EQ):
@@ -523,33 +543,53 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
         case (R_GR):
         case (R_GREQ):
             *type = ET_UNDEFINED;
+            free_data_value(&data);
             return NO_ERR;
 
         case (R_CON):
             if (op1->etype == ET_STRING && op3->etype == ET_STRING) {
+                free_data_value(&data);
                 return NO_ERR;
             } else {
+                free_data_value(&data);
                 return SEM_ERR_TYPE_COMPAT;
             }
 
         case (R_DIV):
             if (op1->etype == ET_FLOAT && op3->etype == ET_FLOAT) {
             } else if (op1->etype == ET_INT && op3->etype == ET_FLOAT) {
+                data.operator = I_MOVE;
+                set_operand_value(&data.result, "tmp2");
+                data.operand_1.type = exp_to_data(ES_NULL);
+                set_operand_value(&data.operand_1, "nil");
+                DLL_InsertLast(i_list, &data);
+                // clear data
+                data.operator = I_INT2FLOAT;
+                set_operand_value(&data.result, "tmp2");
+                data.result.frame = F_GF;
+                set_operand_value(&data.operand_1, op1->value);
+                data.operand_1.frame = F_GF;
+                data.operand_1.type = exp_to_data(ES_INT_LIT);
+
                 // generate(retype(op1, float));
             } else if (op3->etype == ET_INT && op1->etype == ET_FLOAT) {
                 // generate(retype(op3, float));
             } else {
+                free_data_value(&data);
                 return SEM_ERR_TYPE_COMPAT;
             }
 
             *type = ET_FLOAT;
+            free_data_value(&data);
             return NO_ERR;
 
         case (R_PAR):
             *type = op2->etype;
+            free_data_value(&data);
             return NO_ERR;
 
         default:
+            free_data_value(&data);
             return -1;
     }
     // *type = ET_UNDEFINED;

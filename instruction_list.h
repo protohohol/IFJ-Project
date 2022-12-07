@@ -46,9 +46,9 @@ void DLL_Init(DLList* list);
 
 void DLL_Dispose(DLList* list);
 
-void DLL_InsertFirst(DLList* list, taCode data);
+void DLL_InsertFirst(DLList* list, taCode* data);
 
-void DLL_InsertLast(DLList* list, taCode data);
+void DLL_InsertLast(DLList* list, taCode* data);
 
 void DLL_First(DLList* list);
 
@@ -66,13 +66,13 @@ void DLL_DeleteAfter(DLList* list);
 
 void DLL_DeleteBefore(DLList* list);
 
-void DLL_InsertAfter(DLList* list, taCode data);
+void DLL_InsertAfter(DLList* list, taCode* data);
 
-void DLL_InsertBefore(DLList* list, taCode data);
+void DLL_InsertBefore(DLList* list, taCode* data);
 
 void DLL_GetValue(DLList* list, taCode* dataPtr);
 
-void DLL_SetValue(DLList* list, taCode data);
+void DLL_SetValue(DLList* list, taCode* data);
 
 void DLL_Next(DLList* list);
 
@@ -85,5 +85,7 @@ void init_data(taCode* target);
 bool set_operand_value(operand_t* target, char* source);
 
 void free_data_value(taCode* target);
+
+bool insert_data(taCode* target, taCode* source);
 
 #endif
