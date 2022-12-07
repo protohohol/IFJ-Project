@@ -1,7 +1,6 @@
 #include "code_generator.h"
-#include "instruction_list.h"
 
-void codeStart(DLList* list) {
+void codeStart() {
 	printf(".IFJcode22\n\
 	DEFVAR GF@tmp1\n\
 	DEFVAR GF@tmp2\n\
@@ -132,35 +131,44 @@ void codeStart(DLList* list) {
 }
 
 taCode* pregenerating_instructions(taCode data) {
-	if(data.result.value != NULL) {
-		if(!str_init(&data.result.out)) {
-			return NULL;
-		}
+	if (!str_init(&data.result.out)) {
+		return NULL;
+	}
 
-		if(data.result.frame = F_GF) {
+	if (!str_init(&data.operand_1.out)) {
+		return NULL;
+	}
+
+	if (!str_init(&data.operand_2.out)) {
+		return NULL;
+	}
+
+	if (data.result.value != NULL) {
+
+		if (data.result.frame == F_GF) {
 			str_add_more_chars(&data.result.out, "F_GF@");
 			str_add_more_chars(&data.result.out, data.result.value);
-		} else if(data.result.frame = F_LF) {
+		} else if (data.result.frame == F_LF) {
 			str_add_more_chars(&data.result.out, "F_LF@");
 			str_add_more_chars(&data.result.out, data.result.value);
-		} else if(data.result.frame = F_TF) {
+		} else if (data.result.frame == F_TF) {
 			str_add_more_chars(&data.result.out, "F_TF@");
 			str_add_more_chars(&data.result.out, data.result.value);
-		} else if(data.result.type = D_INT) {
+		} else if (data.result.type == D_INT) {
 			str_add_more_chars(&data.result.out, "int@");
 			str_add_more_chars(&data.result.out, data.result.value);
-		} else if(data.result.type = D_FLOAT) {
+		} else if (data.result.type == D_FLOAT) {
 			str_add_more_chars(&data.result.out, "float@");
 			str_add_more_chars(&data.result.out, data.result.value);
-			int i = strlen(&data.result.value);
+			int i = strlen(data.result.value);
 			char c[i+1];
-			double d = atof(&data.result.value);
+			double d = atof(data.result.value);
 			sprintf(c, "%a", d);
 			str_add_more_chars(&data.result.out, c);
-		} else if(data.result.type = D_STRING) {
+		} else if (data.result.type == D_STRING) {
 			str_add_more_chars(&data.result.out, "string@");
 			str_add_more_chars(&data.result.out, data.result.value);
-		} else if(data.result.type = D_VOID) {
+		} else if (data.result.type == D_VOID) {
 			str_add_more_chars(&data.result.out, "nil@");
 			str_add_more_chars(&data.result.out, data.result.value);
 		}
@@ -168,34 +176,31 @@ taCode* pregenerating_instructions(taCode data) {
 
 	} 
 	
-	if(data.operand_1.value != NULL) {
-		if(!str_init(&data.operand_1.out)) {
-			return NULL;
-		}
+	if (data.operand_1.value != NULL) {
 
-		if(data.operand_1.frame = F_GF) {
+		if (data.operand_1.frame == F_GF) {
 			str_add_more_chars(&data.operand_1.out, "F_GF@");
 			str_add_more_chars(&data.operand_1.out, data.operand_1.value);
-		} else if(data.operand_1.frame = F_LF) {
+		} else if (data.operand_1.frame == F_LF) {
 			str_add_more_chars(&data.operand_1.out, "F_LF@");
 			str_add_more_chars(&data.operand_1.out, data.operand_1.value);
-		} else if(data.operand_1.frame = F_TF) {
+		} else if (data.operand_1.frame == F_TF) {
 			str_add_more_chars(&data.operand_1.out, "F_TF@");
 			str_add_more_chars(&data.operand_1.out, data.operand_1.value);
-		} else if(data.operand_1.type = D_INT) {
+		} else if (data.operand_1.type == D_INT) {
 			str_add_more_chars(&data.operand_1.out, "int@");
 			str_add_more_chars(&data.operand_1.out, data.operand_1.value);
-		} else if(data.operand_1.type = D_FLOAT) {
+		} else if (data.operand_1.type == D_FLOAT) {
 			str_add_more_chars(&data.operand_1.out, "float@");
-			int i = strlen(&data.operand_1.value);
+			int i = strlen(data.operand_1.value);
 			char c[i+1];
-			double d = atof(&data.operand_1.value);
+			double d = atof(data.operand_1.value);
 			sprintf(c, "%a", d);
 			str_add_more_chars(&data.operand_1.out, c);
-		} else if(data.operand_1.type = D_STRING) {
+		} else if (data.operand_1.type == D_STRING) {
 			str_add_more_chars(&data.operand_1.out, "string@");
 			str_add_more_chars(&data.operand_1.out, data.operand_1.value);
-		} else if(data.operand_1.type = D_VOID) {
+		} else if (data.operand_1.type == D_VOID) {
 			str_add_more_chars(&data.operand_1.out, "nil@");
 			str_add_more_chars(&data.operand_1.out, data.operand_1.value);
 		}
@@ -203,45 +208,41 @@ taCode* pregenerating_instructions(taCode data) {
 	} 
 
 	if(data.operand_2.value != NULL) {
-		if(!str_init(&data.operand_2.out)) {
-			return NULL;
-		}
 
-		if(data.operand_2.frame = F_GF) {
+		if (data.operand_2.frame == F_GF) {
 			str_add_more_chars(&data.operand_2.out, "F_GF@");
 			str_add_more_chars(&data.operand_2.out, data.operand_2.value);
-		} else if(data.operand_2.frame = F_LF) {
+		} else if (data.operand_2.frame == F_LF) {
 			str_add_more_chars(&data.operand_2.out, "F_LF@");
 			str_add_more_chars(&data.operand_2.out, data.operand_2.value);
-		} else if(data.operand_2.frame = F_TF) {
+		} else if (data.operand_2.frame == F_TF) {
 			str_add_more_chars(&data.operand_2.out, "F_TF@");
 			str_add_more_chars(&data.operand_2.out, data.operand_2.value);
-		} else if(data.operand_2.type = D_INT) {
+		} else if (data.operand_2.type == D_INT) {
 			str_add_more_chars(&data.operand_2.out, "int@");
 			str_add_more_chars(&data.operand_2.out, data.operand_2.value);
-		} else if(data.operand_2.type = D_FLOAT) {
+		} else if (data.operand_2.type == D_FLOAT) {
 			str_add_more_chars(&data.operand_2.out, "float@");
-			int i = strlen(&data.operand_2.value);
+			int i = strlen(data.operand_2.value);
 			char c[i+1];
-			double d = atof(&data.operand_2.value);
+			double d = atof(data.operand_2.value);
 			sprintf(c, "%a", d);
 			str_add_more_chars(&data.operand_2.out, c);
-		} else if(data.operand_2.type = D_STRING) {
+		} else if (data.operand_2.type == D_STRING) {
 			str_add_more_chars(&data.operand_2.out, "string@");
 			str_add_more_chars(&data.operand_2.out, data.operand_2.value);
-		} else if(data.operand_2.type = D_VOID) {
+		} else if (data.operand_2.type == D_VOID) {
 			str_add_more_chars(&data.operand_2.out, "nil@");
 			str_add_more_chars(&data.operand_2.out, data.operand_2.value);
 		}
-		
-
 	} 
 	return &data;
 }
 
 void print_instruction(DLList* list) {
+	codeStart();
 	DLL_First(list);
-	while(DLL_IsActive(list)) {
+	while (DLL_IsActive(list)) {
 		list->activeElement->data = *(pregenerating_instructions(list->activeElement->data));
 		switch (list->activeElement->data.operator){
 			case I_COMMENT:
@@ -440,9 +441,20 @@ void print_instruction(DLList* list) {
 			case I_DPRINT:
 				printf("DPRINT %s\n", list->activeElement->data.operand_1.out.str);
 				break;
+
+			case I_DEFAULT:
+				break;
 		}
-		str_free(list->activeElement->data.result.out.str);
-		str_free(list->activeElement->data.operand_1.out.str);
-		str_free(list->activeElement->data.operand_2.out.str);
+
+		// if (&list->activeElement->data.result.out != NULL) {
+			str_free(&list->activeElement->data.result.out);
+		// }
+		// if (&list->activeElement->data.operand_1.out != NULL) {
+			str_free(&list->activeElement->data.operand_1.out);
+		// }
+		// if (&list->activeElement->data.operand_2.out != NULL) {
+			str_free(&list->activeElement->data.operand_2.out);
+		// }
+		DLL_Next(list);
 	}
 }

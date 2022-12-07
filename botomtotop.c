@@ -896,7 +896,6 @@ int expression (token_t * token) {
             break;
         }
     }
-
     item_stack_t* tmp1;
     if ((tmp1 = get_top(&exp_stack)) != NULL) {
         data.operator = I_MOVE;
@@ -904,10 +903,9 @@ int expression (token_t * token) {
         data.operand_1.type = exp_to_data(tmp1->etype);
         data.result.frame = F_GF;
         set_operand_value(&data.result, "tmp1");
+        // printf("hihihihi\n");
         DLL_InsertLast(i_list, &data);
         clear_data(&data);
-    } else {
-
     }
     // item_stack_t* tmp1;
     // if ((tmp1 = get_top(&exp_stack)) != NULL) {

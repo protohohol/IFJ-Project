@@ -1122,6 +1122,9 @@ int main() {
     if ((error_type = get_next_token(&token)) == 0) {
         error_type = prog(&token);
     }
+    if (!error_type) {
+        print_instruction(&inst_list);
+    }
     printf("%d\n",error_type);
     // symtable_free(symt_stack.top->symt);
     // symtable_free(symt_stack.active->symt);

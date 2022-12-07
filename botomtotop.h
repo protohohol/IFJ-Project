@@ -5,7 +5,7 @@
 
 #include "error.h"
 #include "symbol_table.h"
-#include "instruction_list.h"
+#include "code_generator.h"
 
 
 
