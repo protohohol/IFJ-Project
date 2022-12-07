@@ -139,20 +139,32 @@ taCode* pregenerating_instructions(taCode data) {
 
 		if(data.result.frame = F_GF) {
 			str_add_more_chars(&data.result.out, "F_GF@");
+			str_add_more_chars(&data.result.out, data.result.value);
 		} else if(data.result.frame = F_LF) {
 			str_add_more_chars(&data.result.out, "F_LF@");
+			str_add_more_chars(&data.result.out, data.result.value);
 		} else if(data.result.frame = F_TF) {
 			str_add_more_chars(&data.result.out, "F_TF@");
+			str_add_more_chars(&data.result.out, data.result.value);
 		} else if(data.result.type = D_INT) {
 			str_add_more_chars(&data.result.out, "int@");
+			str_add_more_chars(&data.result.out, data.result.value);
 		} else if(data.result.type = D_FLOAT) {
 			str_add_more_chars(&data.result.out, "float@");
+			str_add_more_chars(&data.result.out, data.result.value);
+			int i = strlen(&data.result.value);
+			char c[i+1];
+			double d = atof(&data.result.value);
+			sprintf(c, "%a", d);
+			str_add_more_chars(&data.result.out, c);
 		} else if(data.result.type = D_STRING) {
 			str_add_more_chars(&data.result.out, "string@");
+			str_add_more_chars(&data.result.out, data.result.value);
 		} else if(data.result.type = D_VOID) {
 			str_add_more_chars(&data.result.out, "nil@");
+			str_add_more_chars(&data.result.out, data.result.value);
 		}
-		str_add_more_chars(&data.result.out, data.result.value);
+		
 
 	} 
 	
@@ -163,20 +175,30 @@ taCode* pregenerating_instructions(taCode data) {
 
 		if(data.operand_1.frame = F_GF) {
 			str_add_more_chars(&data.operand_1.out, "F_GF@");
+			str_add_more_chars(&data.operand_1.out, data.operand_1.value);
 		} else if(data.operand_1.frame = F_LF) {
 			str_add_more_chars(&data.operand_1.out, "F_LF@");
+			str_add_more_chars(&data.operand_1.out, data.operand_1.value);
 		} else if(data.operand_1.frame = F_TF) {
 			str_add_more_chars(&data.operand_1.out, "F_TF@");
+			str_add_more_chars(&data.operand_1.out, data.operand_1.value);
 		} else if(data.operand_1.type = D_INT) {
 			str_add_more_chars(&data.operand_1.out, "int@");
+			str_add_more_chars(&data.operand_1.out, data.operand_1.value);
 		} else if(data.operand_1.type = D_FLOAT) {
 			str_add_more_chars(&data.operand_1.out, "float@");
+			int i = strlen(&data.operand_1.value);
+			char c[i+1];
+			double d = atof(&data.operand_1.value);
+			sprintf(c, "%a", d);
+			str_add_more_chars(&data.operand_1.out, c);
 		} else if(data.operand_1.type = D_STRING) {
 			str_add_more_chars(&data.operand_1.out, "string@");
+			str_add_more_chars(&data.operand_1.out, data.operand_1.value);
 		} else if(data.operand_1.type = D_VOID) {
 			str_add_more_chars(&data.operand_1.out, "nil@");
+			str_add_more_chars(&data.operand_1.out, data.operand_1.value);
 		}
-		str_add_more_chars(&data.operand_1.out, data.operand_1.value);
 
 	} 
 
@@ -187,12 +209,16 @@ taCode* pregenerating_instructions(taCode data) {
 
 		if(data.operand_2.frame = F_GF) {
 			str_add_more_chars(&data.operand_2.out, "F_GF@");
+			str_add_more_chars(&data.operand_2.out, data.operand_2.value);
 		} else if(data.operand_2.frame = F_LF) {
 			str_add_more_chars(&data.operand_2.out, "F_LF@");
+			str_add_more_chars(&data.operand_2.out, data.operand_2.value);
 		} else if(data.operand_2.frame = F_TF) {
 			str_add_more_chars(&data.operand_2.out, "F_TF@");
+			str_add_more_chars(&data.operand_2.out, data.operand_2.value);
 		} else if(data.operand_2.type = D_INT) {
 			str_add_more_chars(&data.operand_2.out, "int@");
+			str_add_more_chars(&data.operand_2.out, data.operand_2.value);
 		} else if(data.operand_2.type = D_FLOAT) {
 			str_add_more_chars(&data.operand_2.out, "float@");
 			int i = strlen(&data.operand_2.value);
@@ -202,10 +228,12 @@ taCode* pregenerating_instructions(taCode data) {
 			str_add_more_chars(&data.operand_2.out, c);
 		} else if(data.operand_2.type = D_STRING) {
 			str_add_more_chars(&data.operand_2.out, "string@");
+			str_add_more_chars(&data.operand_2.out, data.operand_2.value);
 		} else if(data.operand_2.type = D_VOID) {
 			str_add_more_chars(&data.operand_2.out, "nil@");
+			str_add_more_chars(&data.operand_2.out, data.operand_2.value);
 		}
-		str_add_more_chars(&data.operand_2.out, data.operand_2.value);
+		
 
 	} 
 	return &data;
