@@ -302,14 +302,17 @@ void free_data_value(taCode* target) {
 	if (target->operand_1.value != NULL) {
 		free(target->operand_1.value);
 	}
+	target->operand_1.value = NULL;
 
 	if (target->operand_2.value != NULL) {
 		free(target->operand_2.value);
 	}
+	target->operand_2.value = NULL;
 
 	if (target->result.value != NULL) {
 		free(target->result.value);
 	}
+	target->result.value = NULL;
 }
 
 bool insert_data(taCode* target, taCode* source) {
@@ -337,23 +340,25 @@ void clear_data(taCode* source) {
 	if (source == NULL) {
  		return;
  	}
+
 	source->result.frame = F_DEFAULT;
 	source->result.type = D_UNDEFINED;
-	if (source->result.out.str != NULL) {
-		str_free(&source->result.out);
-	}
+	// if (source->result.out.str != NULL) {
+	// 	str_free(&source->result.out);
+	// }
 
 	source->operand_1.frame = F_DEFAULT;
 	source->operand_1.type = D_UNDEFINED;
-	if (source->operand_1.out.str != NULL) {
-		str_free(&source->operand_1.out);
-	}	
+	// if (source->operand_1.out.str != NULL) {
+	// 	str_free(&source->operand_1.out);
+	// }	
 
 	source->operand_2.frame = F_DEFAULT;
 	source->operand_2.type = D_UNDEFINED;
-	if (source->operand_2.out.str != NULL) {
-		str_free(&source->operand_2.out);
-	}	
+	// if (source->operand_2.out.str != NULL) {
+	// 	str_free(&source->operand_2.out);
+	// }
+	
 	free_data_value(source);
 	source->operator = I_DEFAULT;
 }

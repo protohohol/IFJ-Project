@@ -89,4 +89,6 @@ void free_data_value(taCode* target);
 
 bool insert_data(taCode* target, taCode* source);
 
+void clear_data(taCode* source);
+
 #endif
