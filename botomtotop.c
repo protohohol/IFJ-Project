@@ -512,6 +512,7 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
 
                     data.operator = I_MOVE;
                     set_operand_value(&data.result, "tmp2");
+                    data.result.frame = F_GF;
                     data.operand_1.type = exp_to_data(ET_NULL);
                     set_operand_value(&data.operand_1, "nil");
                     DLL_InsertLast(i_list, &data);
@@ -526,9 +527,10 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                     set_operand_value(&data.operand_1, op1->value);
                     char* ptr = NULL;
                     strtol(data.operand_1.value, &ptr, 10);
-                    if (ptr == NULL) {
+                    if (*ptr == '\0') {
                         data.operand_1.type = exp_to_data(ET_INT);
                     } else {
+                        // printf("\t\t\t\t\t\t\t\tptr : %c\n", *ptr);
                         data.operand_1.frame = F_GF;
                     }
                     DLL_InsertLast(i_list, &data);
@@ -540,6 +542,7 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
 
                     data.operator = I_MOVE;
                     set_operand_value(&data.result, "tmp2");
+                    data.result.frame = F_GF;
                     data.operand_1.type = exp_to_data(ET_NULL);
                     set_operand_value(&data.operand_1, "nil");
                     DLL_InsertLast(i_list, &data);
@@ -554,9 +557,10 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                     set_operand_value(&data.operand_1, op3->value);
                     char* ptr = NULL;
                     strtol(data.operand_1.value, &ptr, 10);
-                    if (ptr == NULL) {
+                    if (*ptr == '\0') {
                         data.operand_1.type = exp_to_data(ET_INT);
                     } else {
+                        // printf("\t\t\t\t\t\t\t\tptttr : %c\n", *ptr);
                         data.operand_1.frame = F_GF;
                     }
                     DLL_InsertLast(i_list, &data);
@@ -612,6 +616,7 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
 
                 data.operator = I_MOVE;
                 set_operand_value(&data.result, "tmp2");
+                data.result.frame = F_GF;
                 data.operand_1.type = exp_to_data(ET_NULL);
                 set_operand_value(&data.operand_1, "nil");
                 DLL_InsertLast(i_list, &data);
@@ -626,9 +631,10 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                 set_operand_value(&data.operand_1, op1->value);
                 char* ptr = NULL;
                 strtol(data.operand_1.value, &ptr, 10);
-                if (ptr == NULL) {
+                if (*ptr == '\0') {
                     data.operand_1.type = exp_to_data(ET_INT);
                 } else {
+                    // printf("\t\t\t\t\t\t\t\tptr : %c\n", *ptr);
                     data.operand_1.frame = F_GF;
                 }
                 DLL_InsertLast(i_list, &data);
@@ -639,6 +645,7 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
 
                 data.operator = I_MOVE;
                 set_operand_value(&data.result, "tmp2");
+                data.result.frame = F_GF;
                 data.operand_1.type = exp_to_data(ET_NULL);
                 set_operand_value(&data.operand_1, "nil");
                 DLL_InsertLast(i_list, &data);
@@ -653,9 +660,10 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                 set_operand_value(&data.operand_1, op3->value);
                 char* ptr = NULL;
                 strtol(data.operand_1.value, &ptr, 10);
-                if (ptr == NULL) {
+                if (*ptr == '\0') {
                     data.operand_1.type = exp_to_data(ET_INT);
                 } else {
+                    // printf("\t\t\t\t\t\t\t\tptr : %c\n", *ptr);
                     data.operand_1.frame = F_GF;
                 }
                 DLL_InsertLast(i_list, &data);
@@ -897,7 +905,7 @@ int expression (token_t * token) {
         }
     }
     item_stack_t* tmp1;
-    if ((tmp1 = get_top(&exp_stack)) != NULL) {
+    if ((tmp1 = get_top(&exp_stack)) != NULL && tmp1->value != NULL) {
         data.operator = I_MOVE;
         set_operand_value(&data.operand_1, tmp1->value);
         data.operand_1.type = exp_to_data(tmp1->etype);
