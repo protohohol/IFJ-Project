@@ -758,8 +758,8 @@ int rule_test (int count, item_stack_t * op1, item_stack_t * op2, item_stack_t *
             // tac_generate();
         }
         string s;
+        str_init(&s);
         if (op1->value != NULL) {
-            str_init(&s);
             // printf("jeste ne pizda\n");
             str_add_more_chars(&s, op1->value);
         }
@@ -808,7 +808,7 @@ int expression (token_t * token) {
     }
     while( !( ( convert_to_symbol(token) == ES_END ) && ( ( get_top_term(&exp_stack) )->symbol == ES_END ) ) ) {
         //printf( "%d\n",(get_top_term(&exp_stack) )->symbol);
-        switch (get_cond(token,&exp_stack)) {
+        switch (get_cond(token, &exp_stack)) {
         case C_EQ:
             // printf("i am in C_EQ\n");
             tmp_sym = convert_to_symbol(token);
@@ -846,7 +846,7 @@ int expression (token_t * token) {
         case C_MORE:
             printf("i am in C_MORE\n");
             printf("push more : %d\n", get_top(&exp_stack)->etype);
-            found = find_catch(&count,&exp_stack);
+            found = find_catch(&count, &exp_stack);
             if (found && ( count == 3)) {
                 op_1 = exp_stack.top->next->next;
                 op_2 = exp_stack.top->next;
@@ -907,7 +907,7 @@ int expression (token_t * token) {
         DLL_InsertLast(i_list, &data);
         clear_data(&data);
     } else {
-        
+
     }
     // item_stack_t* tmp1;
     // if ((tmp1 = get_top(&exp_stack)) != NULL) {
