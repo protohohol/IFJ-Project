@@ -65,6 +65,20 @@ bool str_copy_string(string* target, string* source) {
     return true;
 }
 
+bool str_copy_const_string(char* target, string* source) {
+    if (target == NULL || source == NULL) {
+        return false;
+    }
+
+    target = (char*) malloc((source->length+1) * __CHAR_BIT__);
+    if (target == NULL) {
+        return false;
+    }
+
+    strncpy(target, source->str, source->length + 1);
+    return true;
+}
+
 int str_cmp_string(string* s1, string* s2) {
     return strcmp(s1->str, s2->str);
 }

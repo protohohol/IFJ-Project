@@ -97,6 +97,16 @@ void str_get_last_fun_name(string* source, char** target);
 bool str_copy_string(string* target, string* source);
 
 /**
+ * @brief copies content of string source to const string target
+ * 
+ * @param target pointer to const string
+ * @param source pointer to string
+ * @return true if copying was successful
+ * @return false if copying was not successful
+ */
+bool str_copy_const_string(char* target, string* source);
+
+/**
  * @brief compares two strings
  * 
  * @param s1 pointer to first string

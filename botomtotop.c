@@ -5,6 +5,7 @@ char* id;
 bool ass_flag;
 // bool par_flag;
 exp_type* type;
+DLList* i_list;
 
 void set_symtable(symtable* source) {
     symt_l = source;
@@ -26,6 +27,10 @@ void set_type(exp_type* source) {
     type = source;
 }
 
+void set_inst_list(DLList* source) {
+    i_list = source;
+}
+
 exp_type data_to_exp(data_type source) {
     switch (source) {
         case (D_INT):
@@ -36,6 +41,50 @@ exp_type data_to_exp(data_type source) {
             return ET_STRING;
         default:
             return ET_UNDEFINED;
+    }
+}
+
+data_type exp_to_data(exp_type source) {
+    switch (source) {
+        case (ET_INT):
+            return D_INT;
+        case (ET_FLOAT):
+            return D_FLOAT;
+        case (ET_STRING):
+            return D_STRING;
+        case (ET_NULL):
+            return D_VOID;
+        default:
+            return D_UNDEFINED;
+    }
+}
+
+instructions rule_to_inst(exp_rules source) {
+    switch (source) {
+        case (R_EQ):
+            return I_EQ;
+        case (R_NEQ):
+            return I_NOT;
+        case (R_L):
+        case (R_LEQ):
+            return I_LT;
+        case (R_GR):
+        case (R_GREQ):
+            return I_GT;
+        case (R_ADD):
+            return I_ADD;
+        case (R_CON):
+            return I_CONCAT;
+        case (R_DIV):
+            return I_DIV;
+        case (R_ID):
+            return I_MOVE;
+        case (R_MUL):
+            return I_MUL;
+        case (R_SUB):
+            return I_SUB;
+        default:
+            return 100; // error
     }
 }
 
@@ -414,14 +463,23 @@ bool find_catch ( int * count , sstack_t * sstack) {
     return flag;
 }
 
-void tac_generate ( ) {
+void tac_generate (instructions instruction, item_stack_t * op1, item_stack_t * op2, item_stack_t * op3) {
+    // taCode data;
+    // switch (instruction) {
+    //     case (I_DEFVAR):
+    //         data.operand_1.type = exp_to_data(op1->etype);
+    //         data.operand_1.value = 
+    // }
     return;
 }
 
-int check_sem ( exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stack_t * op3, exp_type * type) {
+int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stack_t * op3, exp_type * type) {
+    taCode data;
+    init_data(&data);
     switch (rule) {
         case (R_ID):
             if (op1->etype == ET_UNDEFINED) {
+                free_data_value(&data);
                 return SEM_ERR_UNDEFINED_VAR;
             } else if (op1->etype == ET_INT) {
                 *type = ET_INT;
@@ -432,6 +490,14 @@ int check_sem ( exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_sta
                 // printf("hi3\n");
                 *type = ET_STRING;
             }
+            // data.operand_1.type = exp_to_data(op1->etype);
+            // set_operand_value(&data.operand_1, op1->value); // dobavit proverku blya po bratski realno nado
+            // data.operator = I_DEFVAR;
+            // DLL_InsertLast(i_list, &data);
+            // taCode tmp;
+            // DLL_GetLast(i_list, &tmp);
+            // printf("\t\t\t\t\t\ttestim jebat : %s\t\t\t\t\top : %s\t\t\t\t\t\tdata : %s\n", tmp.operand_1.value, op1->value, data.operand_1.value);
+            free_data_value(&data);
             return NO_ERR;
         case (R_MUL):
         case (R_SUB):
@@ -443,14 +509,31 @@ int check_sem ( exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_sta
                 *type = ET_FLOAT;
             } else if ((op1->etype == ET_INT || op1->etype == ET_FLOAT) && (op3->etype == ET_INT || op3->etype == ET_FLOAT)) {
                 if (op1->etype == ET_INT) {
+                    // data.operand_1.type = exp_to_data(op1->etype);
                     // generate(retype(op1, float));
                 } else {
                     // generate(retype(op3, float));
                 }
                 *type = ET_FLOAT;
             } else {
-                return SEM_ERR_TYPE_COMPAT;
+                free_data_value(&data);
+                return SEM_ERR_TYPE_COMPAT; // надо поменять все ретерны на запись в переменной или добавить фри перед каждым ретерном
             }
+
+            if (rule == R_MUL) {
+                data.operator = I_MUL;
+            } else if (rule == R_ADD) {
+                data.operator = I_ADD;
+            } else {
+                data.operator = R_SUB;
+            }
+
+            data.operand_1.frame = F_GF;
+            data.operand_1.type = exp_to_data(op1->etype);
+            set_operand_value(&data.result, "tmp1");
+            data.operator = I_ADD;
+            
+            free_data_value(&data);
             return NO_ERR;
 
         case (R_EQ):
@@ -460,33 +543,53 @@ int check_sem ( exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_sta
         case (R_GR):
         case (R_GREQ):
             *type = ET_UNDEFINED;
+            free_data_value(&data);
             return NO_ERR;
 
         case (R_CON):
             if (op1->etype == ET_STRING && op3->etype == ET_STRING) {
+                free_data_value(&data);
                 return NO_ERR;
             } else {
+                free_data_value(&data);
                 return SEM_ERR_TYPE_COMPAT;
             }
 
         case (R_DIV):
             if (op1->etype == ET_FLOAT && op3->etype == ET_FLOAT) {
             } else if (op1->etype == ET_INT && op3->etype == ET_FLOAT) {
+                data.operator = I_MOVE;
+                set_operand_value(&data.result, "tmp2");
+                data.operand_1.type = exp_to_data(ES_NULL);
+                set_operand_value(&data.operand_1, "nil");
+                DLL_InsertLast(i_list, &data);
+                // clear data
+                data.operator = I_INT2FLOAT;
+                set_operand_value(&data.result, "tmp2");
+                data.result.frame = F_GF;
+                set_operand_value(&data.operand_1, op1->value);
+                data.operand_1.frame = F_GF;
+                data.operand_1.type = exp_to_data(ES_INT_LIT);
+
                 // generate(retype(op1, float));
             } else if (op3->etype == ET_INT && op1->etype == ET_FLOAT) {
                 // generate(retype(op3, float));
             } else {
+                free_data_value(&data);
                 return SEM_ERR_TYPE_COMPAT;
             }
 
             *type = ET_FLOAT;
+            free_data_value(&data);
             return NO_ERR;
 
         case (R_PAR):
             *type = op2->etype;
+            free_data_value(&data);
             return NO_ERR;
 
         default:
+            free_data_value(&data);
             return -1;
     }
     // *type = ET_UNDEFINED;
@@ -562,12 +665,28 @@ int rule_test (int count, item_stack_t * op1, item_stack_t * op2, item_stack_t *
         if( ( error_type = check_sem ( rule, op1, op2, op3, &tmptype ) ) ){
             return error_type;
         } else if ( ( rule == R_ADD ) && ( tmptype == ET_STRING) ) {
-            tac_generate();
+            // tac_generate();
         } else {
-            tac_generate();
+            // tac_generate();
+        }
+        string s;
+        if (op1->value != NULL) {
+            str_init(&s);
+            // printf("jeste ne pizda\n");
+            str_add_more_chars(&s, op1->value);
         }
         stack_pop_mult(exp_stack,count+1);
-        stack_push(exp_stack, ES_NON_TERM, tmptype);
+        // printf("string : %s\n", s.str);
+        // if (op1 != NULL) {
+        //     printf("op1122 val : %s\n", op1->value);
+        // }
+        if (rule == R_ID) {
+            // printf("op : %s\n", op1->value);
+            stack_push(exp_stack, ES_NON_TERM, tmptype, s.str);
+            str_free(&s);
+        } else {
+            stack_push(exp_stack, ES_NON_TERM, tmptype, NULL);
+        }
         *type = tmptype;
     }
     return NO_ERR;
@@ -585,7 +704,7 @@ int expression (token_t * token) {
     int tmp_type;
     bool found;
     int count;
-    stack_push(&exp_stack, ES_END, ET_UNDEFINED);
+    stack_push(&exp_stack, ES_END, ET_UNDEFINED, NULL);
     if (ass_flag) {
         ass_flag = false;
         htab_data_t* item = symtable_search(symt_l, id);
@@ -593,8 +712,8 @@ int expression (token_t * token) {
         // if (item == NULL) {
         //     printf("hi\n");
         // }
-        stack_push_after(&exp_stack,ES_CATCH, ET_UNDEFINED);
-        stack_push(&exp_stack, ES_ID, data_to_exp(item->type));
+        stack_push_after(&exp_stack, ES_CATCH, ET_UNDEFINED, NULL);
+        stack_push(&exp_stack, ES_ID, data_to_exp(item->type), item->id);
     }
     while( !( ( convert_to_symbol(token) == ES_END ) && ( ( get_top_term(&exp_stack) )->symbol == ES_END ) ) ) {
         //printf( "%d\n",(get_top_term(&exp_stack) )->symbol);
@@ -603,21 +722,27 @@ int expression (token_t * token) {
             // printf("i am in C_EQ\n");
             tmp_sym = convert_to_symbol(token);
             tmp_type = convert_to_type(token);
-            stack_push(&exp_stack,tmp_sym,tmp_type); // TUT PROVERKU DOBAV JESTLI NE VPADLU
+            stack_push(&exp_stack, tmp_sym, tmp_type, token->data.string_c->str); // TUT PROVERKU DOBAV JESTLI NE VPADLU
             if ( ( error_type = get_next_token(token) ) ) {
                 return error_type;
             }
             break;
         case C_LESS:
             printf("i am in C_LESS\n");
-            stack_push_after(&exp_stack,ES_CATCH, ET_UNDEFINED);
+            stack_push_after(&exp_stack, ES_CATCH, ET_UNDEFINED, NULL);
             printf("token type : %d\n", token->type);
             tmp_sym = convert_to_symbol(token);
             printf("token type : %d\n", token->type);
             tmp_type = convert_to_type(token);
             printf("token type : %d\n", token->type);
             // printf("tmp_type : %d\n", tmp_type);
-            stack_push(&exp_stack,tmp_sym,tmp_type);
+            if (token->type == T_VAR_ID || token->type == T_STRING_VAL || token->type == T_DEC_VAL || token->type == T_INT_VAL) {
+                // printf("\t\t\t\t\t\t\t\t\ttoken str val : %s\n", token->data.string_c->str);
+                stack_push(&exp_stack, tmp_sym, tmp_type, token->data.string_c->str);
+            } else {
+                stack_push(&exp_stack, tmp_sym, tmp_type, NULL);
+            }
+            // printf("push string : %s\n", get_top(&exp_stack)->value);
             // printf("push : %d\n", get_top(&exp_stack)->etype);
             if ( ( error_type = get_next_token(token) ) ) {
                 return error_type;
@@ -625,9 +750,9 @@ int expression (token_t * token) {
             break;
         case C_MORE:
             printf("i am in C_MORE\n");
-            // printf("push more : %d\n", get_top(&exp_stack)->etype);
+            printf("push more : %d\n", get_top(&exp_stack)->etype);
             found = find_catch(&count,&exp_stack);
-            if (found && ( count == 3)) { 
+            if (found && ( count == 3)) {
                 op_1 = exp_stack.top->next->next;
                 op_2 = exp_stack.top->next;
                 op_3 = exp_stack.top;
@@ -637,7 +762,12 @@ int expression (token_t * token) {
                 }
                 //printf( "%d\n",(get_top_term(&exp_stack) )->symbol);
             } else if ( found && ( count == 1 ) ) {
-                op_1 = exp_stack.top;
+                // printf("push string : %s\n", get_top(&exp_stack)->value);
+                op_1 = get_top(&exp_stack);
+                // if (op_1 != NULL) {
+                //     printf("op val : %s\n", op_1->value);
+                // }
+                // printf("stack top type : %d\n", op_1->etype);
                 // printf("op1 else if: %d\n", op_1->etype);
                 if ( ( error_type = rule_test ( count, op_1, NULL, NULL, &exp_stack ) ) ) {
                     return error_type;

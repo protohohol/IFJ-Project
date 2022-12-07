@@ -5,6 +5,7 @@ symtable_stack_t symt_stack;
 string fun_name;
 string fun_list;
 int param_counter;
+DLList inst_list;
 
 /**
  * @brief converts exp_type to data_type
@@ -21,7 +22,7 @@ data_type convert_exp_to_d_type(exp_type type) {
     case ET_STRING:
         return D_STRING;
     default:
-        return -1;
+        return 150;
     }
 }
 
@@ -40,7 +41,7 @@ exp_type convert_to_exp(data_type type) {
     case D_STRING:
         return ET_STRING;
     default:
-        return -1;
+        return 250;
     }
 }
 
@@ -63,7 +64,7 @@ data_type convert_to_d_type(token_t* token) {
         case (T_VAR_ID):
             return symtable_search(symt_stack.active->symt, token->data.string_c->str)->type;
         default:
-            return -1; // error
+            return 300; // error
     }
 }
 
@@ -89,7 +90,7 @@ char convert_to_char(token_t* token) {
 int kostyluka (token_t * token) {
     while(token->type != T_KW_FUNCTION && token->type != T_EOF && token->type != T_END_SYMBOL) {
         if (( error_type = get_next_token(token) )) {
-                return error_type;
+            return error_type;
         }
     }
     if(token->type == T_EOF || token->type == T_END_SYMBOL){
@@ -122,7 +123,9 @@ int kostyluka (token_t * token) {
                 }
                 if ( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING || token->type == T_KW_VOID ) {
                     data_type d_tmp = convert_to_d_type(token);
-                    if(symtable_add_type(symtable_search(symt_stack.top->symt, fun_name.str), d_tmp));
+                    if (symtable_add_type(symtable_search(symt_stack.top->symt, fun_name.str), d_tmp)) {
+                        
+                    }
                     printf("ebanina %d\n", token->type);
                     return kostyluka(token);
                 }
@@ -192,8 +195,6 @@ int f_param_kostylga ( token_t * token ) {
     }
 }
 
-
-
 int f_state ( token_t * token ) {
     printf("i am in f_state\n");
     bool f_flag = false;
@@ -214,7 +215,7 @@ int f_state ( token_t * token ) {
                 int result = expression(token);
                 printf("it is good\n");
                 if (result == NO_ERR) {
-                    if( (item_tmp = (symtable_search(symt_stack.top->symt, fun_name.str))) != NULL)  {
+                    if ( (item_tmp = (symtable_search(symt_stack.top->symt, fun_name.str))) != NULL)  {
                         if (!(item_tmp->type == convert_exp_to_d_type(final_type))) {
                             return SEM_ERR_WRONG_PARAM;
                         } else {
@@ -917,6 +918,7 @@ int main() {
     // printf("1 : %d\t2 : %d\t3 : %d\t4 : %d\n", str_find_fun_name(&fun_list, "aboba"), str_find_fun_name(&fun_list, "gogoga"), str_find_fun_name(&fun_list, "lologa"), str_find_fun_name(&fun_list, "abafsda"));
     symtable_stack_init(&symt_stack);
     param_counter = 0;
+    DLL_Init(&inst_list);
     // symtable_stack_t st_stack;
     // symtable symt2;
     // symtable_stack_init(&st_stack);
@@ -977,6 +979,7 @@ int main() {
     }
     set_source(stdin);
     set_src_str(&s);
+    set_inst_list(&inst_list);
     // symtable_insert(&symt, "aboba");
     // symtable_insert(&symt2, "hubabon");
     // symtable_stack_push(&st_stack, &symt);

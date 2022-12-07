@@ -8,11 +8,13 @@
 #include "symbol_table.h"
 #include "str.h"
 #include "code_generator.h"
+#include "symstack.h"
 
 typedef enum {
-    F_GF,   //global frame
-    F_LF,   //local frame
-    F_TF,   //temporary frame
+    F_GF,       //global frame
+    F_LF,       //local frame
+    F_TF,       //temporary frame
+    F_DEFAULT   
 } frame_type;
 
 typedef struct {
@@ -45,9 +47,9 @@ void DLL_Init(DLList* list);
 
 void DLL_Dispose(DLList* list);
 
-void DLL_InsertFirst(DLList* list, taCode data);
+void DLL_InsertFirst(DLList* list, taCode* data);
 
-void DLL_InsertLast(DLList* list, taCode data);
+void DLL_InsertLast(DLList* list, taCode* data);
 
 void DLL_First(DLList* list);
 
@@ -65,18 +67,26 @@ void DLL_DeleteAfter(DLList* list);
 
 void DLL_DeleteBefore(DLList* list);
 
-void DLL_InsertAfter(DLList* list, taCode data);
+void DLL_InsertAfter(DLList* list, taCode* data);
 
-void DLL_InsertBefore(DLList* list, taCode data);
+void DLL_InsertBefore(DLList* list, taCode* data);
 
 void DLL_GetValue(DLList* list, taCode* dataPtr);
 
-void DLL_SetValue(DLList* list, taCode data);
+void DLL_SetValue(DLList* list, taCode* data);
 
 void DLL_Next(DLList* list);
 
 void DLL_Previous(DLList* list);
 
 int DLL_IsActive(DLList* list);
+
+void init_data(taCode* target);
+
+bool set_operand_value(operand_t* target, char* source);
+
+void free_data_value(taCode* target);
+
+bool insert_data(taCode* target, taCode* source);
 
 #endif

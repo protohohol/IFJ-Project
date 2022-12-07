@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
 
+$x = 3;
+write("calling f with ", $x, "\n");
+
 function f  // jmeno funkce
 (int$x)     // seznam parametru
 :

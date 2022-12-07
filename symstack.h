@@ -37,6 +37,7 @@ typedef enum
 typedef struct item_stack {
     exp_stack_symbol symbol;
     exp_type etype;
+	char* value;
     struct item_stack * next;
 } item_stack_t;
 
@@ -45,8 +46,8 @@ typedef struct sstack {
 } sstack_t;
 
 void stack_init (sstack_t * sstack);
-bool stack_push (sstack_t * sstack, exp_stack_symbol symbol, exp_type type);
-bool stack_push_after (sstack_t * sstack, exp_stack_symbol symbol, exp_type type);
+bool stack_push (sstack_t * sstack, exp_stack_symbol symbol, exp_type type, char* value);
+bool stack_push_after (sstack_t * sstack, exp_stack_symbol symbol, exp_type type, char* value);
 bool stack_pop(sstack_t * sstack);
 bool stack_pop_mult ( sstack_t * sstack, int count );
 item_stack_t* get_top ( sstack_t * sstack);
