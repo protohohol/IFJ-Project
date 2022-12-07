@@ -333,10 +333,27 @@ bool insert_data(taCode* target, taCode* source) {
 	return true;
 }
 
-// void clear_data(taCode* source) {
-// 	if (source == NULL) {
-// 		return;
-// 	}
+void clear_data(taCode* source) {
+	if (source == NULL) {
+ 		return;
+ 	}
+	source->result.frame = F_DEFAULT;
+	source->result.type = D_UNDEFINED;
+	if (source->result.out.str != NULL) {
+		str_free(&source->result.out);
+	}
 
-// 	source->operator
-// }
+	source->operand_1.frame = F_DEFAULT;
+	source->operand_1.type = D_UNDEFINED;
+	if (source->operand_1.out.str != NULL) {
+		str_free(&source->operand_1.out);
+	}	
+
+	source->operand_2.frame = F_DEFAULT;
+	source->operand_2.type = D_UNDEFINED;
+	if (source->operand_2.out.str != NULL) {
+		str_free(&source->operand_2.out);
+	}	
+	free_data_value(source);
+	source->operator = I_DEFAULT;
+}

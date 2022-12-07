@@ -11,9 +11,10 @@
 #include "symstack.h"
 
 typedef enum {
-    F_GF,   //global frame
-    F_LF,   //local frame
-    F_TF,   //temporary frame
+    F_GF,       //global frame
+    F_LF,       //local frame
+    F_TF,       //temporary frame
+    F_DEFAULT   
 } frame_type;
 
 typedef struct {

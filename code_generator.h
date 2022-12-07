@@ -79,6 +79,8 @@ typedef enum {
 
     I_COMMENT,
 
+    I_DEFAULT,
+
 }instructions;
 
 #endif
