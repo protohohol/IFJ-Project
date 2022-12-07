@@ -20,3 +20,5 @@ if ($a < 0) {
 	}
 	write("Vysledek je: ", $vysl, "\n");
 }
+
+

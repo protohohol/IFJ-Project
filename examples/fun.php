@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
 
+$x = 3;
+write("calling f with ", $x, "\n");
+
 function f  // jmeno funkce
 (int$x)     // seznam parametru
 :
@@ -12,7 +15,7 @@ int  /* deklarace funkce */ {
   }
 }
 
-function gint( $x):int{
+function g(int $x):int{
   if ($x > 0) {
     write("calling f with ", $x, "\n");
     $x = f($x);// modifikace parametru x, ale az po zavolani funkce f

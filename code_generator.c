@@ -195,6 +195,11 @@ taCode* pregenerating_instructions(taCode data) {
 			str_add_more_chars(&data.operand_2.out, "int@");
 		} else if(data.operand_2.type = D_FLOAT) {
 			str_add_more_chars(&data.operand_2.out, "float@");
+			int i = strlen(&data.operand_2.value);
+			char c[i+1];
+			double d = atof(&data.operand_2.value);
+			sprintf(c, "%a", d);
+			str_add_more_chars(&data.operand_2.out, c);
 		} else if(data.operand_2.type = D_STRING) {
 			str_add_more_chars(&data.operand_2.out, "string@");
 		} else if(data.operand_2.type = D_VOID) {

@@ -430,7 +430,11 @@ const int get_next_token(token_t *token) {
                     ungetc(c, source);
                     token->type = T_INT_VAL;
                     // printf("t.d.s.l : %d\n", token->data->string_c->length);
-                    token->data.int_c = atoi(s->str);
+                    // token->data.int_c = atoi(s->str);
+                    if (!str_copy_string(token->data.string_c, s)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
                     str_free(s);
                     return NO_ERR;
                 }
@@ -477,7 +481,11 @@ const int get_next_token(token_t *token) {
                 } else {
                     ungetc(c, source);
                     token->type = T_DEC_VAL;
-                    token->data.double_c = strtod(s->str, NULL);
+                    // token->data.double_c = strtod(s->str, NULL);
+                    if (!str_copy_string(token->data.string_c, s)) {
+                        str_free(s);
+                        return ERROR_INTERNAL;
+                    }
                     str_free(s);
                     return NO_ERR;
                 }

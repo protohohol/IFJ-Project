@@ -7,7 +7,7 @@ void DLL_Init( DLList *list ) {
 }
 
 void DLL_Dispose( DLList *list ) {
-	if(list->firstElement != NULL) { 
+	if (list->firstElement != NULL) { 
 		DLLElementPtr tmpElement = list->firstElement;
 		while(tmpElement->nextElement != NULL) { 
 			DLLElementPtr tmpElementNext = tmpElement->nextElement;
@@ -23,10 +23,10 @@ void DLL_Dispose( DLList *list ) {
 
 void DLL_InsertFirst( DLList *list, taCode data ) {
 	DLLElementPtr newElement  = (DLLElementPtr)malloc(sizeof(struct DLLElement)); 
-	if(newElement == NULL){
+	if (newElement == NULL) {
 		return;
     }
-	if(list->firstElement == NULL && list->lastElement == NULL){ 
+	if (list->firstElement == NULL && list->lastElement == NULL) {
 		newElement->data = data;
 		newElement->nextElement = NULL;
 		newElement->previousElement = NULL;
@@ -45,10 +45,10 @@ void DLL_InsertFirst( DLList *list, taCode data ) {
 
 void DLL_InsertLast( DLList *list, taCode data ) {
 	DLLElementPtr newElement  = (DLLElementPtr)malloc(sizeof(struct DLLElement)); 
-	if(newElement == NULL){
+	if (newElement == NULL) {
 		return;
     }
-	if(list->firstElement == NULL && list->lastElement == NULL){
+	if (list->firstElement == NULL && list->lastElement == NULL) {
 		newElement->data = data;
 		newElement->nextElement = NULL;
 		newElement->previousElement = NULL;
@@ -76,34 +76,34 @@ void DLL_Last( DLList *list ) {
 
 
 void DLL_GetFirst( DLList *list, taCode *dataPtr ) {
-	if(list->firstElement == NULL){
+	if(list->firstElement == NULL) {
 		return;
 	}
-	else{
+	else {
 		*dataPtr = list->firstElement->data;
 	}
 }
 
 void DLL_GetLast( DLList *list, taCode *dataPtr ) {
-	if(list->firstElement == NULL){
+	if(list->firstElement == NULL) {
 		return;
 	}
-	else{
+	else {
 		*dataPtr = list->lastElement->data;
 	}
 }
 
 void DLL_DeleteFirst( DLList *list ) {
-	if(list->firstElement != NULL)
-	{
+	if (list->firstElement != NULL) {
 		DLLElementPtr tmpElement = list->firstElement;
-		if(list->activeElement = list->firstElement) 
+		if (list->activeElement == list->firstElement) {
 			list->activeElement = NULL;
-		if(tmpElement->nextElement == NULL){
+		}
+		if (tmpElement->nextElement == NULL) {
 			list->firstElement = NULL;
 			list->lastElement = NULL;
 		}
-		else{
+		else {
 			list->firstElement = tmpElement->nextElement;
 			list->firstElement->previousElement = NULL; 
 		}
@@ -112,32 +112,31 @@ void DLL_DeleteFirst( DLList *list ) {
 }
 
 void DLL_DeleteLast( DLList *list ) {
-	if(list->firstElement != NULL)
-	{
+	if (list->firstElement != NULL) {
 		DLLElementPtr tmpElement = list->lastElement;
-		if(list->activeElement = list->lastElement)
+		if (list->activeElement == list->lastElement) {
 			list->activeElement = NULL;
-		if(tmpElement->previousElement == NULL){
+		}
+		if (tmpElement->previousElement == NULL){
 			list->firstElement = NULL;
 			list->lastElement = NULL;
 		}
-		else{
+		else {
 			list->lastElement = tmpElement->previousElement;
 			list->lastElement->nextElement = NULL;
 		}
+
 		free(tmpElement);
 	}
 }
 
 void DLL_DeleteAfter( DLList *list ) {
-	if(list->activeElement != NULL && list->activeElement != list->lastElement)
-	{
+	if (list->activeElement != NULL && list->activeElement != list->lastElement) {
 		DLLElementPtr tmpElement = list->activeElement->nextElement;
-		if(tmpElement->nextElement != NULL){
+		if (tmpElement->nextElement != NULL) {
 			list->activeElement->nextElement = tmpElement->nextElement;
 			list->activeElement->nextElement->previousElement = list->activeElement;
-		}
-		else{
+		} else {
 			list->activeElement->nextElement = NULL;
 			list->lastElement = list->activeElement;
 		}
@@ -147,14 +146,12 @@ void DLL_DeleteAfter( DLList *list ) {
 }
 
 void DLL_DeleteBefore( DLList *list ) {
-	if(list->activeElement != NULL && list->activeElement != list->firstElement)
-	{
+	if (list->activeElement != NULL && list->activeElement != list->firstElement) {
 		DLLElementPtr tmpElement = list->activeElement->previousElement;
-		if(tmpElement->previousElement != NULL){
+		if (tmpElement->previousElement != NULL) {
 			list->activeElement->previousElement = tmpElement->previousElement;
 			list->activeElement->previousElement->nextElement = list->activeElement;
-		}
-		else{
+		} else {
 			list->activeElement->previousElement = NULL;
 			list->firstElement = list->activeElement;
 		}
@@ -164,16 +161,15 @@ void DLL_DeleteBefore( DLList *list ) {
 }
 
 void DLL_InsertAfter( DLList *list, taCode data ) {
-	if(list->activeElement != NULL){
+	if (list->activeElement != NULL) {
 		DLLElementPtr newElement  = (DLLElementPtr)malloc(sizeof(struct DLLElement));
-		if(newElement == NULL)
+		if (newElement == NULL) {
 			return;
-		else{
-			if(list->activeElement->nextElement != NULL){
+		} else {
+			if (list->activeElement->nextElement != NULL) {
 				newElement->nextElement = list->activeElement->nextElement;
 				newElement->nextElement->previousElement = newElement;
-			}
-			else{
+			} else {
 				newElement->nextElement = NULL;
 				list->lastElement = newElement;
 			}
@@ -185,16 +181,15 @@ void DLL_InsertAfter( DLList *list, taCode data ) {
 }
 
 void DLL_InsertBefore( DLList *list, taCode data ) {
-	if(list->activeElement != NULL){
+	if (list->activeElement != NULL) {
 		DLLElementPtr newElement  = (DLLElementPtr)malloc(sizeof(struct DLLElement));
-		if(newElement == NULL)
+		if (newElement == NULL) {
 			return;
-		else{
-			if(list->activeElement->previousElement != NULL){
+		} else {
+			if (list->activeElement->previousElement != NULL) {
 				newElement->previousElement = list->activeElement->previousElement;
 				newElement->previousElement->nextElement = newElement;
-			}
-			else{
+			} else {
 				newElement->previousElement = NULL;
 				list->firstElement = newElement;
 			}
@@ -206,26 +201,27 @@ void DLL_InsertBefore( DLList *list, taCode data ) {
 }
 
 void DLL_GetValue( DLList *list, taCode *dataPtr ) {
-	if(list->activeElement == NULL)
+	if (list->activeElement == NULL) {
 		return;
-	else
+	} else {
 		*dataPtr = list->activeElement->data;
+	}
 }
 
 void DLL_SetValue( DLList *list, taCode data ) {
-	if(list->activeElement != NULL){
+	if (list->activeElement != NULL) {
 		list->activeElement->data = data;
 	}
 }
 
 void DLL_Next( DLList *list ) {
-	if(list->activeElement != NULL){
+	if (list->activeElement != NULL) {
 		list->activeElement = list->activeElement->nextElement;
 	}
 }
 
 void DLL_Previous( DLList *list ) {
-	if(list->activeElement != NULL){
+	if (list->activeElement != NULL) {
 		list->activeElement = list->activeElement->previousElement;
 	}
 }
