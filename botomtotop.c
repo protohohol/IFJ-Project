@@ -474,6 +474,8 @@ void tac_generate (instructions instruction, item_stack_t * op1, item_stack_t * 
 }
 
 int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stack_t * op3, exp_type * type) {
+    taCode data;
+    init_data(&data);
     switch (rule) {
         case (R_ID):
             if (op1->etype == ET_UNDEFINED) {
@@ -487,6 +489,10 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                 // printf("hi3\n");
                 *type = ET_STRING;
             }
+            data.operand_1.type = exp_to_data(op1->etype);
+            set_operand_value(&data.operand_1, op1->value);
+            data.operator = I_DEFVAR;
+            DLL_InsertLast(i_list, data);
             return NO_ERR;
         case (R_MUL):
         case (R_SUB):
@@ -626,7 +632,7 @@ int rule_test (int count, item_stack_t * op1, item_stack_t * op2, item_stack_t *
         string s;
         if (op1->value != NULL) {
             str_init(&s);
-            printf("jeste ne pizda\n");
+            // printf("jeste ne pizda\n");
             str_add_more_chars(&s, op1->value);
         }
         stack_pop_mult(exp_stack,count+1);
@@ -691,7 +697,7 @@ int expression (token_t * token) {
             printf("token type : %d\n", token->type);
             // printf("tmp_type : %d\n", tmp_type);
             if (token->type == T_VAR_ID || token->type == T_STRING_VAL || token->type == T_DEC_VAL || token->type == T_INT_VAL) {
-                printf("\t\t\t\t\t\t\t\t\ttoken str val : %s\n", token->data.string_c->str);
+                // printf("\t\t\t\t\t\t\t\t\ttoken str val : %s\n", token->data.string_c->str);
                 stack_push(&exp_stack, tmp_sym, tmp_type, token->data.string_c->str);
             } else {
                 stack_push(&exp_stack, tmp_sym, tmp_type, NULL);
@@ -716,12 +722,12 @@ int expression (token_t * token) {
                 }
                 //printf( "%d\n",(get_top_term(&exp_stack) )->symbol);
             } else if ( found && ( count == 1 ) ) {
-                printf("push string : %s\n", get_top(&exp_stack)->value);
+                // printf("push string : %s\n", get_top(&exp_stack)->value);
                 op_1 = get_top(&exp_stack);
-                if (op_1 != NULL) {
-                    printf("op val : %s\n", op_1->value);
-                }
-                printf("stack top type : %d\n", op_1->etype);
+                // if (op_1 != NULL) {
+                //     printf("op val : %s\n", op_1->value);
+                // }
+                // printf("stack top type : %d\n", op_1->etype);
                 // printf("op1 else if: %d\n", op_1->etype);
                 if ( ( error_type = rule_test ( count, op_1, NULL, NULL, &exp_stack ) ) ) {
                     return error_type;

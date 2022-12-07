@@ -12,11 +12,11 @@ void stack_init (sstack_t * sstack) {
 }
 
 bool stack_push (sstack_t * sstack, exp_stack_symbol symbol, exp_type type, char* value) {
-	if (value == NULL) {
-		printf("NULL\n");
-	}
-	printf("hi11123123\n");
-	printf("value : %s\n", value);
+	// if (value == NULL) {
+	// 	printf("NULL\n");
+	// }
+	// printf("hi11123123\n");
+	// printf("value : %s\n", value);
     item_stack_t *  new_item = ( item_stack_t* ) malloc ( sizeof ( struct item_stack ) );
     if ( new_item == NULL ) {
         return false;

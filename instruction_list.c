@@ -49,6 +49,7 @@ void DLL_InsertLast( DLList *list, taCode data ) {
 		return;
     }
 	if (list->firstElement == NULL && list->lastElement == NULL) {
+		
 		newElement->data = data;
 		newElement->nextElement = NULL;
 		newElement->previousElement = NULL;
@@ -228,4 +229,42 @@ void DLL_Previous( DLList *list ) {
 
 int DLL_IsActive( DLList *list ) {
 	return (list->activeElement != NULL);
+}
+
+void init_data(taCode* target) {
+	if (target == NULL) {
+		return;
+	}
+
+	target->operand_1.value = NULL;
+	target->operand_2.value = NULL;
+	target->result.value = NULL;
+}
+
+bool set_operand_value(operand_t* target, char* source) {
+	if (target == NULL || source == NULL) {
+		return false;
+	}
+
+	target->value = (char*) malloc((strlen(source)+1) * __CHAR_BIT__);
+	strcpy(target->value, source);
+	return true;
+}
+
+void free_data_value(taCode* target) {
+	if (target == NULL) {
+		return;
+	}
+
+	if (target->operand_1.value != NULL) {
+		free(target->operand_1.value);
+	}
+
+	if (target->operand_2.value != NULL) {
+		free(target->operand_2.value);
+	}
+
+	if (target->result.value != NULL) {
+		free(target->result.value);
+	}
 }

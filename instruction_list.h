@@ -80,4 +80,10 @@ void DLL_Previous(DLList* list);
 
 int DLL_IsActive(DLList* list);
 
+void init_data(taCode* target);
+
+bool set_operand_value(operand_t* target, char* source);
+
+void free_data_value(taCode* target);
+
 #endif
