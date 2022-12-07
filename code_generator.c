@@ -130,120 +130,126 @@ void codeStart() {
 	");
 }
 
-taCode* pregenerating_instructions(taCode data) {
-	if (!str_init(&data.result.out)) {
-		return NULL;
+bool pregenerating_instructions(taCode* data) {
+	if (!str_init(&data->result.out)) {
+		return false;
 	}
 
-	if (!str_init(&data.operand_1.out)) {
-		return NULL;
+	if (!str_init(&data->operand_1.out)) {
+		return false;
 	}
 
-	if (!str_init(&data.operand_2.out)) {
-		return NULL;
+	if (!str_init(&data->operand_2.out)) {
+		return false;
 	}
 
-	if (data.result.value != NULL) {
+	if (data->result.value != NULL) {
 
-		if (data.result.frame == F_GF) {
-			str_add_more_chars(&data.result.out, "F_GF@");
-			str_add_more_chars(&data.result.out, data.result.value);
-		} else if (data.result.frame == F_LF) {
-			str_add_more_chars(&data.result.out, "F_LF@");
-			str_add_more_chars(&data.result.out, data.result.value);
-		} else if (data.result.frame == F_TF) {
-			str_add_more_chars(&data.result.out, "F_TF@");
-			str_add_more_chars(&data.result.out, data.result.value);
-		} else if (data.result.type == D_INT) {
-			str_add_more_chars(&data.result.out, "int@");
-			str_add_more_chars(&data.result.out, data.result.value);
-		} else if (data.result.type == D_FLOAT) {
-			str_add_more_chars(&data.result.out, "float@");
-			str_add_more_chars(&data.result.out, data.result.value);
-			int i = strlen(data.result.value);
+		if (data->result.frame == F_GF) {
+			str_add_more_chars(&data->result.out, "F_GF@");
+			str_add_more_chars(&data->result.out, data->result.value);
+		} else if (data->result.frame == F_LF) {
+			str_add_more_chars(&data->result.out, "F_LF@");
+			str_add_more_chars(&data->result.out, data->result.value);
+		} else if (data->result.frame == F_TF) {
+			str_add_more_chars(&data->result.out, "F_TF@");
+			str_add_more_chars(&data->result.out, data->result.value);
+		} else if (data->result.type == D_INT) {
+			str_add_more_chars(&data->result.out, "int@");
+			str_add_more_chars(&data->result.out, data->result.value);
+		} else if (data->result.type == D_FLOAT) {
+			str_add_more_chars(&data->result.out, "float@");
+			str_add_more_chars(&data->result.out, data->result.value);
+			int i = strlen(data->result.value);
 			char c[i+1];
-			double d = atof(data.result.value);
+			double d = atof(data->result.value);
 			sprintf(c, "%a", d);
-			str_add_more_chars(&data.result.out, c);
-		} else if (data.result.type == D_STRING) {
-			str_add_more_chars(&data.result.out, "string@");
-			str_add_more_chars(&data.result.out, data.result.value);
-		} else if (data.result.type == D_VOID) {
-			str_add_more_chars(&data.result.out, "nil@");
-			str_add_more_chars(&data.result.out, data.result.value);
+			str_add_more_chars(&data->result.out, c);
+		} else if (data->result.type == D_STRING) {
+			str_add_more_chars(&data->result.out, "string@");
+			str_add_more_chars(&data->result.out, data->result.value);
+		} else if (data->result.type == D_VOID) {
+			str_add_more_chars(&data->result.out, "nil@");
+			str_add_more_chars(&data->result.out, data->result.value);
+		} else {
+			str_add_more_chars(&data->result.out, data->result.value);
 		}
 		
 
 	} 
 	
-	if (data.operand_1.value != NULL) {
+	if (data->operand_1.value != NULL) {
 
-		if (data.operand_1.frame == F_GF) {
-			str_add_more_chars(&data.operand_1.out, "F_GF@");
-			str_add_more_chars(&data.operand_1.out, data.operand_1.value);
-		} else if (data.operand_1.frame == F_LF) {
-			str_add_more_chars(&data.operand_1.out, "F_LF@");
-			str_add_more_chars(&data.operand_1.out, data.operand_1.value);
-		} else if (data.operand_1.frame == F_TF) {
-			str_add_more_chars(&data.operand_1.out, "F_TF@");
-			str_add_more_chars(&data.operand_1.out, data.operand_1.value);
-		} else if (data.operand_1.type == D_INT) {
-			str_add_more_chars(&data.operand_1.out, "int@");
-			str_add_more_chars(&data.operand_1.out, data.operand_1.value);
-		} else if (data.operand_1.type == D_FLOAT) {
-			str_add_more_chars(&data.operand_1.out, "float@");
-			int i = strlen(data.operand_1.value);
+		if (data->operand_1.frame == F_GF) {
+			str_add_more_chars(&data->operand_1.out, "F_GF@");
+			str_add_more_chars(&data->operand_1.out, data->operand_1.value);
+		} else if (data->operand_1.frame == F_LF) {
+			str_add_more_chars(&data->operand_1.out, "F_LF@");
+			str_add_more_chars(&data->operand_1.out, data->operand_1.value);
+		} else if (data->operand_1.frame == F_TF) {
+			str_add_more_chars(&data->operand_1.out, "F_TF@");
+			str_add_more_chars(&data->operand_1.out, data->operand_1.value);
+		} else if (data->operand_1.type == D_INT) {
+			str_add_more_chars(&data->operand_1.out, "int@");
+			str_add_more_chars(&data->operand_1.out, data->operand_1.value);
+		} else if (data->operand_1.type == D_FLOAT) {
+			str_add_more_chars(&data->operand_1.out, "float@");
+			int i = strlen(data->operand_1.value);
 			char c[i+1];
-			double d = atof(data.operand_1.value);
+			double d = atof(data->operand_1.value);
 			sprintf(c, "%a", d);
-			str_add_more_chars(&data.operand_1.out, c);
-		} else if (data.operand_1.type == D_STRING) {
-			str_add_more_chars(&data.operand_1.out, "string@");
-			str_add_more_chars(&data.operand_1.out, data.operand_1.value);
-		} else if (data.operand_1.type == D_VOID) {
-			str_add_more_chars(&data.operand_1.out, "nil@");
-			str_add_more_chars(&data.operand_1.out, data.operand_1.value);
+			str_add_more_chars(&data->operand_1.out, c);
+		} else if (data->operand_1.type == D_STRING) {
+			str_add_more_chars(&data->operand_1.out, "string@");
+			str_add_more_chars(&data->operand_1.out, data->operand_1.value);
+		} else if (data->operand_1.type == D_VOID) {
+			str_add_more_chars(&data->operand_1.out, "nil@");
+			str_add_more_chars(&data->operand_1.out, data->operand_1.value);
+		} else {
+			str_add_more_chars(&data->operand_1.out, data->operand_1.value);
 		}
 
 	} 
 
-	if(data.operand_2.value != NULL) {
+	if(data->operand_2.value != NULL) {
 
-		if (data.operand_2.frame == F_GF) {
-			str_add_more_chars(&data.operand_2.out, "F_GF@");
-			str_add_more_chars(&data.operand_2.out, data.operand_2.value);
-		} else if (data.operand_2.frame == F_LF) {
-			str_add_more_chars(&data.operand_2.out, "F_LF@");
-			str_add_more_chars(&data.operand_2.out, data.operand_2.value);
-		} else if (data.operand_2.frame == F_TF) {
-			str_add_more_chars(&data.operand_2.out, "F_TF@");
-			str_add_more_chars(&data.operand_2.out, data.operand_2.value);
-		} else if (data.operand_2.type == D_INT) {
-			str_add_more_chars(&data.operand_2.out, "int@");
-			str_add_more_chars(&data.operand_2.out, data.operand_2.value);
-		} else if (data.operand_2.type == D_FLOAT) {
-			str_add_more_chars(&data.operand_2.out, "float@");
-			int i = strlen(data.operand_2.value);
+		if (data->operand_2.frame == F_GF) {
+			str_add_more_chars(&data->operand_2.out, "F_GF@");
+			str_add_more_chars(&data->operand_2.out, data->operand_2.value);
+		} else if (data->operand_2.frame == F_LF) {
+			str_add_more_chars(&data->operand_2.out, "F_LF@");
+			str_add_more_chars(&data->operand_2.out, data->operand_2.value);
+		} else if (data->operand_2.frame == F_TF) {
+			str_add_more_chars(&data->operand_2.out, "F_TF@");
+			str_add_more_chars(&data->operand_2.out, data->operand_2.value);
+		} else if (data->operand_2.type == D_INT) {
+			str_add_more_chars(&data->operand_2.out, "int@");
+			str_add_more_chars(&data->operand_2.out, data->operand_2.value);
+		} else if (data->operand_2.type == D_FLOAT) {
+			str_add_more_chars(&data->operand_2.out, "float@");
+			int i = strlen(data->operand_2.value);
 			char c[i+1];
-			double d = atof(data.operand_2.value);
+			double d = atof(data->operand_2.value);
 			sprintf(c, "%a", d);
-			str_add_more_chars(&data.operand_2.out, c);
-		} else if (data.operand_2.type == D_STRING) {
-			str_add_more_chars(&data.operand_2.out, "string@");
-			str_add_more_chars(&data.operand_2.out, data.operand_2.value);
-		} else if (data.operand_2.type == D_VOID) {
-			str_add_more_chars(&data.operand_2.out, "nil@");
-			str_add_more_chars(&data.operand_2.out, data.operand_2.value);
+			str_add_more_chars(&data->operand_2.out, c);
+		} else if (data->operand_2.type == D_STRING) {
+			str_add_more_chars(&data->operand_2.out, "string@");
+			str_add_more_chars(&data->operand_2.out, data->operand_2.value);
+		} else if (data->operand_2.type == D_VOID) {
+			str_add_more_chars(&data->operand_2.out, "nil@");
+			str_add_more_chars(&data->operand_2.out, data->operand_2.value);
+		} else {
+			str_add_more_chars(&data->operand_2.out, data->operand_2.value);
 		}
 	} 
-	return &data;
+	return true;
 }
 
 void print_instruction(DLList* list) {
 	codeStart();
 	DLL_First(list);
 	while (DLL_IsActive(list)) {
-		list->activeElement->data = *(pregenerating_instructions(list->activeElement->data));
+		pregenerating_instructions(&list->activeElement->data);
 		switch (list->activeElement->data.operator){
 			case I_COMMENT:
 				printf("# %s\n", list->activeElement->data.operand_1.out.str);
