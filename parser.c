@@ -6,7 +6,7 @@ string fun_name;
 string fun_list;
 int param_counter;
 DLList inst_list;
-
+taCode data_glob;
 
 
 data_type convert_from_arg_to_d_type(char a){
@@ -742,6 +742,10 @@ int state(token_t * token) {
             return expression(token);
         case (T_KW_RETURN):
             //generate_code("return", NULL, NULL, );
+            data_glob.operator = I_CALL;
+            set_operand_value(&data_glob.operand_1, "$$exit");
+            DLL_InsertLast(&inst_list, &data_glob);
+
             if (( error_type = get_next_token(token) )) {
                 return error_type;
             }
@@ -1060,23 +1064,21 @@ int main() {
     str_init(&fun_list);
     str_init(&fun_name);
     DLL_Init(&inst_list);
-    taCode tmp;
-    init_data(&tmp);
+    init_data(&data_glob);
     // printf("hi\n");
-    tmp.operator = I_LABEL;
 
-    set_operand_value(&tmp.operand_1, "$$main");
-    DLL_InsertLast(&inst_list, &tmp);
-    clear_data(&tmp);
+    data_glob.operator = I_LABEL;
+    set_operand_value(&data_glob.operand_1, "$$main");
+    DLL_InsertLast(&inst_list, &data_glob);
+    clear_data(&data_glob);
 
-    tmp.operator = I_CREATEFRAME;
-    DLL_InsertLast(&inst_list, &tmp);
-    clear_data(&tmp);
+    data_glob.operator = I_CREATEFRAME;
+    DLL_InsertLast(&inst_list, &data_glob);
+    clear_data(&data_glob);
 
-    tmp.operator = I_PUSHFRAME;
-    DLL_InsertLast(&inst_list, &tmp);
-
-    free_data_value(&tmp);
+    data_glob.operator = I_PUSHFRAME;
+    DLL_InsertLast(&inst_list, &data_glob);
+    clear_data(&data_glob);
 
     // str_add_fun_name(&fun_list, "aboba");
     // str_add_fun_name(&fun_list, "gogoga");
@@ -1171,10 +1173,19 @@ int main() {
     if ((error_type = get_next_token(&token)) == 0) {
         error_type = prog(&token);
     }
+
+    data_glob.operator = I_LABEL;
+    set_operand_value(&data_glob.operand_1, "$$exit");
+    DLL_InsertLast(&inst_list, &data_glob);
+
+    free_data_value(&data_glob);
+
     if (!error_type) {
         print_instruction(&inst_list);
     }
+
     printf("%d\n",error_type);
+
     // symtable_free(symt_stack.top->symt);
     // symtable_free(symt_stack.active->symt);
     symtable_stack_free(&symt_stack);
