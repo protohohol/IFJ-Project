@@ -78,8 +78,9 @@ const int get_next_token(token_t *token) {
 
     while (true) {
         c = getc(source);
+        // str_clear(token->data.string_c);
         // printf("s len : %d\n", s->allocSize);
-        // printf("c : %c\ns : %s\n", c, s->str);
+        // printf("c : %d\ns : %s\n", c, s->str);
 
         switch (state) {
             case (S_START):
