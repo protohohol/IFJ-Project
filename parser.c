@@ -781,14 +781,25 @@ int state(token_t * token) {
                     /*
                     Sematick check: 
                     */
-                    if((item_tmp = symtable_search(symt_stack.top->symt, token->data.string_c->str))==NULL) {
+                    if((item_tmp = symtable_search(symt_stack.top->symt, token->data.string_c->str)) == NULL) {
                         return SEM_ERR_UNDEFINED_FUNCTION;
-                    }   else {
+                    } else {
                         symtable_add_type(tmp, item_tmp->type);
+
+                        data_glob.operator = I_DEFVAR;
+                        data_glob.operand_1.frame = F_LF;
+                        set_operand_value(&data_glob.operand_1, tmp->id);
+                        DLL_InsertLast(&inst_list, &data_glob);
+                        clear_data(&data_glob);
+
+                        data_glob.operator = I_CREATEFRAME;
+                        DLL_InsertLast(&inst_list, &data_glob);
+                        clear_data(&data_glob);
+
                         return declare(token);
                     }
                 } else if (token->type == T_VAR_ID || token->type == T_INT_VAL || token->type == T_DEC_VAL || token->type == T_STRING_VAL || token->type == T_PAR_LEFT) {
-                    //set_symtable(symt_stack.top->symt);
+                    set_symtable(symt_stack.top->symt);
                     int result = expression(token);
                     if (result == NO_ERR) {
                         symtable_add_type(tmp, ( convert_exp_to_d_type (final_type) )); 
