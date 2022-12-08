@@ -146,13 +146,13 @@ bool pregenerating_instructions(taCode* data) {
 	if (data->result.value != NULL) {
 
 		if (data->result.frame == F_GF) {
-			str_add_more_chars(&data->result.out, "F_GF@");
+			str_add_more_chars(&data->result.out, "GF@");
 			str_add_more_chars(&data->result.out, data->result.value);
 		} else if (data->result.frame == F_LF) {
-			str_add_more_chars(&data->result.out, "F_LF@");
+			str_add_more_chars(&data->result.out, "LF@");
 			str_add_more_chars(&data->result.out, data->result.value);
 		} else if (data->result.frame == F_TF) {
-			str_add_more_chars(&data->result.out, "F_TF@");
+			str_add_more_chars(&data->result.out, "TF@");
 			str_add_more_chars(&data->result.out, data->result.value);
 		} else if (data->result.type == D_INT) {
 			str_add_more_chars(&data->result.out, "int@");
@@ -181,13 +181,13 @@ bool pregenerating_instructions(taCode* data) {
 	if (data->operand_1.value != NULL) {
 
 		if (data->operand_1.frame == F_GF) {
-			str_add_more_chars(&data->operand_1.out, "F_GF@");
+			str_add_more_chars(&data->operand_1.out, "GF@");
 			str_add_more_chars(&data->operand_1.out, data->operand_1.value);
 		} else if (data->operand_1.frame == F_LF) {
-			str_add_more_chars(&data->operand_1.out, "F_LF@");
+			str_add_more_chars(&data->operand_1.out, "LF@");
 			str_add_more_chars(&data->operand_1.out, data->operand_1.value);
 		} else if (data->operand_1.frame == F_TF) {
-			str_add_more_chars(&data->operand_1.out, "F_TF@");
+			str_add_more_chars(&data->operand_1.out, "TF@");
 			str_add_more_chars(&data->operand_1.out, data->operand_1.value);
 		} else if (data->operand_1.type == D_INT) {
 			str_add_more_chars(&data->operand_1.out, "int@");
@@ -214,13 +214,13 @@ bool pregenerating_instructions(taCode* data) {
 	if(data->operand_2.value != NULL) {
 
 		if (data->operand_2.frame == F_GF) {
-			str_add_more_chars(&data->operand_2.out, "F_GF@");
+			str_add_more_chars(&data->operand_2.out, "GF@");
 			str_add_more_chars(&data->operand_2.out, data->operand_2.value);
 		} else if (data->operand_2.frame == F_LF) {
-			str_add_more_chars(&data->operand_2.out, "F_LF@");
+			str_add_more_chars(&data->operand_2.out, "LF@");
 			str_add_more_chars(&data->operand_2.out, data->operand_2.value);
 		} else if (data->operand_2.frame == F_TF) {
-			str_add_more_chars(&data->operand_2.out, "F_TF@");
+			str_add_more_chars(&data->operand_2.out, "TF@");
 			str_add_more_chars(&data->operand_2.out, data->operand_2.value);
 		} else if (data->operand_2.type == D_INT) {
 			str_add_more_chars(&data->operand_2.out, "int@");
