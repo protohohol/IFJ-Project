@@ -1,0 +1,39 @@
+<?php
+id : 	declare
+(
+id : 	strict_types
+=
+int-lit : 	1
+)
+;
+function
+id : 	hlavni_program
+(
+id : 	int
+id : 	$year
+)
+:
+void
+{
+id : 	write
+(
+string-lit : 	"Hello from IFJ"
+,
+id : 	$year
+,
+string-lit : 	"
+"
+)
+;
+}
+id : 	hlavni_program
+(
+int-lit : 	22
+)
+;
+id : 	hlavni_program
+(
+int-lit : 	23
+)
+;
+0

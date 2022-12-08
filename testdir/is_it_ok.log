@@ -1,0 +1,60 @@
+Archive:  xtiemn00.zip
+  inflating: botomtotop.c            
+  inflating: code_generator.c        
+  inflating: instruction_list.c      
+  inflating: parser.c                
+  inflating: scanner.c               
+  inflating: str.c                   
+  inflating: symstack.c              
+  inflating: symtable.c              
+  inflating: test_scanner.c          
+  inflating: botomtotop.h            
+  inflating: code_generator.h        
+  inflating: error.h                 
+  inflating: instruction_list.h      
+  inflating: parser.h                
+  inflating: scanner.h               
+  inflating: str.h                   
+  inflating: symstack.h              
+  inflating: symtable.h              
+  inflating: rozdeleni               
+  inflating: dokumentace.pdf         
+  inflating: Makefile                
+gcc -Wall scanner.c botomtotop.c parser.c code_generator.c instruction_list.c str.c symtable.c symstack.c -o ifj_proj
+scanner.c: In function ‘get_next_token’:
+scanner.c:379:21: error: ‘for’ loop initial declarations are only allowed in C99 mode
+                     for (int i = 0; i < 2; i++) {
+                     ^
+scanner.c:379:21: note: use option -std=c99 or -std=gnu99 to compile your code
+str.c: In function ‘str_add_more_chars’:
+str.c:42:5: error: ‘for’ loop initial declarations are only allowed in C99 mode
+     for (int i = 0; i < strlen(str); i++) {
+     ^
+str.c:42:5: note: use option -std=c99 or -std=gnu99 to compile your code
+str.c: In function ‘str_add_fun_name’:
+str.c:97:5: error: ‘for’ loop initial declarations are only allowed in C99 mode
+     for (int i = 0; i < strlen(name); i++) {
+     ^
+str.c: In function ‘str_find_fun_name’:
+str.c:116:5: error: ‘for’ loop initial declarations are only allowed in C99 mode
+     for (int i = 0; i < target->length; i++) {
+     ^
+symtable.c: In function ‘get_hash’:
+symtable.c:15:3: error: ‘for’ loop initial declarations are only allowed in C99 mode
+   for (int i = 0; i < length; i++) {
+   ^
+symtable.c:15:3: note: use option -std=c99 or -std=gnu99 to compile your code
+symtable.c: In function ‘symtable_init’:
+symtable.c:26:5: error: ‘for’ loop initial declarations are only allowed in C99 mode
+     for (int i = 0; i < MAX_SIZE; i++) {
+     ^
+symtable.c: In function ‘symtable_free’:
+symtable.c:208:5: error: ‘for’ loop initial declarations are only allowed in C99 mode
+     for (int i = 0; i < MAX_SIZE; i++) {
+     ^
+symstack.c: In function ‘stack_pop_mult’:
+symstack.c:88:5: error: ‘for’ loop initial declarations are only allowed in C99 mode
+     for ( int i = 0; i < count; i++)
+     ^
+symstack.c:88:5: note: use option -std=c99 or -std=gnu99 to compile your code
+make: *** [ifj_proj] Error 1

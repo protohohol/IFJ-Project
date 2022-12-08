@@ -1,0 +1,118 @@
+<?php
+id : 	declare
+(
+id : 	strict_types
+=
+int-lit : 	1
+)
+;
+id : 	write
+(
+string-lit : 	"Zadejte cislo pro vypocet faktorialu: "
+)
+;
+id : 	$a
+=
+id : 	readi
+(
+)
+;
+function
+id : 	factorial
+(
+id : 	int
+id : 	$n
+)
+:
+id : 	int
+{
+if
+(
+id : 	$n
+<
+int-lit : 	2
+)
+{
+id : 	$result
+=
+int-lit : 	1
+;
+}
+else
+{
+id : 	$decremented_n
+=
+id : 	$n
+-
+int-lit : 	1
+;
+id : 	$temp_result
+=
+id : 	factorial
+(
+id : 	$decremented_n
+)
+;
+id : 	$result
+=
+id : 	$n
+*
+id : 	$temp_result
+;
+}
+return
+id : 	$result
+;
+}
+if
+(
+id : 	$a
+!==
+null
+)
+{
+if
+(
+id : 	$a
+<
+int-lit : 	0
+)
+{
+id : 	write
+(
+string-lit : 	"Faktorial nelze spocitat
+"
+)
+;
+}
+else
+{
+id : 	$vysl
+=
+id : 	factorial
+(
+id : 	$a
+)
+;
+id : 	write
+(
+string-lit : 	"Vysledek je: "
+,
+id : 	$vysl
+,
+string-lit : 	"
+"
+)
+;
+}
+}
+else
+{
+id : 	write
+(
+string-lit : 	"Chyba pri nacitani celeho cisla!
+"
+)
+;
+}
+0

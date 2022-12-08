@@ -1,0 +1,85 @@
+<?php
+id : 	declare
+(
+id : 	strict_types
+=
+int-lit : 	1
+)
+;
+id : 	$str1
+=
+string-lit : 	"Toto je nejaky text v programu jazyka IFJ22"
+;
+id : 	$str2
+=
+id : 	$str1
+.
+string-lit : 	", ktery jeste trochu obohatime"
+;
+id : 	write
+(
+id : 	$str1
+,
+string-lit : 	"
+"
+,
+id : 	$str2
+,
+string-lit : 	"
+"
+)
+;
+id : 	write
+(
+string-lit : 	"Pozice retezce "text" v $str2: "
+,
+int-lit : 	15
+,
+string-lit : 	"
+"
+)
+;
+id : 	write
+(
+string-lit : 	"Zadejte serazenou posloupnost vsech malych pismen a-h, "
+)
+;
+id : 	$str1
+=
+id : 	reads
+(
+)
+;
+if
+(
+id : 	$str1
+!==
+null
+)
+{
+whlie
+(
+id : 	$str1
+!==
+string-lit : 	"abcdefgh"
+)
+{
+id : 	write
+(
+string-lit : 	"Spatne zadana posloupnost, zkuste znovu:
+"
+)
+;
+id : 	$str1
+=
+id : 	reads
+(
+)
+;
+}
+}
+else
+{
+}
+?>
+0
