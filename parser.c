@@ -1064,8 +1064,18 @@ int main() {
     init_data(&tmp);
     // printf("hi\n");
     tmp.operator = I_LABEL;
+
     set_operand_value(&tmp.operand_1, "$$main");
     DLL_InsertLast(&inst_list, &tmp);
+    clear_data(&tmp);
+
+    tmp.operator = I_CREATEFRAME;
+    DLL_InsertLast(&inst_list, &tmp);
+    clear_data(&tmp);
+
+    tmp.operator = I_PUSHFRAME;
+    DLL_InsertLast(&inst_list, &tmp);
+
     free_data_value(&tmp);
 
     // str_add_fun_name(&fun_list, "aboba");
@@ -1161,9 +1171,9 @@ int main() {
     if ((error_type = get_next_token(&token)) == 0) {
         error_type = prog(&token);
     }
-    // if (!error_type) {
-    //     print_instruction(&inst_list);
-    // }
+    if (!error_type) {
+        print_instruction(&inst_list);
+    }
     printf("%d\n",error_type);
     // symtable_free(symt_stack.top->symt);
     // symtable_free(symt_stack.active->symt);
