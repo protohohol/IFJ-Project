@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
-#include "symbol_table.h"
+#include "symtable.h"
 
 int get_hash(char *key) {
   int result = 1;

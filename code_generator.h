@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 #include "scanner.h"
-#include "symbol_table.h"
+#include "symtable.h"
 #include "str.h"
 #include "instruction_list.h"
 

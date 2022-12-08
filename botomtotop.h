@@ -4,7 +4,7 @@
 
 
 #include "error.h"
-#include "symbol_table.h"
+#include "symtable.h"
 #include "code_generator.h"
 
 

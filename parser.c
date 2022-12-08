@@ -36,6 +36,8 @@ data_type convert_exp_to_d_type(exp_type type) {
         return D_INT;
     case ET_STRING:
         return D_STRING;
+    case ET_NULL:
+        return D_VOID;
     default:
         return -1;
     }
@@ -67,6 +69,7 @@ exp_type convert_to_exp(data_type type) {
  * @return data_type 
  */
 data_type convert_to_d_type(token_t* token) {
+    printf("token s : %s\ttype : %d\n", token->data.string_c->str, token->type);
     switch (token->type) {
         case (T_KW_FLOAT):
         case (T_DEC_VAL):
@@ -80,6 +83,7 @@ data_type convert_to_d_type(token_t* token) {
         case (T_KW_VOID):
             return D_VOID;
         case (T_VAR_ID):
+            printf("hi\n");
             return symtable_search(symt_stack.active->symt, token->data.string_c->str)->type;
         default:
             return -1; // error
@@ -168,7 +172,7 @@ int kostyluka (token_t * token) {
 }
 
 int f_plist_kostylga( token_t * token ) {
-    printf("%d\n",token->type);
+    printf("%d\n", token->type);
     if ( token->type == T_COMMA ) {
         if (( error_type = get_next_token(token) )) {
             return error_type;
@@ -250,7 +254,7 @@ int f_state ( token_t * token ) {
                 Semantic check :
 
                 */
-                if((item_tmp = symtable_search(symt_stack.top->symt, token->data.string_c->str))==NULL) {
+                if ((item_tmp = symtable_search(symt_stack.top->symt, token->data.string_c->str))==NULL) {
                     return SEM_ERR_UNDEFINED_FUNCTION;
                 } else {
                     if (fun_name.str[0] == '\0') {
@@ -262,6 +266,7 @@ int f_state ( token_t * token ) {
                             if (item_tmp->type == tmp->type){
                                 return NO_ERR;
                             } else {
+                                printf("pizda tut\n");
                                 return SEM_ERR_WRONG_PARAM;
                             }
                         } else {
@@ -275,6 +280,11 @@ int f_state ( token_t * token ) {
                 if (result == NO_ERR) {
                     if( (item_tmp = (symtable_search(symt_stack.top->symt, fun_name.str))) != NULL)  {
                         if (!(item_tmp->type == convert_exp_to_d_type(final_type))) {
+                            if (convert_exp_to_d_type(final_type) == D_VOID) {
+                                return result;
+                            }
+                            printf("1 t : %d\t2 t : %d\texp : %d\n", item_tmp->type, final_type, convert_exp_to_d_type(final_type));
+                            printf("pizda tam\n");
                             return SEM_ERR_WRONG_PARAM;
                         } else {
                             return result;
@@ -285,7 +295,7 @@ int f_state ( token_t * token ) {
                 }
             }
         case (T_VAR_ID):
-            
+            printf("ja jebasos\n");
             //set_symtable(symt_stack.active->symt);
             if(fun_name.str[0]== '\0') {
                 if( (tmp = symtable_search(symt_stack.top->symt, token->data.string_c->str) ) == NULL ) {
@@ -306,25 +316,30 @@ int f_state ( token_t * token ) {
                 return error_type;
             }
             if (token->type == T_ASSIGN) {
+                // printf("ja jebasos tok : %s\ttype : %d\n", token->data.string_c->str, token->type);
                 if (( error_type = get_next_token(token) )) {
                     return error_type;
                 }
+                // printf("ja jebasos tok : %s\ttype : %d\n", token->data.string_c->str, token->type);
                 if (token->type == T_FUN_ID) {
                      /*
                     Sematick check: 
-                    If we found the defined function, we retype our variable to type, that function retruns
+                    If we found the defined function, we retype our variable to type, that function returns
                     Else we create a temporary definition in table, and add that to list of undefined but used fucntions
                     in the end of analysis we will check, if it was defined late.
                     */
-                    if((item_tmp = symtable_search(symt_stack.top->symt, token->data.string_c->str))==NULL) {
+                    printf("item tmp : %s\n", token->data.string_c->str);
+                    if((item_tmp = symtable_search(symt_stack.top->symt, token->data.string_c->str)) == NULL) {
                         return SEM_ERR_UNDEFINED_FUNCTION;
-                    }   else {
-                        printf("that's okay, %d %d \n",tmp->type, item_tmp->type);
+                    } else {
+                        int i = declare(token);
+                        printf("that's okay, %d %d i : %d\n",tmp->type, item_tmp->type, i);
                         symtable_add_type(tmp, item_tmp->type);
-                        return declare(token);
+                        return i;
                     }
                     return SEM_ERR_OTHER;
-                } else if (token->type == T_VAR_ID || token->type == T_INT_VAL || token->type == T_DEC_VAL || token->type == T_STRING_VAL) {
+                } else if (token->type == T_VAR_ID || token->type == T_INT_VAL || token->type == T_DEC_VAL || token->type == T_STRING_VAL || token->type == T_PAR_LEFT) {
+                    printf("ja jebasosishshhshe\n");
                     int result = expression(token);
                     if (result == NO_ERR) {
                         symtable_add_type(tmp, ( convert_exp_to_d_type (final_type) ));
@@ -355,7 +370,19 @@ int f_state ( token_t * token ) {
             // if (( error_type = get_next_token(token) )) {
             //     return error_type;
             // }
-            return declare(token);
+            if (fun_name.str[0] == '\0') {
+                if (symtable_search(symt_stack.top->symt, token->data.string_c->str) == NULL) {
+                    return SEM_ERR_UNDEFINED_FUNCTION;
+                } else {
+                    return declare(token);
+                }
+            } else {
+                if (symtable_search(symt_stack.active->symt, token->data.string_c->str) == NULL) {
+                    return SEM_ERR_UNDEFINED_FUNCTION;
+                } else {
+                    return declare(token);
+                }
+            }
             break;
 
         case (T_KW_WHILE):
@@ -450,6 +477,7 @@ int f_state ( token_t * token ) {
 
 int f_list ( token_t * token ) {
     printf("i am in f_list\n");
+    printf("token f_list : %s\ttype : %d\n", token->data.string_c->str, token->type);
     switch (token->type) {
         case (T_INT_VAL):
         case (T_STRING_VAL):
@@ -505,17 +533,17 @@ int f_param_declare ( token_t * token ) {
             return SEM_ERR_UNDEFINED_FUNCTION;
         }
         if (!(param_counter<=item->argumets_amount)) {
-            printf("param counter, arguments_amount : %d , %d", param_counter,item->argumets_amount);
+            printf("param counter, arguments_amount : %d , %d\n", param_counter,item->argumets_amount);
             printf("bombom\n");
             return SEM_ERR_WRONG_PARAM;
         }
         data_type data_tmp;
-        if (token->type==T_VAR_ID) {   
+        if (token->type == T_VAR_ID) {   
             /*
             По-хорошему надо добавить проверочки в серчи
             */
-           printf("%c ", fun_name.str[0]);
-            if(fun_name.str[0]== '\0'){ 
+           printf("%c \n", fun_name.str[0]);
+            if(fun_name.str[0] == '\0'){ 
                 printf("bimbim\n");
                 htab_data_t* tmp = symtable_search(symt_stack.top->symt,token->data.string_c->str);
                 if (tmp == NULL)
@@ -529,19 +557,22 @@ int f_param_declare ( token_t * token ) {
             //    data_tmp = (symtable_search(symt_stack.top->symt,token->data.string_c->str))->type;    
             } else {
                 printf("brombrom\n");
-                data_tmp = (symtable_search(symt_stack.active->symt,token->data.string_c->str)->type);    
+                data_tmp = (symtable_search(symt_stack.active->symt, token->data.string_c->str)->type);    
+                printf("str : %s\ttype : %d\n", token->data.string_c->str, data_tmp);
             }
         } else {
             printf("%d\n", token->type);
             data_tmp = convert_to_d_type(token);
             printf("%d\n", data_tmp);
         }
+        printf("param c : %d\n", param_counter);
         data_type arg_type = convert_from_arg_to_d_type(item->arguments->str[param_counter]);
-        if ( arg_type != D_TERM) {
-            if(arg_type != data_tmp ){
+        if (arg_type != D_TERM) {
+            if (arg_type != data_tmp) {
                 printf("i am here\n");
+                printf("token : %s\n", token->data.string_c->str);
                 printf("%d\n", arg_type);
-                printf("%c , %d\n",item->arguments->str[param_counter], data_tmp);
+                printf("%c , %d\n", item->arguments->str[param_counter], data_tmp);
                 return SEM_ERR_WRONG_PARAM;
             } else {
                 param_counter++;
@@ -552,7 +583,7 @@ int f_param_declare ( token_t * token ) {
         }
         if (last_fun != NULL) {
                 free(last_fun);
-            }
+        }
         return NO_ERR;
     } else {
         return SYNTAX_ERR;
@@ -577,16 +608,16 @@ int f_plist_declare( token_t * token ) {
         return f_plist_declare(token);
     } else if ( token->type == T_PAR_RIGHT ) {
         char * tmp;
-        str_get_last_fun_name(&fun_list,&tmp);
-        if (!(symtable_search(symt_stack.top->symt,tmp)->infinite))
+        str_get_last_fun_name(&fun_list, &tmp);
+        if (!(symtable_search(symt_stack.top->symt, tmp)->infinite))
         {  
-        if(param_counter != (symtable_search(symt_stack.top->symt,tmp))->argumets_amount){
-            printf("bambam\n");
-            return SEM_ERR_WRONG_PARAM;
-        }
+            if (param_counter != (symtable_search(symt_stack.top->symt, tmp))->argumets_amount) {
+                printf("bambam\n");
+                return SEM_ERR_WRONG_PARAM;
+            }
         }
         param_counter = 0;
-        if ( tmp != NULL) {
+        if (tmp != NULL) {
             free(tmp);
         }
         if (( error_type = get_next_token(token) )) {
@@ -661,7 +692,7 @@ int f_plist( token_t * token ) {
 }
 
 int declare(token_t * token) {
-    printf("i am in declare\n");
+    printf("i am in declare : %s\n", token->data.string_c->str);
     char* tmp = token->data.string_c->str;
     if (symtable_search(symt_stack.top->symt, tmp) == NULL) {
         return SEM_ERR_UNDEFINED_FUNCTION;
@@ -752,7 +783,7 @@ int state(token_t * token) {
                         symtable_add_type(tmp, item_tmp->type);
                         return declare(token);
                     }
-                } else if (token->type == T_VAR_ID || token->type == T_INT_VAL || token->type == T_DEC_VAL || token->type == T_STRING_VAL) {
+                } else if (token->type == T_VAR_ID || token->type == T_INT_VAL || token->type == T_DEC_VAL || token->type == T_STRING_VAL || token->type == T_PAR_LEFT) {
                     //set_symtable(symt_stack.top->symt);
                     int result = expression(token);
                     if (result == NO_ERR) {
@@ -825,7 +856,7 @@ int state(token_t * token) {
                     if ( token->type == T_KW_FLOAT || token->type == T_KW_INT || token->type == T_KW_STRING || token->type == T_KW_VOID ) {
                         data_type d_tmp = convert_to_d_type(token);
                         if(symtable_add_type(symtable_search(symt_stack.top->symt, fun_name.str), d_tmp))
-                            printf("that's okay, %d %d \n",d_tmp, symtable_search(symt_stack.top->symt, fun_name.str)->type);
+                            printf("that's pokakay, %d %d \n",d_tmp, symtable_search(symt_stack.top->symt, fun_name.str)->type);
                         else
                             printf("it is really bad\n");
                         // printf("\t\t\t\ttype : %d\n", symtable_search(symt_stack.top->symt, fun_name)->type);
@@ -1011,14 +1042,14 @@ int st_list(token_t * token) {
 }
 
 int prog(token_t * token){
-    if(token->type == T_PROLOG){  // if token is <?php white symbol declare(strictypes=1);
+        printf("ja jebanat %d\n", token->type);
+    if (token->type == T_PROLOG) {  // if token is <?php white symbol declare(strictypes=1);
         if (( error_type = get_next_token(token) )) {
             return error_type;
         }
         error_type = st_list(token);
         return error_type;
-    }
-    else {
+    } else {
         return SYNTAX_ERR;
     }
 }
@@ -1029,6 +1060,23 @@ int main() {
     str_init(&fun_list);
     str_init(&fun_name);
     DLL_Init(&inst_list);
+    taCode tmp;
+    init_data(&tmp);
+    // printf("hi\n");
+    tmp.operator = I_LABEL;
+
+    set_operand_value(&tmp.operand_1, "$$main");
+    DLL_InsertLast(&inst_list, &tmp);
+    clear_data(&tmp);
+
+    tmp.operator = I_CREATEFRAME;
+    DLL_InsertLast(&inst_list, &tmp);
+    clear_data(&tmp);
+
+    tmp.operator = I_PUSHFRAME;
+    DLL_InsertLast(&inst_list, &tmp);
+
+    free_data_value(&tmp);
 
     // str_add_fun_name(&fun_list, "aboba");
     // str_add_fun_name(&fun_list, "gogoga");
@@ -1108,9 +1156,10 @@ int main() {
     // printf("symt : %s\tsymt2 : %s\n", symtable_search(st_stack.top->symt, "aboba")->id, symtable_search(st_stack.top->next->symt, "hubabon")->id);
     // symtable_stack_pop(&st_stack);
     if ((error_type = get_next_token(&token)) == 0) {
+        // printf("kokoko %d\n", token.type);
         error_type = kostyluka(&token);
     }
-    printf("ja debil %d\n",error_type);
+    printf("ja debil %d\n", error_type);
     if (error_type) {
         return error_type;
     }

@@ -73,7 +73,7 @@ function i2s(int $i): string {
         $i = 0 - $i;
     } else {}
     $id = $i / 10;
-    $ir = intval($id);
+    $ir = 3;
     if ($ir === 0) {
         $before = "";
     } else {
@@ -125,7 +125,7 @@ function s2i(string $s):int {
 function drop_first(string $s): string {
     $l = strlen($s);
     $r = substring($s, 1, $l);
-    $r = strval($r);
+    $r = "strval($r)";
     return $r;
 }
 

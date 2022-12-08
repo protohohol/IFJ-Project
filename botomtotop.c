@@ -489,6 +489,8 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
             } else if (op1->etype == ET_STRING) {
                 // printf("hi3\n");
                 *type = ET_STRING;
+            } else if (op1->etype == ET_NULL) {
+                *type = ET_NULL;
             }
             // data.operand_1.type = exp_to_data(op1->etype);
             // set_operand_value(&data.operand_1, op1->value); // dobavit proverku blya po bratski realno nado
@@ -505,8 +507,12 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
             // printf("t1 : %d\tt2 : %d\tt3 : %d\n", op1->etype, op2->etype, op3->etype);
             if (op1->etype == ET_INT && op3->etype == ET_INT) {
                 *type = ET_INT;
-            } else if (op1->etype == ET_FLOAT && op2->etype == ET_FLOAT) {
+                free_data_value(&data);
+                return NO_ERR;
+            } else if (op1->etype == ET_FLOAT && op3->etype == ET_FLOAT) {
                 *type = ET_FLOAT;
+                free_data_value(&data);
+                return NO_ERR;
             } else if ((op1->etype == ET_INT || op1->etype == ET_FLOAT) && (op3->etype == ET_INT || op3->etype == ET_FLOAT)) {
                 if (op1->etype == ET_INT) {
 
@@ -604,6 +610,7 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
         case (R_CON):
             if (op1->etype == ET_STRING && op3->etype == ET_STRING) {
                 free_data_value(&data);
+                *type = ET_STRING;
                 return NO_ERR;
             } else {
                 free_data_value(&data);
@@ -612,6 +619,13 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
 
         case (R_DIV):
             if (op1->etype == ET_FLOAT && op3->etype == ET_FLOAT) {
+                *type = ET_FLOAT;
+                // generate
+                return NO_ERR;
+            } else if (op1->etype == ET_INT && op3->etype == ET_INT) {
+                *type = ET_FLOAT;
+                return NO_ERR;
+                //generate(retype)
             } else if (op1->etype == ET_INT && op3->etype == ET_FLOAT) {
 
                 data.operator = I_MOVE;
@@ -760,14 +774,12 @@ int rule_test (int count, item_stack_t * op1, item_stack_t * op2, item_stack_t *
     } else {
         if( ( error_type = check_sem ( rule, op1, op2, op3, &tmptype ) ) ){
             return error_type;
-        } else if ( ( rule == R_ADD ) && ( tmptype == ET_STRING) ) {
-            // tac_generate();
         } else {
             // tac_generate();
         }
         string s;
         str_init(&s);
-        if (op1->value != NULL) {
+        if (op1->value != NULL && rule == R_ID) {
             // printf("jeste ne pizda\n");
             str_add_more_chars(&s, op1->value);
         }
@@ -854,6 +866,7 @@ int expression (token_t * token) {
         case C_MORE:
             printf("i am in C_MORE\n");
             printf("push more : %d\n", get_top(&exp_stack)->etype);
+            printf("symbol : %d\tvalue : %s\n", get_top(&exp_stack)->symbol, get_top(&exp_stack)->value);
             found = find_catch(&count, &exp_stack);
             if (found && ( count == 3)) {
                 op_1 = exp_stack.top->next->next;
