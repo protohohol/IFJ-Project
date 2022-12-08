@@ -1,5 +1,11 @@
 #include "botomtotop.h"
-
+/*
+IFJ projekt 2022
+xtiemn00: Vsevolod Tiemnohorov
+xpetro27: Denys Petrovsyi
+xbatur00: Illia Baturov
+xshish02: Sviatoslav Shishnev
+*/
 symtable* symt_l;
 char* id;
 bool ass_flag;
