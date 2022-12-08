@@ -127,6 +127,18 @@ void codeStart() {
 		INT2CHAR LF@$chr$return LF@%%0\n\
 		POPFRAME\n\
 		RETURN\n\
+	\n\
+	LABLE $write\n\
+		PUSHFRAME\n\
+		DEFVAR LF@$write$var\n\
+		LABEL $write$loop\n\
+		POPS LF@$write$var\n\
+		JUMPIFEQ $write$end LF@$write$var nil@nil\n\
+		WRITE LF@$write$var\n\
+		JUMP $write$loop\n\
+		LABLE $write$end\n\
+		POPFRAME\n\
+		RETURN\n\
 	");
 }
 

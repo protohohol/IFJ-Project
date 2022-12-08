@@ -11,7 +11,6 @@ int kostyluka (token_t * token);
 
 int f_param_kostylga ( token_t * token );
 
-
 int st_list ( token_t * token );
 
 int define ( token_t * token );
