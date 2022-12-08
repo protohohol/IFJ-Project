@@ -3,7 +3,6 @@
 symtable* symt_l;
 char* id;
 bool ass_flag;
-// bool par_flag;
 exp_type* type;
 DLList* i_list;
 string* f_name;
@@ -23,10 +22,6 @@ void set_id (char* source) {
 void set_flag(bool source) {
     ass_flag = source;
 }
-
-// void set_par(bool source) {
-//     par_flag = source;
-// }
 
 void set_type(exp_type* source) {
     type = source;
@@ -431,7 +426,6 @@ int convert_to_type ( token_t * token ) {
         if ((tmp = symtable_search(symt_l, token->data.string_c->str)) != NULL) {
             return data_to_exp(tmp->type);
         } else {
-            printf("мы в пизде\n");
             return ET_UNDEFINED;
         }
     case T_INT_VAL:
@@ -468,16 +462,6 @@ bool find_catch ( int * count , sstack_t * sstack) {
     return flag;
 }
 
-void tac_generate (instructions instruction, item_stack_t * op1, item_stack_t * op2, item_stack_t * op3) {
-    // taCode data;
-    // switch (instruction) {
-    //     case (I_DEFVAR):
-    //         data.operand_1.type = exp_to_data(op1->etype);
-    //         data.operand_1.value = 
-    // }
-    return;
-}
-
 int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stack_t * op3, exp_type * type) {
     taCode data;
     init_data(&data);
@@ -490,27 +474,17 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
             } else if (op1->etype == ET_INT) {
                 *type = ET_INT;
             } else if (op1->etype == ET_FLOAT) {
-                // printf("hi2\n");
                 *type = ET_FLOAT;
             } else if (op1->etype == ET_STRING) {
-                // printf("hi3\n");
                 *type = ET_STRING;
             } else if (op1->etype == ET_NULL) {
                 *type = ET_NULL;
             }
-            // data.operand_1.type = exp_to_data(op1->etype);
-            // set_operand_value(&data.operand_1, op1->value); // dobavit proverku blya po bratski realno nado
-            // data.operator = I_DEFVAR;
-            // DLL_InsertLast(i_list, &data);
-            // taCode tmp;
-            // DLL_GetLast(i_list, &tmp);
-            // printf("\t\t\t\t\t\ttestim jebat : %s\t\t\t\t\top : %s\t\t\t\t\t\tdata : %s\n", tmp.operand_1.value, op1->value, data.operand_1.value);
             free_data_value(&data);
             return NO_ERR;
         case (R_MUL):
         case (R_SUB):
         case (R_ADD):
-            // printf("t1 : %d\tt2 : %d\tt3 : %d\n", op1->etype, op2->etype, op3->etype);
             if (op1->etype == ET_INT && op3->etype == ET_INT) {
                 *type = ET_INT;
             } else if (op1->etype == ET_FLOAT && op3->etype == ET_FLOAT) {
@@ -566,9 +540,6 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                         DLL_Next(i_list);
                     }
                     clear_data(&data);
-                    // taCode tmp;
-                    // DLL_GetLast(i_list, &tmp);
-                    // printf("\t\t\t\t\t\t\t\t\ttmp : %s\n", tmp.operand_1.value);
 
                     data.operator = I_INT2FLOAT;
                     set_operand_value(&data.result, "tmp2");
@@ -579,7 +550,6 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                     if (*ptr == '\0') {
                         data.operand_1.type = D_FLOAT;
                     } else {
-                        // printf("\t\t\t\t\t\t\t\tptttr : %c\n", *ptr);
                         data.operand_1.frame = F_GF;
                     }
                     if (f_name->str[0] == '\0') {
@@ -590,13 +560,11 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                         DLL_Next(i_list);
                     }
                     clear_data(&data);
-
-                    // generate(retype(op3, float));
                 }
                 *type = ET_FLOAT;
             } else {
                 free_data_value(&data);
-                return SEM_ERR_TYPE_COMPAT; // надо поменять все ретерны на запись в переменной или добавить фри перед каждым ретерном
+                return SEM_ERR_TYPE_COMPAT;
             }
 
             if (rule == R_MUL) {
@@ -639,7 +607,6 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                 } else {
                     data.operand_1.frame = F_LF;
                 }
-                // *ptr = '\0';
                 set_operand_value(&data.operand_2, op3->value);
                 strtol(data.operand_2.value, &ptr, 10);
                 if (*ptr == '\0') {
@@ -709,7 +676,6 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                 if (*ptr == '\0') {
                     data.operand_1.type = exp_to_data(ET_INT);
                 } else {
-                    // printf("\t\t\t\t\t\t\t\tptr : %c\n", *ptr);
                     data.operand_1.frame = F_LF;
                 }
                 if (f_name->str[0] == '\0') {
@@ -921,7 +887,6 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                 } else {
                     data.operand_1.frame = F_LF;
                 }
-                // *ptr = '\0';
                 set_operand_value(&data.operand_2, op3->value);
                 strtol(data.operand_2.value, &ptr, 10);
                 if (*ptr == '\0') {
@@ -967,13 +932,11 @@ int rule_test (int count, item_stack_t * op1, item_stack_t * op2, item_stack_t *
     } else if ( count == 3 ) {
         if ( (op1->symbol == ES_LEFT_BRACKET) & (op2->symbol == ES_NON_TERM) & (op3->symbol == ES_RIGHT_BRACKET) ) {
             rule =  R_PAR;
-            printf("par\n");
         } else if ( op1->symbol == ES_NON_TERM && op3->symbol == ES_NON_TERM ) {
             switch ( op2->symbol )
             {
             case ES_PLUS:
                 rule = R_ADD;
-                printf("ADD\n");
                 break;
             case ES_MINUS:
                 rule = R_SUB;
@@ -982,14 +945,12 @@ int rule_test (int count, item_stack_t * op1, item_stack_t * op2, item_stack_t *
                 rule = R_CON;
                 break;
             case ES_MUL:
-                printf("MUL\n");
                 rule = R_MUL;
                 break;
             case ES_DIV:
                 rule = R_DIV;
                 break;
             case ES_EQ:
-                printf("EQ\n");
                 rule = R_EQ;
                 break;
             case ES_NEQ:
@@ -1022,22 +983,14 @@ int rule_test (int count, item_stack_t * op1, item_stack_t * op2, item_stack_t *
     } else {
         if( ( error_type = check_sem ( rule, op1, op2, op3, &tmptype ) ) ){
             return error_type;
-        } else {
-            // tac_generate();
         }
         string s;
         str_init(&s);
         if (op1->value != NULL && rule == R_ID) {
-            // printf("jeste ne pizda\n");
             str_add_more_chars(&s, op1->value);
         }
         stack_pop_mult(exp_stack,count+1);
-        // printf("string : %s\n", s.str);
-        // if (op1 != NULL) {
-        //     printf("op1122 val : %s\n", op1->value);
-        // }
         if (rule == R_ID) {
-            // printf("op : %s\n", op1->value);
             stack_push(exp_stack, ES_NON_TERM, tmptype, s.str);
             str_free(&s);
         } else {
@@ -1049,7 +1002,6 @@ int rule_test (int count, item_stack_t * op1, item_stack_t * op2, item_stack_t *
 } 
 
 int expression (token_t * token) {
-    printf("i am in expressions\n");
     int error_type;
     sstack_t exp_stack;
     stack_init(&exp_stack);
@@ -1067,21 +1019,15 @@ int expression (token_t * token) {
     if (ass_flag) {
         ass_flag = false;
         htab_data_t* item = symtable_search(symt_l, id);
-        printf("id : %s\n", id);
-        // if (item == NULL) {
-        //     printf("hi\n");
-        // }
         stack_push_after(&exp_stack, ES_CATCH, ET_UNDEFINED, NULL);
         stack_push(&exp_stack, ES_ID, data_to_exp(item->type), item->id);
     }
     while( !( ( convert_to_symbol(token) == ES_END ) && ( ( get_top_term(&exp_stack) )->symbol == ES_END ) ) ) {
-        //printf( "%d\n",(get_top_term(&exp_stack) )->symbol);
         switch (get_cond(token, &exp_stack)) {
         case C_EQ:
-            // printf("i am in C_EQ\n");
             tmp_sym = convert_to_symbol(token);
             tmp_type = convert_to_type(token);
-            stack_push(&exp_stack, tmp_sym, tmp_type, token->data.string_c->str); // TUT PROVERKU DOBAV JESTLI NE VPADLU
+            stack_push(&exp_stack, tmp_sym, tmp_type, token->data.string_c->str);
             if ( ( error_type = get_next_token(token) ) ) {
                 free_data_value(&data);
                 stack_dispose(&exp_stack);
@@ -1089,22 +1035,14 @@ int expression (token_t * token) {
             }
             break;
         case C_LESS:
-            printf("i am in C_LESS\n");
             stack_push_after(&exp_stack, ES_CATCH, ET_UNDEFINED, NULL);
-            printf("token type : %d\n", token->type);
             tmp_sym = convert_to_symbol(token);
-            printf("token type : %d\n", token->type);
             tmp_type = convert_to_type(token);
-            printf("token type : %d\n", token->type);
-            // printf("tmp_type : %d\n", tmp_type);
             if (token->type == T_VAR_ID || token->type == T_STRING_VAL || token->type == T_DEC_VAL || token->type == T_INT_VAL) {
-                // printf("\t\t\t\t\t\t\t\t\ttoken str val : %s\n", token->data.string_c->str);
                 stack_push(&exp_stack, tmp_sym, tmp_type, token->data.string_c->str);
             } else {
                 stack_push(&exp_stack, tmp_sym, tmp_type, NULL);
             }
-            // printf("push string : %s\n", get_top(&exp_stack)->value);
-            // printf("push : %d\n", get_top(&exp_stack)->etype);
             if ( ( error_type = get_next_token(token) ) ) {
                 free_data_value(&data);
                 stack_dispose(&exp_stack);
@@ -1112,29 +1050,18 @@ int expression (token_t * token) {
             }
             break;
         case C_MORE:
-            printf("i am in C_MORE\n");
-            printf("push more : %d\n", get_top(&exp_stack)->etype);
-            printf("symbol : %d\tvalue : %s\n", get_top(&exp_stack)->symbol, get_top(&exp_stack)->value);
             found = find_catch(&count, &exp_stack);
             if (found && ( count == 3)) {
                 op_1 = exp_stack.top->next->next;
                 op_2 = exp_stack.top->next;
                 op_3 = exp_stack.top;
-                // printf("op1 : %d\top2 : %d\top3 : %d\n", op_1->etype, op_2->etype, op_3->etype);
                 if ( ( error_type = rule_test ( count, op_1, op_2, op_3, &exp_stack ) ) ) {
                     free_data_value(&data);
                     stack_dispose(&exp_stack);
                     return error_type;
                 }
-                //printf( "%d\n",(get_top_term(&exp_stack) )->symbol);
             } else if ( found && ( count == 1 ) ) {
-                // printf("push string : %s\n", get_top(&exp_stack)->value);
                 op_1 = get_top(&exp_stack);
-                // if (op_1 != NULL) {
-                //     printf("op val : %s\n", op_1->value);
-                // }
-                // printf("stack top type : %d\n", op_1->etype);
-                // printf("op1 else if: %d\n", op_1->etype);
                 if ( ( error_type = rule_test ( count, op_1, NULL, NULL, &exp_stack ) ) ) {
                     free_data_value(&data);
                     stack_dispose(&exp_stack);
@@ -1148,7 +1075,6 @@ int expression (token_t * token) {
             }
             break;
         case C_NONE:
-            // printf("i am in C_NONE\n");
             if (( ( get_top_term(&exp_stack) )->symbol != ES_END )) {
                 free_data_value(&data);
                 stack_dispose(&exp_stack);
@@ -1184,7 +1110,6 @@ int expression (token_t * token) {
         data.operand_1.type = exp_to_data(tmp1->etype);
         data.result.frame = F_GF;
         set_operand_value(&data.result, "tmp1");
-// printf("hihihihi\n");
         if (f_name->str[0] == '\0') {
             DLL_InsertLast(i_list, &data);
         } else {
@@ -1194,12 +1119,7 @@ int expression (token_t * token) {
         }
         clear_data(&data);
     }
-    // item_stack_t* tmp1;
-    // if ((tmp1 = get_top(&exp_stack)) != NULL) {
-    //     printf("type : %d\tvalue : %s\n", tmp1->etype, tmp1->value);
-    // }
     stack_dispose(&exp_stack);
     free_data_value(&data);
-    // printf("tt : %d\n", token->type);
     return NO_ERR;
 }

@@ -78,9 +78,6 @@ const int get_next_token(token_t *token) {
 
     while (true) {
         c = getc(source);
-        // str_clear(token->data.string_c);
-        // printf("s len : %d\n", s->allocSize);
-        // printf("c : %d\ns : %s\n", c, s->str);
 
         switch (state) {
             case (S_START):
@@ -225,8 +222,6 @@ const int get_next_token(token_t *token) {
                         return ERROR_INTERNAL;
                     }
                 } else if (c == '\"') {
-                    // printf("hi\n");
-                    // printf("t.d.s.l : \ns.l : %d\n", token->data->string_c->length, s->allocSize);
                     if (!str_copy_string(token->data.string_c, s)) {
                         str_free(s);
                         return ERROR_INTERNAL;
@@ -238,7 +233,6 @@ const int get_next_token(token_t *token) {
                     str_free(s);
                     return LEX_ERR;
                 } else if (c == '\\') {
-                    // printf("@@hi1\n");
                     state = S_ESC;
                 } else {
                     str_free(s);
@@ -254,7 +248,6 @@ const int get_next_token(token_t *token) {
                     }
                     state = S_STRING;
                 } else if (c == 'n') {
-                    // printf("hi1\n");
                     if (!str_add_char(s, '\n')) {
                         str_free(s);
                         return ERROR_INTERNAL;
@@ -430,8 +423,6 @@ const int get_next_token(token_t *token) {
                 } else {
                     ungetc(c, source);
                     token->type = T_INT_VAL;
-                    // printf("t.d.s.l : %d\n", token->data->string_c->length);
-                    // token->data.int_c = atoi(s->str);
                     if (!str_copy_string(token->data.string_c, s)) {
                         str_free(s);
                         return ERROR_INTERNAL;
@@ -511,7 +502,6 @@ const int get_next_token(token_t *token) {
                 break;
 
             case (S_START_SYMBOL):
-                // printf("c : %c\ts : %s\tlen : %d\n", c, s->str, s->length);
                 if (s->length < 5) {
                     if (!str_add_char(s, c)) {
                         str_free(s);
@@ -525,38 +515,16 @@ const int get_next_token(token_t *token) {
                         return SYNTAX_ERR;
                     }
                     if (ftell(source) != 5) {
-                        // printf("ftell : %ld\n", ftell(source));
                         str_free(s);
                         return SYNTAX_ERR;
                     }
                     token->type = T_START_SYMBOL;
                     state = S_START;
-                    // token->type = T_START_SYMBOL;
-                    // str_free(s);
-                    // return NO_ERR;
                 } else {
                     str_free(s);
                     return LEX_ERR;
                 }
                 break;
-
-            // case (S_START_SYMBOL_COMMENT):
-            //     if (c == '/') {
-            //         state = S_START_SYMBOL_L_C;
-            //     } else if (c == '*') {
-            //         state = S_START_SYMBOL_B_C;
-            //     } else {
-            //         str_free(s);
-            //         return LEX_ERR;
-            //     }
-
-            // case (S_START_SYMBOL_L_C) {
-            //     if (c == EOL) {
-            //         state = S_START_SYMBOL_CONT;
-            //     } else {
-
-            //     }
-            // }
 
             case (S_END_SYMBOL):
                 if (c == '>') {
@@ -671,20 +639,6 @@ const int get_next_token(token_t *token) {
                 }
                 break;
 
-            // case (S_KW_FUN_START):
-            //     if(isalpha(c) || c == '_') {
-            //         if (!str_add_char(s, c)) {
-            //             str_free(s);
-            //             return ERROR_INTERNAL;
-            //         }
-            //         state = S_KW_FUN;
-            //     } else {
-            //         ungetc(c, source);
-            //         str_free(s);
-            //         return LEX_ERR;
-            //     }
-            //     break;
-
             case (S_KW_FUN):
                 if (isalnum(c) || c == '_') {
                     if (!str_add_char(s, c)) {
@@ -698,7 +652,6 @@ const int get_next_token(token_t *token) {
                             return ERROR_INTERNAL;
                         }
                     } else {
-                        // printf("s : %s\n", s->str);
                         if (!str_cmp_const_str(s, "<?phpdeclare(strict_types=1);")) {
                             str_free(s);
                             token->type = T_PROLOG;

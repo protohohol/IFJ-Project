@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 $b = 1;
 $c = 5;
+$i = readi();
 
 if ($c < $b) {
     $a = $b/$c;
