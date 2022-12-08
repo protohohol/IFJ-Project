@@ -1,21 +1,23 @@
 <?php
 declare(strict_types=1);
 
-$y = foo(3, 4);
+$b = 1;
+$c = 5;
+
+if ($c < $b) {
+    $a = $b/$c;
+}
+
+/*
+foo(5, 6);
+
+$a = 3;
+$b = 4;
+
+$y = foo($a, $b);
 
 function foo(int $i, int $j) : int {
-
-    return $i + $j;
+    foo(7, 8);
 }
-
-$a = (3.1+1.1/3.3)/2.0;
-$a = ($a + 2.0/$a)/2.0;
-$b = 3/$a;
-
-while($a>0){
-    $a = $a - 1;
-}
-
-$txt = "PHP";
-
+*/
 ?>

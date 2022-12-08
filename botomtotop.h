@@ -43,5 +43,6 @@ void set_flag(bool source);
 void set_type(exp_type* source);
 void set_inst_list(DLList* source);
 void tac_generate (instructions rule, item_stack_t * op1, item_stack_t * op2, item_stack_t * op3);
+void set_fun_name(string* source);
 
 #endif

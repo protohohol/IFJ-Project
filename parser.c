@@ -83,10 +83,14 @@ data_type convert_to_d_type(token_t* token) {
         case (T_KW_VOID):
             return D_VOID;
         case (T_VAR_ID):
-            printf("hi\n");
-            return symtable_search(symt_stack.active->symt, token->data.string_c->str)->type;
+            // printf("hi\n");
+            if (fun_name.str[0] == '\0') {
+                return symtable_search(symt_stack.top->symt, token->data.string_c->str)->type;
+            } else {
+                return symtable_search(symt_stack.active->symt, token->data.string_c->str)->type;
+            }
         default:
-            return -1; // error
+            return 550; // error
     }
 }
 
@@ -243,6 +247,11 @@ int f_state ( token_t * token ) {
     set_type(&final_type);
 
     switch (token->type) {
+        case (T_INT_VAL):
+        case (T_STRING_VAL):
+        case (T_DEC_VAL):
+        case (T_PAR_LEFT):
+            return expression(token);
         
         case (T_KW_RETURN):
             // set_symtable(symt_stack.active->symt);
@@ -300,9 +309,10 @@ int f_state ( token_t * token ) {
             if(fun_name.str[0]== '\0') {
                 if( (tmp = symtable_search(symt_stack.top->symt, token->data.string_c->str) ) == NULL ) {
                 // printf("### : %s\n", token->data.string_c->str);
-                tmp = symtable_insert(symt_stack.top->symt, token->data.string_c->str);
+                    printf("\t\t\t\t\t\t\t\tjaskflashjlkfjsklfjsklfjasklfjsklfj\n");
+                    tmp = symtable_insert(symt_stack.top->symt, token->data.string_c->str);
                 } else {
-                f_flag = true;
+                    f_flag = true;
                 }
             } else {
                 if( (tmp = symtable_search(symt_stack.active->symt, token->data.string_c->str) ) == NULL ) {
@@ -316,6 +326,22 @@ int f_state ( token_t * token ) {
                 return error_type;
             }
             if (token->type == T_ASSIGN) {
+                printf("\t\t\t\t\t\t\t\tfufufufufufufufufu%s\n", fun_name.str);
+                if (!f_flag) {
+                    printf("\t\t\t\t\t\tja eblan\n");
+                    data_glob.operator = I_DEFVAR;
+                    data_glob.operand_1.frame = F_LF;
+                    set_operand_value(&data_glob.operand_1, tmp->id);
+                    if (fun_name.str[0] != '\0') {
+                        DLL_InsertAfter(&inst_list, &data_glob);
+                        DLL_Next(&inst_list);
+                    } else {
+                        DLL_InsertLast(&inst_list, &data_glob);
+                    }
+                    clear_data(&data_glob);
+
+                }
+
                 // printf("ja jebasos tok : %s\ttype : %d\n", token->data.string_c->str, token->type);
                 if (( error_type = get_next_token(token) )) {
                     return error_type;
@@ -332,9 +358,27 @@ int f_state ( token_t * token ) {
                     if((item_tmp = symtable_search(symt_stack.top->symt, token->data.string_c->str)) == NULL) {
                         return SEM_ERR_UNDEFINED_FUNCTION;
                     } else {
-                        int i = declare(token);
-                        printf("that's okay, %d %d i : %d\n",tmp->type, item_tmp->type, i);
                         symtable_add_type(tmp, item_tmp->type);
+
+                        data_glob.operator = I_CREATEFRAME;
+                        DLL_InsertAfter(&inst_list, &data_glob);
+                        clear_data(&data_glob);
+
+                        DLL_Next(&inst_list);
+
+                        int i = declare(token);
+                        printf("that's okay, %d %d i : %d\n", tmp->type, item_tmp->type, i);
+
+                        data_glob.operator = I_MOVE;
+                        set_operand_value(&data_glob.result, tmp->id);
+                        data_glob.result.frame = F_LF;
+                        set_operand_value(&data_glob.operand_1, "$$$ret_val");
+                        data_glob.operand_1.frame = F_TF;
+                        DLL_InsertAfter(&inst_list, &data_glob);
+                        clear_data(&data_glob);
+
+                        DLL_Next(&inst_list);
+
                         return i;
                     }
                     return SEM_ERR_OTHER;
@@ -343,6 +387,34 @@ int f_state ( token_t * token ) {
                     int result = expression(token);
                     if (result == NO_ERR) {
                         symtable_add_type(tmp, ( convert_exp_to_d_type (final_type) ));
+
+                        data_glob.operator = I_MOVE;
+                        set_operand_value(&data_glob.result, tmp->id);
+                        data_glob.result.frame = F_LF;
+                        set_operand_value(&data_glob.operand_1, "tmp1");
+                        data_glob.operand_1.frame = F_GF;
+                        if (fun_name.str[0] != '\0') {
+                            DLL_InsertAfter(&inst_list, &data_glob);
+                            DLL_Next(&inst_list);
+                        } else {
+                            DLL_InsertLast(&inst_list, &data_glob);
+                        }
+                        clear_data(&data_glob);
+
+                        data_glob.operator = I_MOVE;
+                        set_operand_value(&data_glob.result, "tmp1");
+                        data_glob.result.frame = F_GF;
+                        data_glob.operand_1.type = D_VOID;
+                        set_operand_value(&data_glob.operand_1, "nil");
+                        if (fun_name.str[0] != '\0') {
+                            DLL_InsertAfter(&inst_list, &data_glob);
+                            DLL_Next(&inst_list);
+                        } else {
+                            DLL_InsertLast(&inst_list, &data_glob);
+                        }
+                        clear_data(&data_glob);
+
+
                         // printf("############tmp : %d\n", tmp->type);
                         // generate_code("=,E_last,NULL,tmp"); псведокод
                     }
@@ -370,18 +442,21 @@ int f_state ( token_t * token ) {
             // if (( error_type = get_next_token(token) )) {
             //     return error_type;
             // }
-            if (fun_name.str[0] == '\0') {
-                if (symtable_search(symt_stack.top->symt, token->data.string_c->str) == NULL) {
-                    return SEM_ERR_UNDEFINED_FUNCTION;
-                } else {
-                    return declare(token);
-                }
+            if (symtable_search(symt_stack.top->symt, token->data.string_c->str) == NULL) {
+                return SEM_ERR_UNDEFINED_FUNCTION;
             } else {
-                if (symtable_search(symt_stack.active->symt, token->data.string_c->str) == NULL) {
-                    return SEM_ERR_UNDEFINED_FUNCTION;
+                data_glob.operator = I_CREATEFRAME;
+                if (fun_name.str[0] != '\0') {
+                    DLL_InsertAfter(&inst_list, &data_glob);
+                    DLL_Next(&inst_list);
                 } else {
-                    return declare(token);
+                    DLL_InsertLast(&inst_list, &data_glob);
                 }
+                clear_data(&data_glob);
+
+                int dec_ret = declare(token);
+
+                return dec_ret;
             }
             break;
 
@@ -482,6 +557,7 @@ int f_list ( token_t * token ) {
         case (T_INT_VAL):
         case (T_STRING_VAL):
         case (T_DEC_VAL):
+        case (T_PAR_LEFT):
         case (T_KW_RETURN):
         case (T_VAR_ID):
         case (T_FUN_ID):
@@ -537,8 +613,36 @@ int f_param_declare ( token_t * token ) {
             printf("bombom\n");
             return SEM_ERR_WRONG_PARAM;
         }
+
         data_type data_tmp;
-        if (token->type == T_VAR_ID) {   
+        if (token->type == T_VAR_ID) {
+            printf("\t\t\t\t\t\t\tja pidoras\n");
+
+
+            char* c_tmp = (char*) malloc(256 * __CHAR_BIT__);
+            if (c_tmp == NULL) {
+                return ERROR_INTERNAL;
+            }
+
+            sprintf(c_tmp, "%%%d", param_counter);
+
+            data_glob.operator = I_DEFVAR;
+            data_glob.operand_1.frame = F_TF;
+            set_operand_value(&data_glob.operand_1, c_tmp);
+            DLL_InsertLast(&inst_list, &data_glob);
+            clear_data(&data_glob);
+
+            data_glob.operator = I_MOVE;
+            data_glob.result.frame = F_TF;
+            set_operand_value(&data_glob.result, c_tmp);
+            data_glob.operand_1.frame = F_LF;
+            // printf("\t\t\t\t\t\t\tja svinorez\n");
+            set_operand_value(&data_glob.operand_1, token->data.string_c->str);
+            DLL_InsertLast(&inst_list, &data_glob);
+            clear_data(&data_glob);
+
+            free(c_tmp);
+
             /*
             По-хорошему надо добавить проверочки в серчи
             */
@@ -561,6 +665,52 @@ int f_param_declare ( token_t * token ) {
                 printf("str : %s\ttype : %d\n", token->data.string_c->str, data_tmp);
             }
         } else {
+            printf("\t\t\t\t\t\t\tja govnojed\n");
+
+            char* c_tmp = (char*) malloc(256 * __CHAR_BIT__);
+            if (c_tmp == NULL) {
+                return ERROR_INTERNAL;
+            }
+
+
+            sprintf(c_tmp, "%%%d", param_counter);
+
+            if (fun_name.str[0] == '\0') {
+                data_glob.operator = I_DEFVAR;
+                data_glob.operand_1.frame = F_TF;
+                set_operand_value(&data_glob.operand_1, c_tmp);
+                DLL_InsertLast(&inst_list, &data_glob);
+                clear_data(&data_glob);
+
+                data_glob.operator = I_MOVE;
+                data_glob.result.frame = F_TF;
+                set_operand_value(&data_glob.result, c_tmp);
+                data_glob.operand_1.type = convert_to_d_type(token);
+                set_operand_value(&data_glob.operand_1, token->data.string_c->str);
+                DLL_InsertLast(&inst_list, &data_glob);
+                clear_data(&data_glob);
+            } else {
+                data_glob.operator = I_DEFVAR;
+                data_glob.operand_1.frame = F_TF;
+                set_operand_value(&data_glob.operand_1, c_tmp);
+                DLL_InsertAfter(&inst_list, &data_glob);
+                clear_data(&data_glob);
+
+                DLL_Next(&inst_list);
+
+                data_glob.operator = I_MOVE;
+                data_glob.result.frame = F_TF;
+                set_operand_value(&data_glob.result, c_tmp);
+                data_glob.operand_1.type = convert_to_d_type(token);
+                set_operand_value(&data_glob.operand_1, token->data.string_c->str);
+                DLL_InsertAfter(&inst_list, &data_glob);
+                clear_data(&data_glob);
+
+                DLL_Next(&inst_list);
+            }
+
+            free(c_tmp);
+
             printf("%d\n", token->type);
             data_tmp = convert_to_d_type(token);
             printf("%d\n", data_tmp);
@@ -617,9 +767,29 @@ int f_plist_declare( token_t * token ) {
             }
         }
         param_counter = 0;
-        if (tmp != NULL) {
-            free(tmp);
+
+        char* tmp_c;
+
+        if (fun_name.str[0] == '\0') {
+            data_glob.operator = I_CALL;
+            str_get_last_fun_name(&fun_list, &tmp_c);
+            set_operand_value(&data_glob.operand_1, tmp_c);
+            DLL_InsertLast(&inst_list, &data_glob);
+            clear_data(&data_glob);
+        } else {
+            data_glob.operator = I_CALL;
+            str_get_last_fun_name(&fun_list, &tmp_c);
+            set_operand_value(&data_glob.operand_1, tmp_c);
+            DLL_InsertAfter(&inst_list, &data_glob);
+            clear_data(&data_glob);
+
+            DLL_Next(&inst_list);
         }
+
+        if (tmp_c != NULL) {
+            free(tmp_c);
+        }
+
         if (( error_type = get_next_token(token) )) {
             return error_type;
         }
@@ -640,6 +810,35 @@ int f_param ( token_t * token ) {
             return error_type;
         }
         if (token->type == T_VAR_ID) {
+
+            char* c_tmp = (char*) malloc(256 * __CHAR_BIT__);
+            if (c_tmp == NULL) {
+                return ERROR_INTERNAL;
+            }
+
+            sprintf(c_tmp, "%%%d", param_counter);
+
+            data_glob.operator = I_DEFVAR;
+            data_glob.operand_1.frame = F_LF;
+            set_operand_value(&data_glob.operand_1, token->data.string_c->str);
+            DLL_InsertAfter(&inst_list, &data_glob);
+            clear_data(&data_glob);
+
+            DLL_Next(&inst_list);
+
+            data_glob.operator = I_MOVE;
+            data_glob.result.frame = F_LF;
+            set_operand_value(&data_glob.result, token->data.string_c->str);
+            data_glob.operand_1.frame = F_LF;
+            // printf("\t\t\t\t\t\t\tja svinorez\n");
+            set_operand_value(&data_glob.operand_1, c_tmp);
+            DLL_InsertAfter(&inst_list, &data_glob);
+            clear_data(&data_glob);
+
+            DLL_Next(&inst_list);
+
+            free(c_tmp);
+
             htab_data_t* item = symtable_insert(symt_stack.active->symt, token->data.string_c->str);
             symtable_add_type(item, tmp);
             param_counter++;
@@ -676,11 +875,12 @@ int f_plist( token_t * token ) {
     } else if ( token->type == T_PAR_RIGHT ) {
         htab_data_t* tmp;
         if((tmp = symtable_search(symt_stack.top->symt,fun_name.str))){
-            tmp->argumets_amount= param_counter;
+            tmp->argumets_amount = param_counter;
         } else {
             return ERROR_INTERNAL;
         }
         param_counter = 0;
+
         if (( error_type = get_next_token(token) )) {
             return error_type;
         }
@@ -697,7 +897,7 @@ int declare(token_t * token) {
     if (symtable_search(symt_stack.top->symt, tmp) == NULL) {
         return SEM_ERR_UNDEFINED_FUNCTION;
     } else {
-        str_add_fun_name(&fun_list,tmp);
+        str_add_fun_name(&fun_list, tmp);
     }
     if (( error_type = get_next_token(token) )) { // here we skip function fun_id token
         return error_type;
@@ -739,6 +939,7 @@ int state(token_t * token) {
         case (T_INT_VAL):
         case (T_STRING_VAL):
         case (T_DEC_VAL):
+        case (T_PAR_LEFT):
             return expression(token);
         case (T_KW_RETURN):
             //generate_code("return", NULL, NULL, );
@@ -770,10 +971,20 @@ int state(token_t * token) {
             } else {
                 f_flag = true;
             }
+
             if (( error_type = get_next_token(token) )) {
                 return error_type;
             }
             if (token->type == T_ASSIGN) {
+                
+                if (!f_flag) {
+                    data_glob.operator = I_DEFVAR;
+                    data_glob.operand_1.frame = F_LF;
+                    set_operand_value(&data_glob.operand_1, tmp->id);
+                    DLL_InsertLast(&inst_list, &data_glob);
+                    clear_data(&data_glob);
+                }
+
                 if (( error_type = get_next_token(token) )) {
                     return error_type;
                 }
@@ -786,23 +997,44 @@ int state(token_t * token) {
                     } else {
                         symtable_add_type(tmp, item_tmp->type);
 
-                        data_glob.operator = I_DEFVAR;
-                        data_glob.operand_1.frame = F_LF;
-                        set_operand_value(&data_glob.operand_1, tmp->id);
-                        DLL_InsertLast(&inst_list, &data_glob);
-                        clear_data(&data_glob);
-
                         data_glob.operator = I_CREATEFRAME;
                         DLL_InsertLast(&inst_list, &data_glob);
                         clear_data(&data_glob);
 
-                        return declare(token);
+                        int dec_ret = declare(token);
+
+                        data_glob.operator = I_MOVE;
+                        set_operand_value(&data_glob.result, tmp->id);
+                        data_glob.result.frame = F_LF;
+                        set_operand_value(&data_glob.operand_1, "$$$ret_val");
+                        data_glob.operand_1.frame = F_TF;
+                        DLL_InsertLast(&inst_list, &data_glob);
+                        clear_data(&data_glob);
+
+                        return dec_ret;
                     }
                 } else if (token->type == T_VAR_ID || token->type == T_INT_VAL || token->type == T_DEC_VAL || token->type == T_STRING_VAL || token->type == T_PAR_LEFT) {
                     set_symtable(symt_stack.top->symt);
                     int result = expression(token);
                     if (result == NO_ERR) {
                         symtable_add_type(tmp, ( convert_exp_to_d_type (final_type) )); 
+
+                        data_glob.operator = I_MOVE;
+                        set_operand_value(&data_glob.result, tmp->id);
+                        data_glob.result.frame = F_LF;
+                        set_operand_value(&data_glob.operand_1, "tmp1");
+                        data_glob.operand_1.frame = F_GF;
+                        DLL_InsertLast(&inst_list, &data_glob);
+                        clear_data(&data_glob);
+
+                        data_glob.operator = I_MOVE;
+                        set_operand_value(&data_glob.result, "tmp1");
+                        data_glob.result.frame = F_GF;
+                        data_glob.operand_1.type = D_VOID;
+                        set_operand_value(&data_glob.operand_1, "nil");
+                        DLL_InsertLast(&inst_list, &data_glob);
+                        clear_data(&data_glob);
+
                         // printf("############tmp : %d\n", tmp->type);
                         // generate_code("=,E_last,NULL,tmp"); псведокод
                     }
@@ -831,17 +1063,58 @@ int state(token_t * token) {
             break;
 
         case (T_FUN_ID):
-            if ((item_tmp = symtable_search(symt_stack.top->symt,token->data.string_c->str))!=NULL) {
-                return declare(token);    
+            if ((item_tmp = symtable_search(symt_stack.top->symt,token->data.string_c->str)) != NULL) {
+
+                data_glob.operator = I_CREATEFRAME;
+                DLL_InsertLast(&inst_list, &data_glob);
+                clear_data(&data_glob);
+
+                int dec_ret = declare(token);
+
+                return dec_ret;
             } else {
                 return SEM_ERR_UNDEFINED_FUNCTION;
             }
         case (T_KW_FUNCTION):
             printf("i am in function\n");
+
+
             if (( error_type = get_next_token(token) )) {
                 return error_type;
             }
             if (token->type == T_FUN_ID) {
+
+                data_glob.operator = I_LABEL;
+                set_operand_value(&data_glob.operand_1, token->data.string_c->str);
+                DLL_InsertFirst(&inst_list, &data_glob);
+                clear_data(&data_glob);
+
+                DLL_First(&inst_list);
+
+                data_glob.operator = I_PUSHFRAME;
+                DLL_InsertAfter(&inst_list, &data_glob);
+                clear_data(&data_glob);
+
+                DLL_Next(&inst_list);
+
+                data_glob.operator = I_DEFVAR;
+                data_glob.operand_1.frame = F_LF;
+                set_operand_value(&data_glob.operand_1, "$$$ret_value");
+                DLL_InsertAfter(&inst_list, &data_glob);
+                clear_data(&data_glob);
+
+                DLL_Next(&inst_list);
+
+                data_glob.operator = I_MOVE;
+                set_operand_value(&data_glob.result, "$$$ret_value");
+                data_glob.result.frame = F_LF;
+                data_glob.operand_1.type = D_VOID;
+                set_operand_value(&data_glob.operand_1, "nil");
+                DLL_InsertAfter(&inst_list, &data_glob);
+                clear_data(&data_glob);
+
+                DLL_Next(&inst_list);
+
                 symtable_stack_push(&symt_stack);
                 htab_data_t* item = symtable_search(symt_stack.top->symt, token->data.string_c->str);
                 if (item == NULL) {
@@ -883,7 +1156,31 @@ int state(token_t * token) {
                                 return error_type;
                             }
                             set_symtable(symt_stack.active->symt);
-                            return f_list(token);
+                            int f_ret = f_list(token);
+
+                            data_glob.operator = I_MOVE;
+                            data_glob.result.frame = F_LF;
+                            set_operand_value(&data_glob.result, "$$$ret_val");
+                            data_glob.operand_1.frame = F_GF;
+                            set_operand_value(&data_glob.operand_1, "tmp3");
+                            DLL_InsertAfter(&inst_list, &data_glob);
+                            clear_data(&data_glob);
+
+                            DLL_Next(&inst_list);
+
+                            data_glob.operator = I_POPFRAME;
+                            DLL_InsertAfter(&inst_list, &data_glob);
+                            clear_data(&data_glob);
+
+                            DLL_Next(&inst_list);
+
+                            data_glob.operator = I_RETURN;
+                            DLL_InsertAfter(&inst_list, &data_glob);
+                            clear_data(&data_glob);
+
+                            DLL_Next(&inst_list);
+
+                            return f_ret;
                         } else {
                             return SYNTAX_ERR;
                         }
@@ -990,6 +1287,7 @@ int st_list(token_t * token) {
         case (T_INT_VAL):
         case (T_STRING_VAL):
         case (T_DEC_VAL):
+        case (T_PAR_LEFT):
         case (T_KW_RETURN):
         case (T_VAR_ID):
         case (T_FUN_ID):
@@ -1074,6 +1372,7 @@ int main() {
     string s;
     str_init(&fun_list);
     str_init(&fun_name);
+    set_fun_name(&fun_name);
     DLL_Init(&inst_list);
     init_data(&data_glob);
     // printf("hi\n");

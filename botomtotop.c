@@ -6,9 +6,14 @@ bool ass_flag;
 // bool par_flag;
 exp_type* type;
 DLList* i_list;
+string* f_name;
 
 void set_symtable(symtable* source) {
     symt_l = source;
+}
+
+void set_fun_name(string* source) {
+    f_name = source;
 }
 
 void set_id (char* source) {
@@ -476,6 +481,7 @@ void tac_generate (instructions instruction, item_stack_t * op1, item_stack_t * 
 int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stack_t * op3, exp_type * type) {
     taCode data;
     init_data(&data);
+
     switch (rule) {
         case (R_ID):
             if (op1->etype == ET_UNDEFINED) {
@@ -507,12 +513,8 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
             // printf("t1 : %d\tt2 : %d\tt3 : %d\n", op1->etype, op2->etype, op3->etype);
             if (op1->etype == ET_INT && op3->etype == ET_INT) {
                 *type = ET_INT;
-                free_data_value(&data);
-                return NO_ERR;
             } else if (op1->etype == ET_FLOAT && op3->etype == ET_FLOAT) {
                 *type = ET_FLOAT;
-                free_data_value(&data);
-                return NO_ERR;
             } else if ((op1->etype == ET_INT || op1->etype == ET_FLOAT) && (op3->etype == ET_INT || op3->etype == ET_FLOAT)) {
                 if (op1->etype == ET_INT) {
 
@@ -521,11 +523,14 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                     data.result.frame = F_GF;
                     data.operand_1.type = exp_to_data(ET_NULL);
                     set_operand_value(&data.operand_1, "nil");
-                    DLL_InsertLast(i_list, &data);
+                    if (f_name->str[0] == '\0') {
+                        DLL_InsertLast(i_list, &data);
+                    } else {
+                        DLL_InsertAfter(i_list, &data);
+
+                        DLL_Next(i_list);
+                    }
                     clear_data(&data);
-                    // taCode tmp;
-                    // DLL_GetLast(i_list, &tmp);
-                    // printf("\t\t\t\t\t\t\t\t\ttmp : %s\n", tmp.operand_1.value);
 
                     data.operator = I_INT2FLOAT;
                     set_operand_value(&data.result, "tmp2");
@@ -534,16 +539,18 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                     char* ptr = NULL;
                     strtol(data.operand_1.value, &ptr, 10);
                     if (*ptr == '\0') {
-                        data.operand_1.type = exp_to_data(ET_INT);
+                        data.operand_1.type = D_FLOAT;
                     } else {
-                        // printf("\t\t\t\t\t\t\t\tptr : %c\n", *ptr);
                         data.operand_1.frame = F_GF;
                     }
-                    DLL_InsertLast(i_list, &data);
-                    clear_data(&data);
+                    if (f_name->str[0] == '\0') {
+                        DLL_InsertLast(i_list, &data);
+                    } else {
+                        DLL_InsertAfter(i_list, &data);
 
-                    // data.operand_1.type = exp_to_data(op1->etype);
-                    // generate(retype(op1, float));
+                        DLL_Next(i_list);
+                    }
+                    clear_data(&data);
                 } else {
 
                     data.operator = I_MOVE;
@@ -551,7 +558,13 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                     data.result.frame = F_GF;
                     data.operand_1.type = exp_to_data(ET_NULL);
                     set_operand_value(&data.operand_1, "nil");
-                    DLL_InsertLast(i_list, &data);
+                    if (f_name->str[0] == '\0') {
+                        DLL_InsertLast(i_list, &data);
+                    } else {
+                        DLL_InsertAfter(i_list, &data);
+
+                        DLL_Next(i_list);
+                    }
                     clear_data(&data);
                     // taCode tmp;
                     // DLL_GetLast(i_list, &tmp);
@@ -564,12 +577,18 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                     char* ptr = NULL;
                     strtol(data.operand_1.value, &ptr, 10);
                     if (*ptr == '\0') {
-                        data.operand_1.type = exp_to_data(ET_INT);
+                        data.operand_1.type = D_FLOAT;
                     } else {
                         // printf("\t\t\t\t\t\t\t\tptttr : %c\n", *ptr);
                         data.operand_1.frame = F_GF;
                     }
-                    DLL_InsertLast(i_list, &data);
+                    if (f_name->str[0] == '\0') {
+                        DLL_InsertLast(i_list, &data);
+                    } else {
+                        DLL_InsertAfter(i_list, &data);
+
+                        DLL_Next(i_list);
+                    }
                     clear_data(&data);
 
                     // generate(retype(op3, float));
@@ -588,13 +607,57 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                 data.operator = I_SUB;
             }
 
-            data.operand_1.frame = F_GF;
-            data.operand_1.type = exp_to_data(op1->etype);
-            set_operand_value(&data.result, "tmp1");
-            data.operator = I_ADD;
-            // printf("hi");
-            clear_data(&data);
+            if (op1->value == NULL) {
+                set_operand_value(&data.result, "tmp1");
+                data.result.frame = F_GF;
+                set_operand_value(&data.operand_1, "tmp1");
+                data.operand_1.frame = F_GF;
+                set_operand_value(&data.operand_2, op3->value);
+                char* ptr = NULL;
+                strtol(data.operand_2.value, &ptr, 10);
+                if (*ptr == '\0') {
+                    data.operand_2.type = exp_to_data(op3->etype);
+                } else {
+                    data.operand_2.frame = F_LF;
+                }
+                if (f_name->str[0] == '\0') {
+                    DLL_InsertLast(i_list, &data);
+                } else {
+                    DLL_InsertAfter(i_list, &data);
+
+                    DLL_Next(i_list);
+                }
+                clear_data(&data);
+            } else {
+                set_operand_value(&data.result, "tmp1");
+                data.result.frame = F_GF;
+                set_operand_value(&data.operand_1, op1->value);
+                char* ptr = NULL;
+                strtol(data.operand_1.value, &ptr, 10);
+                if (*ptr == '\0') {
+                    data.operand_1.type = exp_to_data(op1->etype);
+                } else {
+                    data.operand_1.frame = F_LF;
+                }
+                // *ptr = '\0';
+                set_operand_value(&data.operand_2, op3->value);
+                strtol(data.operand_2.value, &ptr, 10);
+                if (*ptr == '\0') {
+                    data.operand_2.type = exp_to_data(op3->etype);
+                } else {
+                    data.operand_2.frame = F_LF;
+                }
+                if (f_name->str[0] == '\0') {
+                    DLL_InsertLast(i_list, &data);
+                } else {
+                    DLL_InsertAfter(i_list, &data);
+
+                    DLL_Next(i_list);
+                }
+                clear_data(&data);
+            }
             
+            free_data_value(&data);
             return NO_ERR;
 
         case (R_EQ):
@@ -621,23 +684,21 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
             if (op1->etype == ET_FLOAT && op3->etype == ET_FLOAT) {
                 *type = ET_FLOAT;
                 // generate
-                return NO_ERR;
             } else if (op1->etype == ET_INT && op3->etype == ET_INT) {
                 *type = ET_FLOAT;
-                return NO_ERR;
-                //generate(retype)
-            } else if (op1->etype == ET_INT && op3->etype == ET_FLOAT) {
-
                 data.operator = I_MOVE;
                 set_operand_value(&data.result, "tmp2");
                 data.result.frame = F_GF;
                 data.operand_1.type = exp_to_data(ET_NULL);
                 set_operand_value(&data.operand_1, "nil");
-                DLL_InsertLast(i_list, &data);
+                if (f_name->str[0] == '\0') {
+                    DLL_InsertLast(i_list, &data);
+                } else {
+                    DLL_InsertAfter(i_list, &data);
+
+                    DLL_Next(i_list);
+                }
                 clear_data(&data);
-                // taCode tmp;
-                // DLL_GetLast(i_list, &tmp);
-                // printf("\t\t\t\t\t\t\t\t\ttmp : %s\n", tmp.operand_1.value);
 
                 data.operator = I_INT2FLOAT;
                 set_operand_value(&data.result, "tmp2");
@@ -649,12 +710,128 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                     data.operand_1.type = exp_to_data(ET_INT);
                 } else {
                     // printf("\t\t\t\t\t\t\t\tptr : %c\n", *ptr);
-                    data.operand_1.frame = F_GF;
+                    data.operand_1.frame = F_LF;
                 }
-                DLL_InsertLast(i_list, &data);
+                if (f_name->str[0] == '\0') {
+                    DLL_InsertLast(i_list, &data);
+                } else {
+                    DLL_InsertAfter(i_list, &data);
+
+                    DLL_Next(i_list);
+                }
                 clear_data(&data);
 
-                // generate(retype(op1, float));
+                data.operator = I_MOVE;
+                set_operand_value(&data.result, op1->value);
+                data.result.frame = F_LF;
+                set_operand_value(&data.operand_1, "tmp2");
+                data.operand_1.frame = F_GF;
+                if (f_name->str[0] == '\0') {
+                    DLL_InsertLast(i_list, &data);
+                } else {
+                    DLL_InsertAfter(i_list, &data);
+
+                    DLL_Next(i_list);
+                }
+                clear_data(&data);
+
+                data.operator = I_MOVE;
+                set_operand_value(&data.result, "tmp2");
+                data.result.frame = F_GF;
+                data.operand_1.type = exp_to_data(ET_NULL);
+                set_operand_value(&data.operand_1, "nil");
+                if (f_name->str[0] == '\0') {
+                    DLL_InsertLast(i_list, &data);
+                } else {
+                    DLL_InsertAfter(i_list, &data);
+
+                    DLL_Next(i_list);
+                }
+                clear_data(&data);
+
+                data.operator = I_INT2FLOAT;
+                set_operand_value(&data.result, "tmp2");
+                data.result.frame = F_GF;
+                set_operand_value(&data.operand_1, op3->value);
+                strtol(data.operand_1.value, &ptr, 10);
+                if (*ptr == '\0') {
+                    data.operand_1.type = exp_to_data(ET_INT);
+                } else {
+                    data.operand_1.frame = F_LF;
+                }
+                if (f_name->str[0] == '\0') {
+                    DLL_InsertLast(i_list, &data);
+                } else {
+                    DLL_InsertAfter(i_list, &data);
+
+                    DLL_Next(i_list);
+                }
+                clear_data(&data);
+
+                data.operator = I_MOVE;
+                set_operand_value(&data.result, op3->value);
+                data.result.frame = F_LF;
+                set_operand_value(&data.operand_1, "tmp2");
+                data.operand_1.frame = F_GF;
+                if (f_name->str[0] == '\0') {
+                    DLL_InsertLast(i_list, &data);
+                } else {
+                    DLL_InsertAfter(i_list, &data);
+
+                    DLL_Next(i_list);
+                }
+                clear_data(&data);
+
+            } else if (op1->etype == ET_INT && op3->etype == ET_FLOAT) {
+
+                data.operator = I_MOVE;
+                set_operand_value(&data.result, "tmp2");
+                data.result.frame = F_GF;
+                data.operand_1.type = exp_to_data(ET_NULL);
+                set_operand_value(&data.operand_1, "nil");
+                if (f_name->str[0] == '\0') {
+                    DLL_InsertLast(i_list, &data);
+                } else {
+                    DLL_InsertAfter(i_list, &data);
+
+                    DLL_Next(i_list);
+                }
+                clear_data(&data);
+
+                data.operator = I_INT2FLOAT;
+                set_operand_value(&data.result, "tmp2");
+                data.result.frame = F_GF;
+                set_operand_value(&data.operand_1, op1->value);
+                char* ptr = NULL;
+                strtol(data.operand_1.value, &ptr, 10);
+                if (*ptr == '\0') {
+                    data.operand_1.type = exp_to_data(ET_INT);
+                } else {
+                    data.operand_1.frame = F_LF;
+                }
+                if (f_name->str[0] == '\0') {
+                    DLL_InsertLast(i_list, &data);
+                } else {
+                    DLL_InsertAfter(i_list, &data);
+
+                    DLL_Next(i_list);
+                }
+                clear_data(&data);
+
+                data.operator = I_MOVE;
+                set_operand_value(&data.result, op1->value);
+                data.result.frame = F_LF;
+                set_operand_value(&data.operand_1, "tmp2");
+                data.operand_1.frame = F_GF;
+                if (f_name->str[0] == '\0') {
+                    DLL_InsertLast(i_list, &data);
+                } else {
+                    DLL_InsertAfter(i_list, &data);
+
+                    DLL_Next(i_list);
+                }
+                clear_data(&data);
+
             } else if (op3->etype == ET_INT && op1->etype == ET_FLOAT) {
 
                 data.operator = I_MOVE;
@@ -662,11 +839,14 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                 data.result.frame = F_GF;
                 data.operand_1.type = exp_to_data(ET_NULL);
                 set_operand_value(&data.operand_1, "nil");
-                DLL_InsertLast(i_list, &data);
+                if (f_name->str[0] == '\0') {
+                    DLL_InsertLast(i_list, &data);
+                } else {
+                    DLL_InsertAfter(i_list, &data);
+
+                    DLL_Next(i_list);
+                }
                 clear_data(&data);
-                // taCode tmp;
-                // DLL_GetLast(i_list, &tmp);
-                // printf("\t\t\t\t\t\t\t\t\ttmp : %s\n", tmp.operand_1.value);
 
                 data.operator = I_INT2FLOAT;
                 set_operand_value(&data.result, "tmp2");
@@ -677,16 +857,86 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
                 if (*ptr == '\0') {
                     data.operand_1.type = exp_to_data(ET_INT);
                 } else {
-                    // printf("\t\t\t\t\t\t\t\tptr : %c\n", *ptr);
-                    data.operand_1.frame = F_GF;
+                    data.operand_1.frame = F_LF;
                 }
-                DLL_InsertLast(i_list, &data);
+                if (f_name->str[0] == '\0') {
+                    DLL_InsertLast(i_list, &data);
+                } else {
+                    DLL_InsertAfter(i_list, &data);
+
+                    DLL_Next(i_list);
+                }
                 clear_data(&data);
-                
-                // generate(retype(op3, float));
+
+                data.operator = I_MOVE;
+                set_operand_value(&data.result, op3->value);
+                data.result.frame = F_LF;
+                set_operand_value(&data.operand_1, "tmp2");
+                data.operand_1.frame = F_GF;
+                if (f_name->str[0] == '\0') {
+                    DLL_InsertLast(i_list, &data);
+                } else {
+                    DLL_InsertAfter(i_list, &data);
+
+                    DLL_Next(i_list);
+                }
+                clear_data(&data);
+
             } else {
                 free_data_value(&data);
                 return SEM_ERR_TYPE_COMPAT;
+            }
+
+            if (op1->value == NULL) {
+                data.operator = I_DIV;
+                set_operand_value(&data.result, "tmp1");
+                data.result.frame = F_GF;
+                set_operand_value(&data.operand_1, "tmp1");
+                data.operand_1.frame = F_GF;
+                set_operand_value(&data.operand_2, op3->value);
+                char* ptr = NULL;
+                strtol(data.operand_2.value, &ptr, 10);
+                if (*ptr == '\0') {
+                    data.operand_2.type = D_FLOAT;
+                } else {
+                    data.operand_2.frame = F_LF;
+                }
+                if (f_name->str[0] == '\0') {
+                    DLL_InsertLast(i_list, &data);
+                } else {
+                    DLL_InsertAfter(i_list, &data);
+
+                    DLL_Next(i_list);
+                }
+                clear_data(&data);
+            } else {
+                data.operator = I_DIV;
+                set_operand_value(&data.result, "tmp1");
+                data.result.frame = F_GF;
+                set_operand_value(&data.operand_1, op1->value);
+                char* ptr = NULL;
+                strtol(data.operand_1.value, &ptr, 10);
+                if (*ptr == '\0') {
+                    data.operand_1.type = D_FLOAT;
+                } else {
+                    data.operand_1.frame = F_LF;
+                }
+                // *ptr = '\0';
+                set_operand_value(&data.operand_2, op3->value);
+                strtol(data.operand_2.value, &ptr, 10);
+                if (*ptr == '\0') {
+                    data.operand_2.type = D_FLOAT;
+                } else {
+                    data.operand_2.frame = F_LF;
+                }
+                if (f_name->str[0] == '\0') {
+                    DLL_InsertLast(i_list, &data);
+                } else {
+                    DLL_InsertAfter(i_list, &data);
+
+                    DLL_Next(i_list);
+                }
+                clear_data(&data);
             }
 
             *type = ET_FLOAT;
@@ -702,8 +952,6 @@ int check_sem (exp_rules rule, item_stack_t * op1, item_stack_t * op2, item_stac
             free_data_value(&data);
             return -1;
     }
-    // *type = ET_UNDEFINED;
-    // return NO_ERR;
 }
 
 int rule_test (int count, item_stack_t * op1, item_stack_t * op2, item_stack_t * op3, sstack_t * exp_stack) {
@@ -906,10 +1154,22 @@ int expression (token_t * token) {
                 stack_dispose(&exp_stack);
                 return SYNTAX_ERR;  
             } else {
-                // item_stack_t* tmp1;
-                // if ((tmp1 = get_top(&exp_stack)) != NULL) {
-                //     printf("type : %d\tvalue : %s\n", tmp1->etype, tmp1->value);
-                // }
+                item_stack_t* tmp1;
+                if ((tmp1 = get_top(&exp_stack)) != NULL && tmp1->value != NULL) {
+                    data.operator = I_MOVE;
+                    set_operand_value(&data.operand_1, tmp1->value);
+                    data.operand_1.type = exp_to_data(tmp1->etype);
+                    data.result.frame = F_GF;
+                    set_operand_value(&data.result, "tmp1");
+                    if (f_name->str[0] == '\0') {
+                        DLL_InsertLast(i_list, &data);
+                    } else {
+                        DLL_InsertAfter(i_list, &data);
+
+                        DLL_Next(i_list);
+                    }
+                    clear_data(&data);
+                }
                 free_data_value(&data);
                 stack_dispose(&exp_stack);
                 return NO_ERR;
@@ -924,8 +1184,14 @@ int expression (token_t * token) {
         data.operand_1.type = exp_to_data(tmp1->etype);
         data.result.frame = F_GF;
         set_operand_value(&data.result, "tmp1");
-        // printf("hihihihi\n");
-        DLL_InsertLast(i_list, &data);
+// printf("hihihihi\n");
+        if (f_name->str[0] == '\0') {
+            DLL_InsertLast(i_list, &data);
+        } else {
+            DLL_InsertAfter(i_list, &data);
+
+            DLL_Next(i_list);
+        }
         clear_data(&data);
     }
     // item_stack_t* tmp1;
